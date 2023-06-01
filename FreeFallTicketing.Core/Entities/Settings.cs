@@ -1,0 +1,37 @@
+﻿using SkyDiveTicketing.Core.Entities.Base;
+
+namespace SkyDiveTicketing.Core.Entities
+{
+    public class Settings : BaseEntity
+    {
+        public Settings() : base()
+        {
+            UserStatusInfo = new List<UserStatusInfo>();
+        }
+
+        public string? TermsAndConditionsUrl { get; set; }
+        public ICollection<UserStatusInfo> UserStatusInfo { get; set; }
+
+        public void SetStatus(UserStatus status, string description)
+        {
+            var userstatusInfo = UserStatusInfo.FirstOrDefault(c => c.UserStatus == status);
+            if (userstatusInfo is null)
+                UserStatusInfo.Add(new UserStatusInfo(status, description));
+            else
+                userstatusInfo.Description = description;
+        }
+
+    }
+
+    public class UserStatusInfo
+    {
+        public UserStatusInfo(UserStatus userStatus, string description)
+        {
+            UserStatus = userStatus;
+            Description = description;
+        }
+
+        public UserStatus UserStatus { get; set; }
+        public string Description { get; set; }
+    }
+}
