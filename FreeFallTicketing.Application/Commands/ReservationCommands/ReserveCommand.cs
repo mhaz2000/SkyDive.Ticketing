@@ -6,10 +6,20 @@ namespace SkyDiveTicketing.Application.Commands.Reservation
 {
     public class ReserveCommand : ICommandBase
     {
-        public Guid FlightLoadId { get; set; }
-        public int Type1SeatReservedQuantity { get; set; }
-        public int Type2SeatReservedQuantity { get; set; }
-        public int Type3SeatReservedQuantity { get; set; }
-        public void Validate() => new ReserveCommandValidator().Validate(this).RaiseExceptionIfRequired();
+        public List<ReserveDetailCommand> Items { get; set; }
+        public void Validate()
+        {
+            Items.ForEach(x => x.Validate());
+            new ReserveCommandValidator().Validate(this).RaiseExceptionIfRequired();
+        }
+    }
+
+    public class ReserveDetailCommand : ICommandBase
+    {
+        public Guid SkyDiveItemId { get; set; }
+        public Guid FlightLoadItemId { get; set; }
+        public int Qty { get; set; }
+
+        public void Validate() => new ReserveDetailCommandValidator().Validate(this).RaiseExceptionIfRequired();
     }
 }

@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.SkyDiveEventCommands;
 using SkyDiveTicketing.Application.Services.SkyDiveEventServices;
+using System.Data;
 
 namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
 {
@@ -18,6 +20,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             _skyDiveEventService = skyDiveEventService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(SkyDiveEventCommand command)
         {
@@ -43,6 +46,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] SkyDiveEventCommand command)
         {
@@ -51,6 +55,128 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
                 command.Validate();
 
                 await _skyDiveEventService.Update(command, id);
+                return OkResult("رویداد با موفقیت ویرایش شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("ToggleActivation/{id}")]
+        public async Task<IActionResult> ToggleActivation(Guid id)
+        {
+            try
+            {
+                await _skyDiveEventService.ToggleActivationEvent(id);
+                return OkResult("عملیات با موفقیت انجام شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+                await _skyDiveEventService.Remove(id);
+                return OkResult("رویداد با موفقیت حذف شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("AddEventTypeFee/{id}")]
+        public async Task<IActionResult> AddEventTypeFee(Guid id, [FromBody] AddEventTypeFeeCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _skyDiveEventService.AddEventTypeFee(command, id);
+                return OkResult("قیمت های واحد برای انواع بلیت ثبت شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("ConditionsAndTerms/{id}")]
+        public async Task<IActionResult> AddConditionsAndTerms(Guid id, [FromBody] AddEventConditionsAndTermsCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _skyDiveEventService.AddConditionsAndTerms(command, id);
+                return OkResult("شرایط و قوانین با موفقیت ثبت شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("AddFlight/{id}")]
+        public async Task<IActionResult> AddFlight(Guid id, [FromBody] AddSkyDiveEventFlightCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _skyDiveEventService.AddFlight(command, id);
                 return OkResult("رویداد با موفقیت ویرایش شد.");
             }
             catch (ManagedException e)
@@ -106,48 +232,6 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
-        [HttpPut("ToggleActivation/{id}")]
-        public async Task<IActionResult> ToggleActivation(Guid id)
-        {
-            try
-            {
-                await _skyDiveEventService.ToggleActivationEvent(id);
-                return OkResult("عملیات با موفقیت انجام شد.");
-            }
-            catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            try
-            {
-                await _skyDiveEventService.Remove(id);
-                return OkResult("رویداد با موفقیت حذف شد.");
-            }
-            catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (ValidationException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
-            }
-        }
-
         [HttpGet("GetLastCode")]
         public IActionResult GetLastCode(Guid id)
         {
@@ -172,7 +256,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
         {
             try
             {
-                var eventDays = await _skyDiveEventService.GetEventDays(id);
+                var eventDays = await _skyDiveEventService.GetEventDays(id, UserId);
                 return OkResult("روز های رویداد", eventDays, eventDays.Count());
             }
             catch (ManagedException e)
@@ -186,71 +270,15 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
-        [HttpPost("AddEventTypeFee/{id}")]
-        public async Task<IActionResult> AddEventTypeFee(Guid id, [FromBody] AddEventTypeFeeCommand command)
+        [HttpGet("EventDayFlights/{id}")]
+        public IActionResult GetEventDayFlights(Guid id, PageQuery page)
         {
             try
             {
-                command.Validate();
-
-                await _skyDiveEventService.AddEventTypeFee(command, id);
-                return OkResult("قیمت های واحد برای انواع بلیط ثبت شد.");
+                var tickets = _skyDiveEventService.GetEventDayFlights(id, page.PageSize);
+                return OkResult("بلیت های رویداد", tickets, tickets.Flights.Count());
             }
             catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (ValidationException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
-            }
-        }
-
-        [HttpPost("ConditionsAndTerms/{id}")]
-        public async Task<IActionResult> AddConditionsAndTerms(Guid id, [FromBody] AddEventConditionsAndTermsCommand command)
-        {
-            try
-            {
-                command.Validate();
-
-                await _skyDiveEventService.AddConditionsAndTerms(command, id);
-                return OkResult("شرایط و قوانین با موفقیت ثبت شد.");
-            }
-            catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (ValidationException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
-            }
-        }
-
-        [HttpPost("AddFlight/{id}")]
-        public async Task<IActionResult> AddFlight(Guid id, [FromBody] AddSkyDiveEventFlightCommand command)
-        {
-            try
-            {
-                command.Validate();
-
-                await _skyDiveEventService.AddFlight(command, id);
-                return OkResult("رویداد با موفقیت ویرایش شد.");
-            }
-            catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (ValidationException e)
             {
                 return BadRequest(e.Message);
             }

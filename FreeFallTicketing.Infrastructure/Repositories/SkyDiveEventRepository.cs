@@ -30,6 +30,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                     flightLoad.FlightLoadItems.Add(new FlightLoadItem(item.Key, item.Value));
                 }
 
+                skyDiveEventDay.FlightNumber = flightNumber;
                 skyDiveEventDay.FlightLoads.Add(flightLoad);
             }
         }
@@ -51,12 +52,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             await Context.SkyDiveEvents.AddAsync(skyDiveEvent);
         }
 
-        public IQueryable<SkyDiveEvent> FindEvents(Expression<Func<SkyDiveEvent, bool>> predicate)
+        public IQueryable<SkyDiveEvent> FindEvents(Expression<Func<SkyDiveEvent, bool>>? predicate = null)
         {
             return Context.SkyDiveEvents
                 .Include(c => c.TypesAmount).ThenInclude(c => c.Type)
                 .Include(c => c.Status)
-                .Include(c => c.Items).ThenInclude(c => c.FlightLoads)
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c=>c.FlightLoadItems).ThenInclude(c=>c.Tickets).ThenInclude(c=> c.ReservedBy)
                 .Where(predicate);
         }
 

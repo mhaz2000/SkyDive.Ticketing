@@ -93,7 +93,7 @@ namespace SkyDiveTicketing.Core.Entities
         public ICollection<SkyDiveEventItem> Items { get; set; }
 
         /// <summary>
-        /// قیمت واحد هر نوع بلیط
+        /// قیمت واحد هر نوع بلیت
         /// </summary>
         public ICollection<SkyDiveEventTicketTypeAmount> TypesAmount { get; set; }
 
@@ -114,6 +114,11 @@ namespace SkyDiveTicketing.Core.Entities
         /// تاریخ پرواز
         /// </summary>
         public DateTime Date { get; set; }
+
+        /// <summary>
+        /// تعداد پرواز
+        /// </summary>
+        public int FlightNumber { get; set; }
 
         /// <summary>
         /// گنجایش

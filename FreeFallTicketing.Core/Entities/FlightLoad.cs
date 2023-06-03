@@ -40,9 +40,12 @@ namespace SkyDiveTicketing.Core.Entities
         {
             FlightLoadType = flightLoadType;
             SeatNumber = seatNumber;
+            Tickets = new List<Ticket>();
         }
 
         public SkyDiveEventTicketType FlightLoadType { get; set; }
         public int SeatNumber { get; set; }
+
+        public ICollection<Ticket> Tickets { get; set; }
     }
 }

@@ -41,6 +41,8 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
             {
                 _unitOfWork.UserRepository.ChangeUserStatus(user, UserStatus.Active);
                 _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.");
+
+                //send sms
             }
             await _unitOfWork.CommitAsync();
         }

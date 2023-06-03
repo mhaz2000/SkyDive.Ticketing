@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Base;
-using SkyDiveTicketing.Application.Commands.FlightLoadCommands;
 using SkyDiveTicketing.Application.Commands.Reservation;
 using SkyDiveTicketing.Application.Services.ReservationServices;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +51,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
                 command.Validate();
 
                 await _reservationService.Update(command, id);
-                return OkResult("بلیط با موفقیت ویرایش شد.");
+                return OkResult("بلیت با موفقیت ویرایش شد.");
             }
             catch (ManagedException e)
             {
@@ -77,7 +76,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
                 command.Validate();
 
                 await _reservationService.RegisterIdentityDocuments(command);
-                return OkResult("بلیط با موفقیت ویرایش شد.");
+                return OkResult("بلیت با موفقیت ویرایش شد.");
             }
             catch (ManagedException e)
             {
@@ -100,7 +99,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             try
             {
                 await _reservationService.CancelTicket(id);
-                return OkResult("بلیط با موفقیت کنسل شد.");
+                return OkResult("بلیت با موفقیت کنسل شد.");
             }
             catch (ManagedException e)
             {
@@ -123,7 +122,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             try
             {
                 var tickets = await _reservationService.GetTickets();
-                return OkResult("اطلاعات بلیط های خریداری شده.", tickets);
+                return OkResult("اطلاعات بلیت های خریداری شده.", tickets);
             }
             catch (ManagedException e)
             {

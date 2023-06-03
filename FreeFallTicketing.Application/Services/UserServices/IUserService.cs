@@ -31,5 +31,15 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         Task InactivateUser(UserCommand command);
 
         Task CheckPersonalInformation(UserCheckPersonalInformationCommand command);
+
+        Task AssignUserType(AssignUserTypeCommand command);
+
+        Task<bool> CheckIfUserIsActive(Guid id);
+
+        Task<UserInformationDTO> GetUserInformation(Guid userId);
+
+        Task<UserPersonalInformationDTO> GetPersonalInformation(Guid userId);
+
+        Task<UserDocumentsDTO> GetUserDocuments(Guid userId);
     }
 }

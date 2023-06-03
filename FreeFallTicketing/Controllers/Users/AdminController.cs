@@ -90,5 +90,30 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 throw new SystemException("متاسفانه خطای سیستمی رخ داده");
             }
         }
+
+        [HttpPut("AssignUserType")]
+        public async Task<IActionResult> AssignUserType(AssignUserTypeCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _userService.AssignUserType(command);
+                return OkResult("نوع حساب کاربر با موفقیت به کاربر انتصاب داده شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
     }
 }

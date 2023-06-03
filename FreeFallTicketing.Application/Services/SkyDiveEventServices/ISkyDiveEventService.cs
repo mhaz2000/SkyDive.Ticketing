@@ -13,8 +13,9 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
         Task ToggleActivationEvent(Guid id);
         Task AddFlight(AddSkyDiveEventFlightCommand command, Guid id);
         string GetLastCode(Guid id);
-        Task<IEnumerable<SkyDiveEventDaysDTO>> GetEventDays(Guid id);
+        Task<IEnumerable<SkyDiveEventDaysDTO>> GetEventDays(Guid id, Guid userId);
         Task AddEventTypeFee(AddEventTypeFeeCommand command, Guid id);
         Task AddConditionsAndTerms(AddEventConditionsAndTermsCommand command, Guid id);
+        SkyDiveEventItemDTO GetEventDayFlights(Guid id, int pageSize);
     }
 }

@@ -6,7 +6,7 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface ISkyDiveEventRepository : IRepository<SkyDiveEvent>
     {
-        IQueryable<SkyDiveEvent> FindEvents(Expression<Func<SkyDiveEvent, bool>> predicate);
+        IQueryable<SkyDiveEvent> FindEvents(Expression<Func<SkyDiveEvent, bool>>? predicate = null);
         Task Create(int code, string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status);
         void ToggleActivation(SkyDiveEvent skyDiveEvent);
         void Update(string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status, SkyDiveEvent skyDiveEvent);

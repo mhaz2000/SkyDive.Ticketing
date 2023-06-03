@@ -26,7 +26,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             try
             {
                 var skyDiveEventTicketTypes = await _skyDiveEventTicketTypeService.GetAllSkyDiveEventTicketTypes();
-                return OkResult("انواع بلیط.", skyDiveEventTicketTypes, skyDiveEventTicketTypes.Count());
+                return OkResult("انواع بلیت.", skyDiveEventTicketTypes, skyDiveEventTicketTypes.Count());
             }
             catch (ManagedException e)
             {
@@ -47,7 +47,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
                 command.Validate();
 
                 await _skyDiveEventTicketTypeService.Create(command);
-                return OkResult("نوع بلیط جدید با موفقیت ثبت شد.");
+                return OkResult("نوع بلیت جدید با موفقیت ثبت شد.");
             }
             catch (ManagedException e)
             {
@@ -72,7 +72,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
                 command.Validate();
 
                 await _skyDiveEventTicketTypeService.Update(command, id);
-                return OkResult("نوع بلیط با موفقیت ویرایش شد.");
+                return OkResult("نوع بلیت با موفقیت ویرایش شد.");
             }
             catch (ManagedException e)
             {
@@ -114,7 +114,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             try
             {
                 await _skyDiveEventTicketTypeService.Remove(id);
-                return OkResult("نوع بلیط با موفقیت حذف شد.");
+                return OkResult("نوع بلیت با موفقیت حذف شد.");
             }
             catch (ManagedException e)
             {

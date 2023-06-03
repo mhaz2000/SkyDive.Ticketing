@@ -39,5 +39,7 @@ namespace SkyDiveTicketing.Core.Repositories
         void LoginFailed(User user);
 
         void AddMessage(User user, string message);
+
+        void AssignUserType(User user, UserType userType);
     }
 }

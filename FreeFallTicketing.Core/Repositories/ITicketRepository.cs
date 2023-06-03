@@ -15,5 +15,7 @@ namespace SkyDiveTicketing.Core.Repositories
 
         void AddTicketPassenger(Ticket ticket, string nationalCode, DefaultCity city, string address, float height, float weight, string emergencyContact, string emergencyPhone,
             Guid medicalDocumentFileId, Guid logBookDocumentFileId, Guid attorneyDocumentFileId, Guid nationalCardDocumentFileId);
+
+        void AddTicket(FlightLoadItem flightLoadItem, User user, int flightNumber, SkyDiveEvent skyDiveEvent);
     }
 }

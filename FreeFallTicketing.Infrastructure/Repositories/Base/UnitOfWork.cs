@@ -17,10 +17,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
         private PassengerRepository? _passengerRepository;
         private FileModelRepository? _fileModelRepository;
         private FlightLoadRepository? _flightLoadRepository;
+        private ShoppingCartRepository? _shoppingCartRepository;
         private SkyDiveEventRepository? _skyDiveEventRepository;
-        private SkyDiveEventTicketTypeRepository? _skyDiveEventTicketTypeRepository;
+        private SkyDiveEventItemRepository? _skyDiveEventItemRepository;
         private PassengerDocumentRepository? _passengerDocumentRepository;
         private SkyDiveEventStatusRepository? _skyDiveEventStatusRepository;
+        private SkyDiveEventTicketTypeRepository? _skyDiveEventTicketTypeRepository;
         private FlightLoadCancellationTypeRepository? _flightLoadCancellationTypeRepository;
 
         public UnitOfWork(DataContext context) => _context = context;
@@ -43,15 +45,20 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
 
         public IFlightLoadRepository FlightLoadRepository => _flightLoadRepository ?? new FlightLoadRepository(_context);
 
+        public IShoppingCartRepository ShoppingCartRepository => _shoppingCartRepository ?? new ShoppingCartRepository(_context);
+
         public ISkyDiveEventRepository SkyDiveEventRepository => _skyDiveEventRepository ?? new SkyDiveEventRepository(_context);
 
-        public ISkyDiveEventTicketTypeRepository SkyDiveEventTicketTypeRepository => _skyDiveEventTicketTypeRepository ?? new SkyDiveEventTicketTypeRepository(_context);
+        public ISkyDiveEventItemRepository SkyDiveEventItemRepository => _skyDiveEventItemRepository ?? new SkyDiveEventItemRepository(_context);
 
         public IPassengerDocumentRepository PassengerDocumentRepository => _passengerDocumentRepository ?? new PassengerDocumentRepository(_context);
 
         public ISkyDiveEventStatusRepository SkyDiveEventStatusRepository => _skyDiveEventStatusRepository ??  new SkyDiveEventStatusRepository(_context);
 
+        public ISkyDiveEventTicketTypeRepository SkyDiveEventTicketTypeRepository => _skyDiveEventTicketTypeRepository ?? new SkyDiveEventTicketTypeRepository(_context);
+
         public IFlightLoadCancellationTypeRepository FlightLoadCancellationTypeRepository => _flightLoadCancellationTypeRepository ?? new FlightLoadCancellationTypeRepository(_context);
+
 
         public async Task<int> CommitAsync()
         {

@@ -19,6 +19,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             user.AddMessage(new Message(message));
         }
 
+        public void AssignUserType(User user, UserType userType)
+        {
+            user.UserType = userType;
+        }
+
         public void ChangeUserStatus(User user, UserStatus status)
         {
             user.Status = status;
@@ -61,7 +66,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public async Task<string> CreateAsync(string phone)
         {
-            var defaultType = await Context.UserTypes.FirstOrDefaultAsync(c=> c.IsDefault);
+            var defaultType = await Context.UserTypes.FirstOrDefaultAsync(c => c.IsDefault);
             var user = new User()
             {
                 Status = UserStatus.AwaitingCompletion,
@@ -119,7 +124,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public void InactivateUser(User user)
         {
-            user.Status= UserStatus.Inactive;
+            user.Status = UserStatus.Inactive;
         }
 
         public void LoginFailed(User user)

@@ -7,7 +7,7 @@ namespace SkyDiveTicketing.Application.Validators.FlightLoadValidators
     {
         public RegisterIdentityDocumentCommandValidator()
         {
-            RuleFor(c => c.TicketId).NotNull().NotEmpty().WithMessage("شناسه بلیط اجباری است.");
+            RuleFor(c => c.TicketId).NotNull().NotEmpty().WithMessage("شناسه بلیت اجباری است.");
             RuleFor(c => c.Documents.Count()).GreaterThan(0).WithMessage("اطلاعات مسافران اجباری است.");
         }
     }

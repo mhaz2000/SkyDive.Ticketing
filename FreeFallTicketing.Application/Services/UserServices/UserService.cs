@@ -228,6 +228,21 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await _unitOfWork.CommitAsync();
         }
 
+        public async Task AssignUserType(AssignUserTypeCommand command)
+        {
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == command.Id && c.Status != UserStatus.Inactive, c => c.UserType);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            var userType = await _unitOfWork.UserTypeRepository.GetByIdAsync(command.UserTypeId);
+            if (userType is null)
+                throw new ManagedException("نوع کاربری یافت نشد.");
+
+            _unitOfWork.UserRepository.AssignUserType(user, userType);
+            await _unitOfWork.CommitAsync();
+
+        }
+
         private void UploadDocument(User user, UserPersonalInformationCompletionCommand command)
         {
             if (command.NationalCardDocument is not null)
@@ -251,6 +266,56 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, city, command.Address ?? string.Empty, command.EmergencyContact ?? string.Empty,
                 command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
+        }
+
+        public async Task<bool> CheckIfUserIsActive(Guid id)
+        {
+            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Id == id && c.Status != UserStatus.Inactive);
+            if (user is null || user.Status != UserStatus.Active)
+                return false;
+
+            return true;
+        }
+
+        public async Task<UserInformationDTO> GetUserInformation(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId && c.Status != UserStatus.Inactive, c => c.UserType);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            return new UserInformationDTO(userId, user.CreatedAt, user.UpdatedAt, user.Code, user.UserName, user.PhoneNumber, user.Status.GetDescription(), user.UserType.Title);
+        }
+
+        public async Task<UserPersonalInformationDTO> GetPersonalInformation(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId && c.Status != UserStatus.Inactive, c => c.Passenger.City);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            return new UserPersonalInformationDTO(user.Id, user.CreatedAt, user.UpdatedAt, user.NationalCode,user.BirthDate, user.FirstName, user.LastName,
+                user.Email, user.Passenger?.City?.Id, user.Passenger?.City?.State, user.Passenger?.City?.City, user.Passenger?.Address, user.Passenger?.Weight, user.Passenger?.Height);
+        }
+
+        public async Task<UserDocumentsDTO> GetUserDocuments(Guid userId)
+        {
+            Expression<Func<User, object>>[] includeExpressions = {
+                c => c.Passenger.AttorneyDocumentFile,
+                c => c.Passenger.NationalCardDocumentFile,
+                c=> c.Passenger.LogBookDocumentFile,
+                c=> c.Passenger.MedicalDocumentFile
+            };
+
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId && c.Status != UserStatus.Inactive, includeExpressions);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            return new UserDocumentsDTO(userId, user.CreatedAt, user.UpdatedAt)
+            {
+                AttorneyDocument = user.Passenger?.AttorneyDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.AttorneyDocumentFile.Id, user.Passenger.AttorneyDocumentFile.ExpirationDate) : null,
+                MedicalDocument = user.Passenger?.MedicalDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.MedicalDocumentFile.Id, user.Passenger.MedicalDocumentFile.ExpirationDate) : null,
+                LogBookDocument = user.Passenger?.LogBookDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.LogBookDocumentFile.Id, user.Passenger.LogBookDocumentFile.ExpirationDate) : null,
+                NationalCardDocument = user.Passenger?.NationalCardDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.NationalCardDocumentFile.Id, user.Passenger.NationalCardDocumentFile.ExpirationDate) : null
+            };
         }
     }
 }

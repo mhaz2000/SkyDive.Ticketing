@@ -10,6 +10,7 @@ namespace SkyDiveTicketing.Core.Entities
         }
 
         public string? TermsAndConditionsUrl { get; set; }
+        public float VAT { get; set; }
         public ICollection<UserStatusInfo> UserStatusInfo { get; set; }
 
         public void SetStatus(UserStatus status, string description)

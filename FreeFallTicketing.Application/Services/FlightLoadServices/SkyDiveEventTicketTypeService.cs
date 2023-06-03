@@ -35,7 +35,7 @@ namespace SkyDiveTicketing.Application.Services.FlightLoadServices
         {
             var skyDiveEventTicketType = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetByIdAsync(id);
             if (skyDiveEventTicketType is null)
-                throw new ManagedException("نوع بلیط یافت نشد.");
+                throw new ManagedException("نوع بلیت یافت نشد.");
 
             return new SkyDiveEventTicketTypeDTO(skyDiveEventTicketType.Id, skyDiveEventTicketType.CreatedAt, skyDiveEventTicketType.UpdatedAt, skyDiveEventTicketType.Title, skyDiveEventTicketType.Capacity);
         }
@@ -43,7 +43,7 @@ namespace SkyDiveTicketing.Application.Services.FlightLoadServices
         {
             var skyDiveEventTicketType = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetByIdAsync(id);
             if (skyDiveEventTicketType is null)
-                throw new ManagedException("نوع بلیط یافت نشد.");
+                throw new ManagedException("نوع بلیت یافت نشد.");
 
             //check if used
             await _unitOfWork.CommitAsync();
@@ -53,7 +53,7 @@ namespace SkyDiveTicketing.Application.Services.FlightLoadServices
         {
             var skyDiveEventTicketType = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetByIdAsync(id);
             if (skyDiveEventTicketType is null)
-                throw new ManagedException("نوع بلیط یافت نشد.");
+                throw new ManagedException("نوع بلیت یافت نشد.");
 
             //check if used
             await _unitOfWork.CommitAsync();

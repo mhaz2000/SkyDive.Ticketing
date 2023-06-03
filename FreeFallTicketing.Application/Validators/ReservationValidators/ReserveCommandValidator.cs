@@ -7,11 +7,8 @@ namespace SkyDiveTicketing.Application.Validators.ReservationValidators
     {
         public ReserveCommandValidator()
         {
-            RuleFor(c=> c.FlightLoadId).NotNull().NotEmpty().WithMessage("شناسه لود پرواز نمی‌تواند خالی باشد.");
-
-            RuleFor(c => c.Type1SeatReservedQuantity).NotNull().NotEmpty().WithMessage("تعداد صندلی های رزروی نوع 1 نمی‌تواند خالی باشد.");
-            RuleFor(c => c.Type2SeatReservedQuantity).NotNull().NotEmpty().WithMessage("تعداد صندلی های رزروی نوع 2 نمی‌تواند خالی باشد.");
-            RuleFor(c => c.Type3SeatReservedQuantity).NotNull().NotEmpty().WithMessage("تعداد صندلی های رزروی نوع 3 نمی‌تواند خالی باشد.");
+            RuleFor(c=> c.Items).NotNull().NotEmpty().WithMessage("آیتم های سبد خرید نمی‌تواند خالی باشد.");
+            RuleFor(c => c.Items.Count()).GreaterThan(0).WithMessage("حداقل یه بلیت را انتخاب کنید.");
         }
     }
 }

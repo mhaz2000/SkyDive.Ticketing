@@ -2,13 +2,13 @@
 {
     public class SkyDiveEventDaysDTO : BaseDTO<Guid>
     {
-        public SkyDiveEventDaysDTO(Guid id, DateTime createdAt, DateTime updatedAt, DateTime date, int capacity) : base(id, createdAt, updatedAt)
+        public SkyDiveEventDaysDTO(Guid id, DateTime createdAt, DateTime updatedAt, DateTime date, int emptyCapacity, int flightNumber, int ticketNumber) : base(id, createdAt, updatedAt)
         {
             Date = date;
-            Capacity = capacity;
+            EmptyCapacity = emptyCapacity;
         }
 
         public DateTime Date { get; set; }
-        public int Capacity { get; set; }
+        public int EmptyCapacity { get; set; }
     }
 }

@@ -44,5 +44,18 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
             return await Context.Tickets.Include(c => c.Passengers).ThenInclude(c => c.City).FirstOrDefaultAsync(c => c.Id == id);
         }
+
+        public void AddTicket(FlightLoadItem flightLoadItem, User user, int flightNumber, SkyDiveEvent skyDiveEvent)
+        {
+            var lastNumber = skyDiveEvent.Items.SelectMany(s => s.FlightLoads, (skyDiveEventItem, flightLoad) => flightLoad)?
+                .SelectMany(c => c.FlightLoadItems, (flightLoad, flightLoadItem) => flightLoadItem)?
+                .SelectMany(c => c.Tickets, (item, ticket) => ticket)?.OrderByDescending(c => c.TicketNumber)?.FirstOrDefault()?.TicketNumber;
+
+            var counter = string.IsNullOrEmpty(lastNumber) ? int.Parse(lastNumber.Substring(lastNumber.Count() - 4)) : 1;
+
+            var number = skyDiveEvent.Code.ToString("000") + flightNumber.ToString("000") + counter.ToString("0000");
+
+            flightLoadItem.Tickets.Add(new Ticket(number, false, user, false));
+        }
     }
 }

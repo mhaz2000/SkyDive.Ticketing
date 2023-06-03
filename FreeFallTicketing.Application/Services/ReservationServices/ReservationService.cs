@@ -19,7 +19,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
         {
             var ticket = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).FirstOrDefault(c => c.Id == id);
             if (ticket is null)
-                throw new ManagedException("بلیط مورد نظر یافت نشد.");
+                throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
             if (ticket.FlightLoad.CancellationTypes.Any())
             {
@@ -40,39 +40,33 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task<Guid> Create(ReserveCommand command)
+        public async Task<Guid> Create(ReserveCommand command, Guid userId)
         {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
             List<string> errors = new List<string>();
 
-            var flightLoad = await _unitOfWork.FlightLoadRepository.GetByIdAsync(command.FlightLoadId);
-            if (flightLoad is null)
-                throw new ManagedException("لود پرواز مورد نظر یافت نشد.");
-
-            var previousReserves = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).Where(c => c.FlightLoad.Id == command.FlightLoadId);
-
-            if (previousReserves.Any())
+            foreach (var item in command.Items)
             {
-                var reservedType1Seat = previousReserves.Sum(c => c.Type1SeatReservedQuantity);
-                var reservedType2Seat = previousReserves.Sum(c => c.Type2SeatReservedQuantity);
-                var reservedType3Seat = previousReserves.Sum(c => c.Type3SeatReservedQuantity);
+                var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Items.Any(c => c.Id == item.SkyDiveItemId)).FirstOrDefault();
+                if (skyDiveEvent is null)
+                    throw new ManagedException("رویدادی پیدا نشد.");
 
-                if (reservedType1Seat < command.Type1SeatReservedQuantity)
-                    errors.Add("گنجایش صندلی‌های نوع 1 کمتر از میزان درخواستی شما است.");
+                var skyDiveEventItem = skyDiveEvent.Items.FirstOrDefault(c => c.Id == item.SkyDiveItemId);
+                var flightLoad = skyDiveEventItem.FlightLoads.FirstOrDefault(c => c.FlightLoadItems.Any(t => t.Id == item.FlightLoadItemId));
+                var flightLoadItem = flightLoad.FlightLoadItems.FirstOrDefault(c => c.Id == item.FlightLoadItemId);
 
-                if (reservedType2Seat < command.Type2SeatReservedQuantity)
-                    errors.Add("گنجایش صندلی‌های نوع 2 کمتر از میزان درخواستی شما است.");
-
-                if (reservedType3Seat < command.Type3SeatReservedQuantity)
-                    errors.Add("گنجایش صندلی‌های نوع 3 کمتر از میزان درخواستی شما است.");
+                if (flightLoadItem.SeatNumber - (flightLoadItem.Tickets.Count() + item.Qty) < 0)
+                    errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {flightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
+                else
+                {
+                    _unitOfWork.TicketRepository.AddTicket(flightLoadItem, user, flightLoad.Number, skyDiveEvent);
+                    //add to shopping cart
+                }
             }
 
-            if (errors.Any())
-                throw new ManagedException(string.Join("\n", errors));
-
-            var ticketId = await _unitOfWork.TicketRepository.ReserveTicket(command.Type1SeatReservedQuantity, command.Type2SeatReservedQuantity, command.Type3SeatReservedQuantity, flightLoad);
-            await _unitOfWork.CommitAsync();
-
-            return ticketId;
         }
 
         public async Task Update(ReserveCommand command, Guid id)
@@ -81,7 +75,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             var ticket = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).FirstOrDefault(c => c.Id == id);
             if (ticket is null)
-                throw new ManagedException("بلیط مورد نظر یافت نشد.");
+                throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
             var previousReserves = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).Where(c => c.Id != id && c.FlightLoad.Id == command.FlightLoadId);
 
@@ -137,7 +131,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             var ticket = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).FirstOrDefault(c => c.Id == command.TicketId);
             if (ticket is null)
-                throw new ManagedException("بلیط مورد نظر یافت نشد.");
+                throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
             foreach (var passengerCommand in command.Documents)
             {

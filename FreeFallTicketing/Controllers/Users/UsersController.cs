@@ -6,6 +6,7 @@ using SkyDiveTicketing.Application.Services.UserServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.Application.Services.PassengerServices;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SkyDiveTicketing.API.Controllers.Users
 {
@@ -105,7 +106,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
-
         [HttpPost("UserSecurityInformationCompletion")]
         public async Task<IActionResult> UserSecurityInformationCompletion(UserSecurityInformationCompletionCommand command)
         {
@@ -161,7 +161,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
         {
             try
             {
-                await _userService.InactivateUser(new UserCommand() { Id = UserId.ToString() });
+                await _userService.InactivateUser(new UserCommand() { Id = UserId });
                 return OkResult("حساب کاربری غیر فعال گردید..");
             }
             catch (ManagedException e)
@@ -200,6 +200,12 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
+        /// <summary>
+        /// ورود بر اساس sms
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        /// <exception cref="SystemException"></exception>
         [AllowAnonymous]
         [HttpPost("OtpLogin")]
         public async Task<IActionResult> OtpLogin(OtpUserConfirmationCommand command)
@@ -224,6 +230,13 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
+        /// <summary>
+        /// ارسال اطلاعات تکمیلی کاربر برای فعال سازی حساب کاربری/
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="registration"></param>
+        /// <returns></returns>
+        /// <exception cref="SystemException"></exception>
         [HttpPost("UserPersonalInformationCompletion/{registration}")]
         public async Task<IActionResult> UserPersonalInformationCompletion(UserPersonalInformationCompletionCommand command, bool registration)
         {
@@ -248,5 +261,80 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 throw new SystemException("متاسفانه خطای سیستمی رخ داده");
             }
         }
+
+        /// <summary>
+        /// بررسی اینکه آیا حساب کاربر فعال است یا خیر
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="SystemException"></exception>
+        [HttpGet("CheckIfUserIsActive")]
+        public async Task<IActionResult> CheckIfUserIsActive()
+        {
+            try
+            {
+                var isActive = await _userService.CheckIfUserIsActive(UserId);
+                return OkResult("وضعیت حساب کاربری.", isActive);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+        /// <summary>
+        /// اطلاعات کاربری
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="SystemException"></exception>
+        [HttpGet("GetUserInformation")]
+        public async Task<IActionResult> GetUserInformation()
+        {
+
+            try
+            {
+                var user = await _userService.GetUserInformation(UserId);
+                return OkResult("اطلاعات کاربری.", user);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+
+        /// <summary>
+        /// اطلاعات شخصی
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="SystemException"></exception>
+        [HttpGet("GetPersonalInformation")]
+        public async Task<IActionResult> GetPersonalInformation()
+        {
+            try
+            {
+                var user = await _userService.GetPersonalInformation(UserId);
+                return OkResult("اطلاعات شخصی.", user);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
     }
 }

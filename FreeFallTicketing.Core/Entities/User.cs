@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel;
 using static SkyDiveTicketing.Core.Entities.User;
 
 namespace SkyDiveTicketing.Core.Entities
@@ -126,9 +127,13 @@ namespace SkyDiveTicketing.Core.Entities
 
     public enum UserStatus
     {
+        [Description("فعال")]
         Active = 1,
+        [Description("غیر فعال")]
         Inactive,
+        [Description("در انتظار تایید")]
         Pending,
+        [Description("در انتظار تکمیل")]
         AwaitingCompletion
     }
 }
