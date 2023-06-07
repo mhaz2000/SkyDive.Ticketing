@@ -23,17 +23,17 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// نام
         /// </summary>
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         /// <summary>
         /// نام خانوادگی
         /// </summary>
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         /// <summary>
         /// تاریخ تولد
         /// </summary>
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
 
         /// <summary>
         /// تاریخ ثبت نام
@@ -48,7 +48,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// کد ملی
         /// </summary>
-        public string NationalCode { get; set; }
+        public string? NationalCode { get; set; }
 
         /// <summary>
         /// وضعیت
@@ -58,12 +58,12 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// نوع حساب کاربری
         /// </summary>
-        public UserType UserType { get; set; }
+        public UserType? UserType { get; set; }
 
         /// <summary>
         /// کد ارسالی
         /// </summary>
-        public string OtpCode { get; set; }
+        public string? OtpCode { get; set; }
 
         /// <summary>
         /// زمان درخواست کد
@@ -73,7 +73,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// تعداد دفعاتی که ورود با خطا مواجه گشت.
         /// </summary>
-        public int LoginFailedAttempts { get; set; }
+        public int? LoginFailedAttempts { get; set; }
 
         /// <summary>
         /// آیا اطلاعات شخصی وارد شده است.
@@ -83,18 +83,16 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// اطلاعات مسافر
         /// </summary>
-        public Passenger Passenger { get; set; }
+        public Passenger? Passenger { get; set; }
 
         /// <summary>
         /// پیام های کاربر
         /// </summary>
-        public ICollection<Message> Messages { get; private set; }
+        public ICollection<Message>? Messages { get; private set; }
 
         public List<RefreshToken> RefreshTokens { get; set; }
 
         public string FullName => FirstName + " " + LastName;
-
-
 
 
         public void AddMessage(Message message)

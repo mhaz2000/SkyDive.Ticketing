@@ -2,6 +2,11 @@
 {
     public class DefaultCity
     {
+        public DefaultCity()
+        {
+
+        }
+
         public DefaultCity(string province, string state, string city)
         {
             Id = Guid.NewGuid();

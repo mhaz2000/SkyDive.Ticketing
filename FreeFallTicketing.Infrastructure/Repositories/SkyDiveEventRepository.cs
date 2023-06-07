@@ -91,13 +91,9 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             skyDiveEvent.Location = location;
             skyDiveEvent.Voidable = voidable;
             skyDiveEvent.SubjecToVAT = subjecToVAT;
-
-            skyDiveEvent.Images.Clear(); //temporary
-            skyDiveEvent.Images.Add(image);
-
+            skyDiveEvent.Image=image;
             skyDiveEvent.StartDate = startDate;
             skyDiveEvent.EndDate = endDate;
-
         }
     }
 }

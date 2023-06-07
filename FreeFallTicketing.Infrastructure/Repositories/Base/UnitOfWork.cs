@@ -22,10 +22,14 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
         private SkyDiveEventRepository? _skyDiveEventRepository;
         private AdminCartableRepository _adminCartableRepository;
         private SkyDiveEventItemRepository? _skyDiveEventItemRepository;
-        private PassengerDocumentRepository? _passengerDocumentRepository;
         private SkyDiveEventStatusRepository? _skyDiveEventStatusRepository;
         private SkyDiveEventTicketTypeRepository? _skyDiveEventTicketTypeRepository;
+        private PassengerMedicalDocumentRepository? _passengerMedicalDocumentRepository;
+        private PassengerLogBookDocumentRepository? _passengerLogBookDocumentRepository;
+        private PassengerAttorneyDocumentRepository? _passengerAttorneyDocumentRepository;
         private FlightLoadCancellationTypeRepository? _flightLoadCancellationTypeRepository;
+        private PassengerNationalCardDocumentRepository? _passengerNationalCardDocumentRepository;
+
 
         public UnitOfWork(DataContext context) => _context = context;
 
@@ -57,15 +61,19 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
 
         public ISkyDiveEventItemRepository SkyDiveEventItemRepository => _skyDiveEventItemRepository ?? new SkyDiveEventItemRepository(_context);
 
-        public IPassengerDocumentRepository PassengerDocumentRepository => _passengerDocumentRepository ?? new PassengerDocumentRepository(_context);
-
         public ISkyDiveEventStatusRepository SkyDiveEventStatusRepository => _skyDiveEventStatusRepository ??  new SkyDiveEventStatusRepository(_context);
 
         public ISkyDiveEventTicketTypeRepository SkyDiveEventTicketTypeRepository => _skyDiveEventTicketTypeRepository ?? new SkyDiveEventTicketTypeRepository(_context);
 
+        public IPassengerMedicalDocumentRepository PassengerMedicalDocumentRepository => _passengerMedicalDocumentRepository ?? new PassengerMedicalDocumentRepository(_context);
+
+        public IPassengerLogBookDocumentRepository PassengerLogBookDocumentRepository => _passengerLogBookDocumentRepository ?? new PassengerLogBookDocumentRepository(_context);
+
+        public IPassengerAttorneyDocumentRepository PassengerAttorneyDocumentRepository => _passengerAttorneyDocumentRepository ?? new PassengerAttorneyDocumentRepository(_context);
+
         public IFlightLoadCancellationTypeRepository FlightLoadCancellationTypeRepository => _flightLoadCancellationTypeRepository ?? new FlightLoadCancellationTypeRepository(_context);
 
-
+        public IPassengerNationalCardDocumentRepository PassengerNationalCardDocumentRepository => _passengerNationalCardDocumentRepository ?? new PassengerNationalCardDocumentRepository(_context);
 
         public async Task<int> CommitAsync()
         {

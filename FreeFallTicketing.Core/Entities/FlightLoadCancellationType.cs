@@ -4,6 +4,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class FlightLoadCancellationType : BaseEntity
     {
+        public FlightLoadCancellationType()
+        {
+
+        }
+
         public FlightLoadCancellationType(FlightLoad flightLoad, int hoursBeforeCancellation, float rate) : base()
         {
             FlightLoad = flightLoad;

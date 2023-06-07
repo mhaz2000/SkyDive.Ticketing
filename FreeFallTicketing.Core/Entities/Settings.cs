@@ -24,9 +24,14 @@ namespace SkyDiveTicketing.Core.Entities
 
     }
 
-    public class UserStatusInfo
+    public class UserStatusInfo : BaseEntity
     {
-        public UserStatusInfo(UserStatus userStatus, string description)
+        public UserStatusInfo()
+        {
+
+        }
+
+        public UserStatusInfo(UserStatus userStatus, string description) : base() 
         {
             UserStatus = userStatus;
             Description = description;

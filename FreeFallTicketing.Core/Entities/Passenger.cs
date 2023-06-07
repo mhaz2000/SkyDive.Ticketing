@@ -4,6 +4,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class Passenger : BaseEntity
     {
+        public Passenger()
+        {
+
+        }
+
         public Passenger(string nationalCode, DefaultCity? city, string address, float? height, float? weight, string emergencyContact, string emergencyPhone) : base()
         {
             City = city;
@@ -14,10 +19,10 @@ namespace SkyDiveTicketing.Core.Entities
             EmergencyPhone = emergencyPhone;
             EmergencyContact = emergencyContact;
             CustomFields = new List<UserCustomField>();
-            MedicalDocumentFile = new PassengerDocument();
-            LogBookDocumentFile = new PassengerDocument();
-            AttorneyDocumentFile = new PassengerDocument();
-            NationalCardDocumentFile = new PassengerDocument();
+            MedicalDocumentFile = new MedicalDocument();
+            LogBookDocumentFile = new LogBookDocument();
+            AttorneyDocumentFile = new AttorneyDocument();
+            NationalCardDocumentFile = new NationalCardDocument();
         }
 
 
@@ -64,21 +69,26 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// فایل سند پزشکی
         /// </summary>
-        public PassengerDocument MedicalDocumentFile { get; set; }
+        public MedicalDocument? MedicalDocumentFile { get; set; }
 
         /// <summary>
         /// سند لاگ بوک
         /// </summary>
-        public PassengerDocument LogBookDocumentFile { get; set; }
+        public LogBookDocument? LogBookDocumentFile { get; set; }
 
         /// <summary>
         /// سند وکالت نامه محضری
         /// </summary>
-        public PassengerDocument AttorneyDocumentFile { get; set; }
+        public AttorneyDocument? AttorneyDocumentFile { get; set; }
 
         /// <summary>
         /// فایل کارت ملی
         /// </summary>
-        public PassengerDocument NationalCardDocumentFile { get; set; }
+        public NationalCardDocument? NationalCardDocumentFile { get; set; }
+
+        public Guid? MedicalDocumentFileId { get; set; }
+        public Guid? LogBookDocumentFileId { get; set; }
+        public Guid? AttorneyDocumentFileId { get; set; }
+        public Guid? NationalCardDocumentFileId { get; set; }
     }
 }

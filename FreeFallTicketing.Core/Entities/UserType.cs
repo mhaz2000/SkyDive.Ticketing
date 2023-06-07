@@ -4,6 +4,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class UserType : BaseEntity
     {
+        public UserType()
+        {
+
+        }
+
         public UserType(string title) : base()
         {
             Title = title;

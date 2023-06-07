@@ -4,12 +4,16 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class SkyDiveEvent : BaseEntity
     {
+        public SkyDiveEvent()
+        {
+
+        }
         public SkyDiveEvent(int code, string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate,
             SkyDiveEventStatus status) : base()
         {
             Code = code;
             Title = title;
-            Images = new List<Guid>() { image };
+            Image = image ;
             StartDate = startDate;
             EndDate = endDate;
             IsActive = false;
@@ -45,7 +49,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// تصاویر رویداد
         /// </summary>
-        public List<Guid> Images { get; set; }
+        public Guid Image { get; set; }
 
         /// <summary>
         /// تاریخ شروع رویداد
@@ -103,6 +107,11 @@ namespace SkyDiveTicketing.Core.Entities
 
     public class SkyDiveEventItem : BaseEntity
     {
+        public SkyDiveEventItem()
+        {
+
+        }
+
         public SkyDiveEventItem(DateTime date, int capacity) : base()
         {
             Date = date;
@@ -133,6 +142,11 @@ namespace SkyDiveTicketing.Core.Entities
 
     public class SkyDiveEventTicketTypeAmount : BaseEntity
     {
+        public SkyDiveEventTicketTypeAmount()
+        {
+
+        }
+
         public SkyDiveEventTicketTypeAmount(SkyDiveEventTicketType type, double amount) : base()
         {
             Type = type;

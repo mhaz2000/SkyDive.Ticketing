@@ -110,7 +110,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
         public async Task UnlockTickets()
         {
-            var tickets = _unitOfWork.TicketRepository.Where(x => Math.Abs((DateTime.Now - x.CreatedAt).TotalMinutes) >= 15);
+            var tickets = _unitOfWork.TicketRepository.AsEnumerable().Where(x => Math.Abs((DateTime.Now - x.CreatedAt).TotalMinutes) >= 15);
 
             foreach (var ticket in tickets)
                 _unitOfWork.TicketRepository.Unlock(ticket);

@@ -4,6 +4,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class FlightLoad : BaseEntity
     {
+        public FlightLoad()
+        {
+
+        }
+
         public FlightLoad(int number, DateTime date, int capacity, int voidableNumber)
         {
             //CancellationTypes = new List<FlightLoadCancellationType>();
@@ -36,6 +41,11 @@ namespace SkyDiveTicketing.Core.Entities
 
     public class FlightLoadItem : BaseEntity
     {
+        public FlightLoadItem()
+        {
+
+        }
+
         public FlightLoadItem(SkyDiveEventTicketType flightLoadType, int seatNumber) : base()
         {
             FlightLoadType = flightLoadType;

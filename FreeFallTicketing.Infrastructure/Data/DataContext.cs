@@ -15,17 +15,22 @@ namespace SkyDiveTicketing.Infrastructure.Data
         public DbSet<Settings> Settings { get; set; }
         public DbSet<DefaultCity> Cities { get; set; }
         public DbSet<UserType> UserTypes { get; set; }
+        public DbSet<Passenger> Passengers { get; set; }
         public DbSet<FlightLoad> FlightLoads { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<SkyDiveEvent> SkyDiveEvents { get; set; }
-        public DbSet<PassengerDocument> Documents { get; set; }
         public DbSet<AdminCartable> AdminCartables  { get; set; }
         public DbSet<FlightLoadItem> FlightLoadItems { get; set; }
+        public DbSet<MedicalDocument> MedicalDocuments { get; set; }
+        public DbSet<LogBookDocument> LogBookDocuments { get; set; }
         public DbSet<SkyDiveEventItem> SkyDiveEventItems { get; set; }
+        public DbSet<AttorneyDocument> AttorneyDocuments { get; set; }
         public DbSet<SkyDiveEventStatus> SkyDiveEventStatuses { get; set; }
+        public DbSet<NationalCardDocument> NationalCardDocuments { get; set; }
         public DbSet<SkyDiveEventTicketType> SkyDiveEventTicketTypes { get; set; }
-        public DbSet<FlightLoadCancellationType> FlightLoadCancellationTypes { get; set; }
+
+        //public DbSet<FlightLoadCancellationType> FlightLoadCancellationTypes { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -36,6 +41,30 @@ namespace SkyDiveTicketing.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyGlobalFilter<BaseEntity>(p => !p.IsDeleted);
+
+            modelBuilder.Entity<Passenger>()
+                .HasOne(p => p.MedicalDocumentFile)
+                .WithOne()
+                .HasForeignKey<Passenger>(p => p.MedicalDocumentFileId);
+            //.OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Passenger>()
+                .HasOne(p => p.LogBookDocumentFile)
+                .WithOne()
+                .HasForeignKey<Passenger>(p => p.LogBookDocumentFileId);
+                //.OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Passenger>()
+                .HasOne(p => p.AttorneyDocumentFile)
+                .WithOne()
+                .HasForeignKey<Passenger>(p => p.AttorneyDocumentFileId);
+                //.OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Passenger>()
+                .HasOne(p => p.NationalCardDocumentFile)
+                .WithOne()
+                .HasForeignKey<Passenger>(p => p.NationalCardDocumentFileId);
+                //.OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

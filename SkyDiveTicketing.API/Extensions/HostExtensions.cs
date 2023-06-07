@@ -56,9 +56,9 @@ namespace SkyDiveTicketing.API.Extensions
         {
             if (!dataContext.Cities.Any())
             {
-                var filePath = Directory.GetCurrentDirectory() + @"JsonFiles\cities.json";
+                var filePath = Directory.GetCurrentDirectory() + @"\JsonFiles\cities.json";
                 using FileStream stream = File.OpenRead(filePath);
-                var cities = JsonSerializer.Deserialize<ICollection<DefaultCity>>(stream);
+                var cities = JsonSerializer.Deserialize<ICollection<DefaultCity>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false});
 
                 dataContext.Cities.AddRange(cities);
                 dataContext.SaveChanges();
@@ -76,7 +76,9 @@ namespace SkyDiveTicketing.API.Extensions
                     FirstName = "Admin",
                     LastName = "Admin",
                     UserName = "admin",
-                    NormalizedUserName = "admin"
+                    NormalizedUserName = "admin",
+                    Status = UserStatus.Active,
+                    PersonalInformationIsCompeleted = true
                 };
 
                 var done = userManager.CreateAsync(newUser, "123456");

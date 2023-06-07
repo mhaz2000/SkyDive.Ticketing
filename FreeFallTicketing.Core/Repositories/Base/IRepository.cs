@@ -9,6 +9,7 @@ namespace SkyDiveTicketing.Core.Repositories.Base
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<IEnumerable<TEntity>> GetWithPagingAsync(int pageSize, int pageIndex);
         IEnumerable<TEntity> GetAll();
+        IEnumerable<TEntity> AsEnumerable();
         IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
         Task<ICollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
         Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);

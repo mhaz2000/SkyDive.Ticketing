@@ -1,8 +1,6 @@
 ﻿using SkyDiveTicketing.Application.Base;
-using SkyDiveTicketing.Application.Commands.UserCommands;
 using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
-using System.Linq.Expressions;
 
 namespace SkyDiveTicketing.Application.Services.PassengerServices
 {
@@ -17,14 +15,28 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
 
         public async Task CheckPassengerDocument(Guid documentId, bool isConfirmed)
         {
-            var passengerDocument = await _unitOfWork.PassengerDocumentRepository.GetByIdAsync(documentId);
-            if (passengerDocument is null)
+            var medicalDocument = await _unitOfWork.PassengerMedicalDocumentRepository.GetByIdAsync(documentId);
+            var attorneyDocument = await _unitOfWork.PassengerAttorneyDocumentRepository.GetByIdAsync(documentId);
+            var logBookDocument = await _unitOfWork.PassengerLogBookDocumentRepository.GetByIdAsync(documentId);
+            var nationalCardDocument = await _unitOfWork.PassengerNationalCardDocumentRepository.GetByIdAsync(documentId);
+
+            if (medicalDocument is null && attorneyDocument is null && logBookDocument is null && nationalCardDocument is null)
                 throw new ManagedException("مدرک مورد نظر یافت نشد.");
 
             if (isConfirmed)
-                passengerDocument.SetStatus(DocumentStatus.Confirmed);
+            {
+                medicalDocument?.SetStatus(DocumentStatus.Confirmed);
+                attorneyDocument?.SetStatus(DocumentStatus.Confirmed);
+                logBookDocument?.SetStatus(DocumentStatus.Confirmed);
+                nationalCardDocument?.SetStatus(DocumentStatus.Confirmed);
+            }
             else
-                passengerDocument.SetStatus(DocumentStatus.NotLoaded);
+            {
+                medicalDocument?.SetStatus(DocumentStatus.NotLoaded);
+                attorneyDocument?.SetStatus(DocumentStatus.NotLoaded);
+                logBookDocument?.SetStatus(DocumentStatus.NotLoaded);
+                nationalCardDocument?.SetStatus(DocumentStatus.NotLoaded);
+            }
 
             var user = _unitOfWork.UserRepository.GetAllWithIncludes(c => c.Passenger.NationalCardDocumentFile.Id == documentId ||
             c.Passenger.AttorneyDocumentFile.Id == documentId ||
@@ -49,7 +61,8 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
 
         public async Task CheckPassengerDocumentExpirationDate()
         {
-            await _unitOfWork.PassengerDocumentRepository.ExpireDocuments();
+            await _unitOfWork.PassengerAttorneyDocumentRepository.ExpireDocuments();
+            await _unitOfWork.PassengerMedicalDocumentRepository.ExpireDocuments();
 
             await _unitOfWork.CommitAsync();
         }

@@ -5,6 +5,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class AdminCartable : BaseEntity
     {
+        public AdminCartable()
+        {
+
+        }
+
         public AdminCartable(string title, User applicant, RequestType type) : base()
         {
             Title = title;

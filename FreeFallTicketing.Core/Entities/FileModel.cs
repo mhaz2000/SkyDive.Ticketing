@@ -4,6 +4,10 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class FileModel : BaseEntity
     {
+        public FileModel()
+        {
+
+        }
         public FileModel(Guid fileId, string filename) : base()
         {
             Filename = filename;

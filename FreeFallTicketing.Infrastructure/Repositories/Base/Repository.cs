@@ -50,6 +50,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
             return Context.Set<TEntity>().ToList();
         }
 
+        public IEnumerable<TEntity> AsEnumerable()
+        {
+            return Context.Set<TEntity>().AsEnumerable();
+        }
+
         public ValueTask<TEntity> GetByIdAsync(Guid id)
         {
             return Context.Set<TEntity>().FindAsync(id);

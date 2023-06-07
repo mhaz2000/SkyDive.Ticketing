@@ -9,6 +9,5 @@ namespace SkyDiveTicketing.Core.Repositories
         void AddAttorneyDocument(Passenger passenger, Guid fileId, DateTime? expirationDate);
         void AddLogBookDocument(Passenger passenger, Guid fileId);
         void AddMedicalDocument(Passenger passenger, Guid fileId, DateTime? expirationDate);
-        void ChangeDocumentStatus(PassengerDocument document, DocumentStatus status);
     }
 }

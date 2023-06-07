@@ -4,6 +4,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class SkyDiveEventStatus : BaseEntity
     {
+        public SkyDiveEventStatus()
+        {
+
+        }
+
         public SkyDiveEventStatus(string title) : base()
         {
             Title = title;

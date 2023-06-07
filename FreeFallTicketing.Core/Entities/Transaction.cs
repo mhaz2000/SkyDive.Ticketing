@@ -4,6 +4,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class Transaction : BaseEntity
     {
+        public Transaction()
+        {
+
+        }
+
         public Transaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, int invoiceNumber) : base()
         {
             InvoiceNumber = invoiceNumber;

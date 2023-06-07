@@ -2,7 +2,7 @@
 {
     public class UserPersonalInformationDTO : BaseDTO<Guid>
     {
-        public UserPersonalInformationDTO(Guid id, DateTime createdAt, DateTime updatedAt, string nationalCode, DateTime birthDate, string firstName,
+        public UserPersonalInformationDTO(Guid id, DateTime createdAt, DateTime updatedAt, string nationalCode, DateTime? birthDate, string firstName,
             string lastName, string email, Guid? cityId, string state, string city, string address, float? weight, float? height) : base(id, createdAt, updatedAt)
         {
             NationalCode = nationalCode;
@@ -19,7 +19,7 @@
         }
 
         public string NationalCode { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }

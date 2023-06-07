@@ -14,6 +14,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using System.Text;
 using SkyDiveTicketing.API.Jobs;
+using SkyDiveTicketing.Application.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +52,7 @@ builder.Services.Configure<JwtIssuerOptionsModel>(options =>
 });
 
 // add identity
-var identityBuilder = builder.Services.AddIdentity<User, IdentityRole>(o =>
+var identityBuilder = builder.Services.AddIdentity<User, IdentityRole<Guid>>(o =>
 {
     // configure identity options
     o.Password.RequireDigit = true;
@@ -61,7 +62,7 @@ var identityBuilder = builder.Services.AddIdentity<User, IdentityRole>(o =>
     o.Password.RequiredLength = 6;
     o.Tokens.ChangePhoneNumberTokenProvider = "Phone";
 });
-identityBuilder = new IdentityBuilder(identityBuilder.UserType, typeof(IdentityRole), builder.Services);
+identityBuilder = new IdentityBuilder(identityBuilder.UserType, typeof(IdentityRole<Guid>), builder.Services);
 
 identityBuilder.AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
 
@@ -98,20 +99,22 @@ builder.Services.AddAuthentication(options =>
 });
 
 
-builder.Services.AddHangfireServer();
+builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
+builder.Services.AddScoped<IJwtFactory, JwtFactory>();
+builder.Services.AddScoped<ITokenFactory, TokenFactory>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IPassengerDocumentJob, PassengerDocumentJob>();
+builder.Services.AddScoped<ITicketJob, TicketJob>();
+
 
 builder.Services.AddHangfire(configuration => configuration
              .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
              .UseSimpleAssemblyNameTypeSerializer()
              .UseRecommendedSerializerSettings()
-             .UseSqlServerStorage(config.GetConnectionString("Main"), new SqlServerStorageOptions
-             {
-                 CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                 SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                 QueuePollInterval = TimeSpan.Zero,
-                 UseRecommendedIsolationLevel = true,
-                 DisableGlobalLocks = true
-             }));
+             .UseSqlServerStorage(config.GetConnectionString("Main")));
+
+builder.Services.AddHangfireServer();
+
 
 builder.Services.AddAuthorization(options =>
 {
@@ -128,9 +131,6 @@ builder.Services.AddAuthorization(options =>
         });
 });
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IPassengerDocumentJob, PassengerDocumentJob>();
-builder.Services.AddScoped<ITicketJob, TicketJob>();
 
 Registry.Register(builder.Services);
 
@@ -144,13 +144,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseHangfireDashboard();
 app.UseAuthorization();
 app.MapControllers();
 
+app.MigrateDatabase<Program>();
+
 RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
 RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
-
-app.MigrateDatabase<Program>();
 
 app.Run();

@@ -9,6 +9,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class UserCustomField : BaseEntity
     {
+        public UserCustomField()
+        {
+
+        }
+
         public UserCustomField(string key, string value) : base()
         {
             Key = key;

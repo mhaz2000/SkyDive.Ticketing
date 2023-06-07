@@ -39,7 +39,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 throw new ManagedException("رویداد مورد نظر یافت نشد.");
 
             return new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
-                skyDiveEvent.Images.FirstOrDefault(), skyDiveEvent.IsActive, skyDiveEvent.Capacity, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
+                skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Capacity, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
                 skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions, skyDiveEvent.Status.Title);
         }
 
@@ -57,7 +57,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 events = events.Where(c => c.EndDate <= end);
 
             return events.Select(skyDiveEvent => new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
-                skyDiveEvent.Images.FirstOrDefault(), skyDiveEvent.IsActive, skyDiveEvent.Capacity, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
+                skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Capacity, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
                 skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions, skyDiveEvent.Status.Title));
         }
 

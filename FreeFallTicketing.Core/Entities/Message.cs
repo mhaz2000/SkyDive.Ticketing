@@ -4,6 +4,10 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class Message : BaseEntity
     {
+        public Message()
+        {
+
+        }
         public Message(string text) : base()
         {
             Text = text;

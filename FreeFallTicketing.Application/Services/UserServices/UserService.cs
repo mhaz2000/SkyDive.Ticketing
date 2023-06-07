@@ -14,9 +14,9 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
-        public UserService(IUnitOfWork unitOfWork, RoleManager<IdentityRole> roleManager,
+        public UserService(IUnitOfWork unitOfWork, RoleManager<IdentityRole<Guid>> roleManager,
             UserManager<User> userManager, ITokenGenerator tokenGenerator)
         {
             _unitOfWork = unitOfWork;
@@ -292,7 +292,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            return new UserPersonalInformationDTO(user.Id, user.CreatedAt, user.UpdatedAt, user.NationalCode,user.BirthDate, user.FirstName, user.LastName,
+            return new UserPersonalInformationDTO(user.Id, user.CreatedAt, user.UpdatedAt, user.NationalCode, user.BirthDate, user.FirstName, user.LastName,
                 user.Email, user.Passenger?.City?.Id, user.Passenger?.City?.State, user.Passenger?.City?.City, user.Passenger?.Address, user.Passenger?.Weight, user.Passenger?.Height);
         }
 

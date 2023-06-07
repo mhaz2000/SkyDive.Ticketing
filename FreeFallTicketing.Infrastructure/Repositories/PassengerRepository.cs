@@ -31,10 +31,5 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             if (passenger.NationalCardDocumentFile.Status != DocumentStatus.Confirmed)
                 passenger.NationalCardDocumentFile?.Upload(fileId, null);
         }
-
-        public void ChangeDocumentStatus(PassengerDocument document, DocumentStatus status)
-        {
-            document.SetStatus(status);
-        }
     }
 }

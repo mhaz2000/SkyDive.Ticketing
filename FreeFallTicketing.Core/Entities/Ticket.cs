@@ -4,6 +4,10 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class Ticket : BaseEntity
     {
+        public Ticket()
+        {
+
+        }
         public Ticket(string ticketNumber, bool voidable, User reservedBy, bool reservedByAdmin) : base()
         {
             TicketNumber = ticketNumber;

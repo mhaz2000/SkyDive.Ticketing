@@ -4,6 +4,11 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class SkyDiveEventTicketType : BaseEntity
     {
+        public SkyDiveEventTicketType()
+        {
+
+        }
+
         public SkyDiveEventTicketType(string title, int capacity) : base()
         {
             Title = title;

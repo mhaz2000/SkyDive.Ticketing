@@ -1,12 +1,7 @@
 ﻿using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Core.Entities;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using static SkyDiveTicketing.Core.Entities.User;
 
 namespace SkyDiveTicketing.Application.Helpers
@@ -22,7 +17,7 @@ namespace SkyDiveTicketing.Application.Helpers
             _tokenFactory = tokenFactory;
         }
 
-        public JwToken TokenGeneration(User user, JwtIssuerOptionsModel _jwtOptions, IList<IdentityRole> userRoles)
+        public JwToken TokenGeneration(User user, JwtIssuerOptionsModel _jwtOptions, IList<IdentityRole<Guid>> userRoles)
         {
             var refreshToken = _tokenFactory.GenerateToken();
             if (user.RefreshTokens == null)

@@ -6,6 +6,6 @@ namespace SkyDiveTicketing.Application.Helpers
 {
     public interface ITokenGenerator
     {
-        JwToken TokenGeneration(User user, JwtIssuerOptionsModel jwtOptions, IList<IdentityRole> userRoles);
+        JwToken TokenGeneration(User user, JwtIssuerOptionsModel jwtOptions, IList<IdentityRole<Guid>> userRoles);
     }
 }
