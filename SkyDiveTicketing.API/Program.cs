@@ -139,12 +139,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseHangfireDashboard();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-app.UseHangfireDashboard();
 app.UseAuthorization();
 app.MapControllers();
 
