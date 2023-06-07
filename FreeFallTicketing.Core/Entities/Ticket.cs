@@ -11,6 +11,8 @@ namespace SkyDiveTicketing.Core.Entities
             ReservedBy = reservedBy;
             ReservedByAdmin = reservedByAdmin;
             Paid = false;
+            Locked = true;
+            Cancelled = false;
         }
 
         public string TicketNumber { get; set; }
@@ -18,7 +20,14 @@ namespace SkyDiveTicketing.Core.Entities
         public User ReservedBy { get; set; }
         public bool ReservedByAdmin { get; set; }
         public bool Paid { get; private set; }
+        public bool Locked { get; private set; }
+        public bool Cancelled { get; private set; }
+        public AdminCartable? RelatedAdminCartableRequest { get; private set; }
 
+        public void SetRequest(AdminCartable request) => RelatedAdminCartableRequest = request;
         public void SetAsPaid() => Paid = true;
+        public void SetAsUnLock() => Locked = false;
+        public void SetAsCancelled() => Cancelled = true;
+
     }
 }

@@ -4,13 +4,13 @@ namespace SkyDiveTicketing.Core.Entities
 {
     public class ShoppingCart : BaseEntity
     {
-        public ShoppingCart(Ticket ticket, User user) : base()
+        public ShoppingCart(IEnumerable<Ticket> tickets, User user) : base()
         {
             User = user;
-            Ticket = ticket;
+            Tickets = tickets.ToList();
         }
 
-        public Ticket Ticket { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
         public User User { get; set; }
     }
 }

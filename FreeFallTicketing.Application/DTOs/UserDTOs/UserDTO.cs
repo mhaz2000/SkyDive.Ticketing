@@ -2,9 +2,9 @@
 
 namespace SkyDiveTicketing.Application.DTOs.UserDTOs
 {
-    public class UserDTO : BaseDTO<string>
+    public class UserDTO : BaseDTO<Guid>
     {
-        public UserDTO(string id, string username, string phone, string email, string firstName, string lastName,
+        public UserDTO(Guid id, string username, string phone, string email, string firstName, string lastName,
             UserStatus status, int code, string userType, DateTime createdAt, DateTime updatedAt)
             : base(id, createdAt, updatedAt)
         {

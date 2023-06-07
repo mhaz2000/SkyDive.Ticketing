@@ -6,8 +6,8 @@ namespace SkyDiveTicketing.Application.Validators.SkyDiveEventValidatorts
     public class SkyDiveEventCommandValidator : AbstractValidator<SkyDiveEventCommand>
     {
         public SkyDiveEventCommandValidator()
-        { 
-            out int res = 0;
+        {
+            int res = 0;
             RuleFor(c => c.StartDate).NotNull().NotEmpty().WithMessage("تاریخ شروع رویداد نمی‌تواند خالی باشد.");
             RuleFor(c => c.EndDate).NotNull().NotEmpty().WithMessage("تاریخ پایان رویداد نمی‌تواند خالی باشد.");
             RuleFor(c => c.Title).NotNull().NotEmpty().WithMessage("عنوان رویداد نمی‌تواند خالی باشد.");

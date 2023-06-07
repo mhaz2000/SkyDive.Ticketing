@@ -7,6 +7,7 @@ using SkyDiveTicketing.Application.Services.UserTypeServices;
 using SkyDiveTicketing.Application.Services.PassengerServices;
 using SkyDiveTicketing.Application.Services.SkyDiveEventServices;
 using SkyDiveTicketing.Application.Services.SettingsServices;
+using SkyDiveTicketing.Application.Services.TransactionServices;
 
 namespace SkyDiveTicketing.Application
 {
@@ -15,7 +16,6 @@ namespace SkyDiveTicketing.Application
         public static void Register(IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IFlightLoadService, FlightLoadService>();
             services.AddScoped<ISkyDiveEventTicketTypeService, SkyDiveEventTicketTypeService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IFlightLoadCancellationTypeService, FlightLoadCancellationTypeService>();
@@ -25,6 +25,7 @@ namespace SkyDiveTicketing.Application
             services.AddScoped<ISkyDiveEventStatusService, SkyDiveEventStatusService>();
             services.AddScoped<ISkyDiveEventService, SkyDiveEventService>();
             services.AddScoped<ISettingsService, SettingsService>();
+            services.AddScoped<ITransactionService, TransactionService>();
         }
     }
 }

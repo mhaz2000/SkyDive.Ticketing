@@ -71,7 +71,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await _unitOfWork.CommitAsync();
         }
 
-        public UserDTO GetUser(string id)
+        public UserDTO GetUser(Guid id)
         {
             var user = _unitOfWork.UserRepository.Include(c => c.UserType).FirstOrDefault(c => c.Id == id);
 
@@ -119,7 +119,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             };
         }
 
-        public async Task<string> OtpRegisterConfirmation(OtpUserConfirmationCommand command)
+        public async Task<Guid> OtpRegisterConfirmation(OtpUserConfirmationCommand command)
         {
             var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.PhoneNumber == command.Phone && c.Status != UserStatus.Inactive);
             if (user is null)
@@ -179,7 +179,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task<string> Register(CreateUserCommand command)
+        public async Task<Guid> Register(CreateUserCommand command)
         {
             var duplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower()
                 && (c.Status == UserStatus.Active || c.Status == UserStatus.AwaitingCompletion));

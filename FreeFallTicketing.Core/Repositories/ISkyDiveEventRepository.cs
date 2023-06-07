@@ -1,4 +1,5 @@
 ﻿using SkyDiveTicketing.Core.Entities;
+using SkyDiveTicketing.Core.Model;
 using SkyDiveTicketing.Core.Repositories.Base;
 using System.Linq.Expressions;
 
@@ -14,5 +15,6 @@ namespace SkyDiveTicketing.Core.Repositories
         void AddTicketTypeAmount(SkyDiveEvent skyDiveEvent, SkyDiveEventTicketType ticketType, double amount);
         void AddConditionsAndTerms(SkyDiveEvent skyDiveEvent, string conditionsAndTerms);
         void ClearTicketTypesAmount(SkyDiveEvent skyDiveEvent);
+        IEnumerable<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null);
     }
 }

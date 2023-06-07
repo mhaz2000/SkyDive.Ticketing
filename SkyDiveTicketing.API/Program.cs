@@ -129,6 +129,8 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IPassengerDocumentJob, PassengerDocumentJob>();
+builder.Services.AddScoped<ITicketJob, TicketJob>();
 
 Registry.Register(builder.Services);
 
@@ -147,6 +149,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
+RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
 
 app.MigrateDatabase<Program>();
 

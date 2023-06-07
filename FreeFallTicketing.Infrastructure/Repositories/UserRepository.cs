@@ -64,7 +64,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             user.PasswordHash = _passwordHasher.HashPassword(user, password);
         }
 
-        public async Task<string> CreateAsync(string phone)
+        public async Task<Guid> CreateAsync(string phone)
         {
             var defaultType = await Context.UserTypes.FirstOrDefaultAsync(c => c.IsDefault);
             var user = new User()
@@ -79,7 +79,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             await Context.Users.AddAsync(user);
 
             var role = Context.Roles.FirstOrDefault(c => c.Name == "User");
-            await Context.UserRoles.AddAsync(new IdentityUserRole<string>() { RoleId = role.Id, UserId = user.Id });
+            await Context.UserRoles.AddAsync(new IdentityUserRole<Guid>() { RoleId = role.Id, UserId = user.Id });
 
             return user.Id;
         }

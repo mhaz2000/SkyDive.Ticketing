@@ -1,6 +1,6 @@
 ﻿using SkyDiveTicketing.Application.Commands.Base;
 using SkyDiveTicketing.Application.Validators.Extensions;
-using SkyDiveTicketing.Application.Validators.SkyDiveEvnetValidatorts;
+using SkyDiveTicketing.Application.Validators.SkyDiveEventValidatorts;
 
 namespace SkyDiveTicketing.Application.Commands.SkyDiveEventCommands
 {

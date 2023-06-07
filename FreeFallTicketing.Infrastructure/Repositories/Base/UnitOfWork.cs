@@ -17,8 +17,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
         private PassengerRepository? _passengerRepository;
         private FileModelRepository? _fileModelRepository;
         private FlightLoadRepository? _flightLoadRepository;
+        private TransactionRepository? _transactionRepository;
         private ShoppingCartRepository? _shoppingCartRepository;
         private SkyDiveEventRepository? _skyDiveEventRepository;
+        private AdminCartableRepository _adminCartableRepository;
         private SkyDiveEventItemRepository? _skyDiveEventItemRepository;
         private PassengerDocumentRepository? _passengerDocumentRepository;
         private SkyDiveEventStatusRepository? _skyDiveEventStatusRepository;
@@ -45,9 +47,13 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
 
         public IFlightLoadRepository FlightLoadRepository => _flightLoadRepository ?? new FlightLoadRepository(_context);
 
+        public ITransactionRepository TransactionRepositroy => _transactionRepository ?? new TransactionRepository(_context);
+
         public IShoppingCartRepository ShoppingCartRepository => _shoppingCartRepository ?? new ShoppingCartRepository(_context);
 
         public ISkyDiveEventRepository SkyDiveEventRepository => _skyDiveEventRepository ?? new SkyDiveEventRepository(_context);
+
+        public IAdminCartableRepository AdminCartableRepository => _adminCartableRepository ?? new AdminCartableRepository(_context);
 
         public ISkyDiveEventItemRepository SkyDiveEventItemRepository => _skyDiveEventItemRepository ?? new SkyDiveEventItemRepository(_context);
 
@@ -58,6 +64,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
         public ISkyDiveEventTicketTypeRepository SkyDiveEventTicketTypeRepository => _skyDiveEventTicketTypeRepository ?? new SkyDiveEventTicketTypeRepository(_context);
 
         public IFlightLoadCancellationTypeRepository FlightLoadCancellationTypeRepository => _flightLoadCancellationTypeRepository ?? new FlightLoadCancellationTypeRepository(_context);
+
 
 
         public async Task<int> CommitAsync()

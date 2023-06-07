@@ -6,17 +6,17 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 {
     public interface IUserService
     {
-        Task<string> Register(CreateUserCommand command);
+        Task<Guid> Register(CreateUserCommand command);
 
         Task OtpRequest(OtpUserCommand command);
 
         Task Update(string id, CreateUserCommand command);
 
-        UserDTO GetUser(string id);
+        UserDTO GetUser(Guid id);
 
         IEnumerable<UserDTO> GetUsers(string search);
 
-        Task<string> OtpRegisterConfirmation(OtpUserConfirmationCommand command);
+        Task<Guid> OtpRegisterConfirmation(OtpUserConfirmationCommand command);
 
         Task CompeleteUserPersonalInformation(UserPersonalInformationCompletionCommand command, bool registration);
 

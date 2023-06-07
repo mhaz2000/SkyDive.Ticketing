@@ -32,7 +32,8 @@ namespace SkyDiveTicketing.Application.Services.FlightLoadServices
             if (flightLoad is null)
                 throw new ManagedException("لود پرواز یافت نشد.");
 
-            return flightLoad.CancellationTypes.Select(s => new FlightLoadCancellationTypeDTO(s.Id, s.CreatedAt, s.UpdatedAt, flightLoadId, s.HoursBeforeCancellation, s.Rate));
+            return null;
+            //return flightLoad.CancellationTypes.Select(s => new FlightLoadCancellationTypeDTO(s.Id, s.CreatedAt, s.UpdatedAt, flightLoadId, s.HoursBeforeCancellation, s.Rate));
         }
 
         public FlightLoadCancellationTypeDTO GetFlightLoadCancellationType(Guid id)
@@ -51,7 +52,7 @@ namespace SkyDiveTicketing.Application.Services.FlightLoadServices
             if (cancellationType is null)
                 throw new ManagedException("نرخ کنسلی یافت نشد.");
 
-            _unitOfWork.FlightLoadRepository.RemoveFlightLoadCancellationType(cancellationType.FlightLoad, cancellationType);
+            //_unitOfWork.FlightLoadRepository.RemoveFlightLoadCancellationType(cancellationType.FlightLoad, cancellationType);
             _unitOfWork.FlightLoadCancellationTypeRepository.Remove(cancellationType);
 
             return Task.CompletedTask;

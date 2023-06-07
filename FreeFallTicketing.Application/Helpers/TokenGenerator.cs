@@ -27,9 +27,9 @@ namespace SkyDiveTicketing.Application.Helpers
             var refreshToken = _tokenFactory.GenerateToken();
             if (user.RefreshTokens == null)
                 user.RefreshTokens = new List<RefreshToken>();
-            user.AddRefreshToken(refreshToken, user.Id, _jwtOptions.ExpireTimeTokenInMinute);
+            user.AddRefreshToken(refreshToken, user.Id.ToString(), _jwtOptions.ExpireTimeTokenInMinute);
 
-            var identity = _jwtFactory.GenerateClaimsIdentity(user.Email, user.Id);
+            var identity = _jwtFactory.GenerateClaimsIdentity(user.Email, user.Id.ToString());
             if (identity == null)
             {
                 throw new SystemException("در فراخوانی و تطابق اطلاعات حساب کاربری خطایی رخ داده است!");

@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkyDiveTicketing.Core.Entities;
+using SkyDiveTicketing.Core.Model;
 using SkyDiveTicketing.Core.Repositories;
 using SkyDiveTicketing.Infrastructure.Data;
 using SkyDiveTicketing.Infrastructure.Repositories.Base;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SkyDiveTicketing.Infrastructure.Repositories
@@ -57,8 +59,24 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             return Context.SkyDiveEvents
                 .Include(c => c.TypesAmount).ThenInclude(c => c.Type)
                 .Include(c => c.Status)
-                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c=>c.FlightLoadItems).ThenInclude(c=>c.Tickets).ThenInclude(c=> c.ReservedBy)
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy)
                 .Where(predicate);
+        }
+
+        public IEnumerable<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null)
+        {
+            return FindEvents()
+                   .SelectMany(skyDiveEvent => skyDiveEvent.Items, (skyDiveEvent, skyDiveEventItem) => new { skyDiveEvent, skyDiveEventItem })
+                   .SelectMany(c => c.skyDiveEventItem.FlightLoads, (skyDiveEventItem, flightLoad) => new { skyDiveEventItem.skyDiveEvent, skyDiveEventItem.skyDiveEventItem, flightLoad })
+                   .SelectMany(c => c.flightLoad.FlightLoadItems, (flightLoad, flightLoadItems) => new { flightLoad.skyDiveEvent, flightLoad.skyDiveEventItem, flightLoad.flightLoad, flightLoadItems })
+                   .SelectMany(c => c.flightLoadItems.Tickets, (flightLoadItems, ticket) => new TicketDetailModel
+                   {
+                       SkyDiveEvent = flightLoadItems.skyDiveEvent,
+                       SkyDiveEventItem = flightLoadItems.skyDiveEventItem,
+                       FlightLoad = flightLoadItems.flightLoad,
+                       FlightLoadItem = flightLoadItems.flightLoadItems,
+                       Ticket = ticket
+                   }).Where(predicate);
         }
 
         public void ToggleActivation(SkyDiveEvent skyDiveEvent)

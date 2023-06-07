@@ -10,7 +10,7 @@ namespace SkyDiveTicketing.Core.Repositories
 
         Task<User?> GetUserAsync(string id);
 
-        Task<string> CreateAsync(string phone);
+        Task<Guid> CreateAsync(string phone);
 
         Task EditAsync(string username, string email, string firstName, string lastName, string phone, string password, string userId);
 

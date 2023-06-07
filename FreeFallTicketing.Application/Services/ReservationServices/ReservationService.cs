@@ -1,8 +1,9 @@
 ﻿using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.Reservation;
-using SkyDiveTicketing.Application.DTOs;
 using SkyDiveTicketing.Application.DTOs.TicketDTOs;
+using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
+using System.Linq.Expressions;
 
 namespace SkyDiveTicketing.Application.Services.ReservationServices
 {
@@ -15,38 +16,135 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             _unitOfWork = unitOfWork;
         }
 
-        public async Task CancelTicket(Guid id)
+        public async Task<(bool, string)> CheckTickets(Guid userId)
         {
-            var ticket = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).FirstOrDefault(c => c.Id == id);
-            if (ticket is null)
-                throw new ManagedException("بلیت مورد نظر یافت نشد.");
+            Expression<Func<ShoppingCart, object>>[] includeExpressions = {
+                c=> c.User,
+                c=> c.Tickets,
+            };
 
-            if (ticket.FlightLoad.CancellationTypes.Any())
+            var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, includeExpressions);
+            if (shoppingCart is null || !shoppingCart.Tickets.Any())
+                throw new ManagedException("سبد خرید شما خالی است.");
+
+            var unLockedTickets = shoppingCart.Tickets.Where(c => !c.Locked);
+            if (unLockedTickets.Any())
             {
-                var hoursLeftToFlight = Math.Abs((ticket.ReserveTime - DateTime.Now).TotalHours);
+                List<string> errors = new List<string>();
 
-                var penaltyRate = ticket.FlightLoad.CancellationTypes.OrderBy(c => c.HoursBeforeCancellation).FirstOrDefault(c => c.HoursBeforeCancellation >= hoursLeftToFlight)?.Rate;
+                Dictionary<FlightLoadItem, List<Ticket>> ticketItems = new Dictionary<FlightLoadItem, List<Ticket>>();
+                foreach (var ticket in unLockedTickets)
+                {
+                    var flightLoadItem = await _unitOfWork.FlightLoadRepository.GetFlightItemByTicket(ticket);
+                    if (ticketItems.ContainsKey(flightLoadItem))
+                        ticketItems[flightLoadItem].Add(ticket);
+                }
 
-                var type1SeatPenaltyAmount = (ticket.Type1SeatReservedQuantity * ticket.FlightLoad.Type1SeatAmount * penaltyRate) / 100;
-                var type2SeatPenaltyAmount = (ticket.Type2SeatReservedQuantity * ticket.FlightLoad.Type2SeatAmount * penaltyRate) / 100;
-                var type3SeatPenaltyAmount = (ticket.Type3SeatReservedQuantity * ticket.FlightLoad.Type3SeatAmount * penaltyRate) / 100;
+                foreach (var item in ticketItems)
+                {
+                    var flightLoad = await _unitOfWork.FlightLoadRepository.GetFirstWithIncludeAsync(c => c.FlightLoadItems.Contains(item.Key), c => c.FlightLoadItems);
+                    if (item.Key.SeatNumber - (item.Key.Tickets.Where(c => !c.Locked && !c.Cancelled).Count() + item.Value.Count()) < 0)
+                        errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {item.Key.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
+                }
 
-                var penalty = type1SeatPenaltyAmount + type2SeatPenaltyAmount + type3SeatPenaltyAmount;
-
-                //return penalty amount to user
+                if (errors.Any())
+                    return (false, string.Join("\n", errors));
             }
 
-            _unitOfWork.TicketRepository.CancelTicket(ticket);
+            return (true, string.Empty);
+        }
+
+        public async Task<IEnumerable<MyTicketDTO>> GetUserTickets(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            List<MyTicketDTO> myTickets = new List<MyTicketDTO>();
+            var ticketModels = _unitOfWork.SkyDiveEventRepository.GetDetails();
+
+            var tickets = _unitOfWork.TicketRepository.Include(c => c.ReservedBy).Where(c => c.ReservedBy == user);
+            foreach (var ticket in tickets)
+            {
+                var ticketModel = ticketModels.FirstOrDefault(x => x.Ticket == ticket);
+
+                myTickets.Add(new MyTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, ticketModel.FlightLoad.Date, ticketModel.FlightLoad.Number.ToString("000"),
+                    ticketModel.SkyDiveEvent.Location, ticketModel.FlightLoadItem.FlightLoadType.Title, ticketModel.SkyDiveEvent.TermsAndConditions, ticketModel.SkyDiveEvent.Voidable));
+            }
+
+            return myTickets;
+        }
+
+        public async Task<bool> SetAsPaid(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            Expression<Func<ShoppingCart, object>>[] includeExpressions = {
+                c=> c.User,
+                c=> c.Tickets,
+            };
+
+            var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, includeExpressions);
+            if (shoppingCart is null)
+                throw new ManagedException("سبد خرید شما خالی است.");
+
+            //check if paid
+
+            var ticketModels = _unitOfWork.SkyDiveEventRepository.GetDetails();
+
+            foreach (var ticket in shoppingCart.Tickets)
+            {
+                var ticketModel = ticketModels.FirstOrDefault(x => x.Ticket == ticket);
+                _unitOfWork.TicketRepository.SetAsPaid(ticket);
+
+                await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber, ticketModel.SkyDiveEvent.Location + "کد" + ticketModel.SkyDiveEvent.Code.ToString("000"), "", 0, TransactionType.Confirmed);
+            }
+
+            await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
+
+            return true;
+
+        }
+
+        public async Task UnlockTickets()
+        {
+            var tickets = _unitOfWork.TicketRepository.Where(x => Math.Abs((DateTime.Now - x.CreatedAt).TotalMinutes) >= 15);
+
+            foreach (var ticket in tickets)
+                _unitOfWork.TicketRepository.Unlock(ticket);
+
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task<Guid> Create(ReserveCommand command, Guid userId)
+        public async Task CancelTicketRequest(Guid id, Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.RelatedAdminCartableRequest);
+            if (ticket is null)
+                throw new ManagedException("بلیت مورد نظر یافت نشد.");
+
+            if (!ticket.Voidable)
+                throw new ManagedException("امکان کنسل کردن بلیت وجود ندارد.");
+
+            await _unitOfWork.AdminCartableRepository.AddToCartable("در خواست کنسلی بلیت", user, RequestType.TicketCancellation, ticket);
+            await _unitOfWork.CommitAsync();
+        }
+
+        public async Task Update(ReserveCommand command, Guid userId)
         {
             var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
             List<string> errors = new List<string>();
+            List<Ticket> tickets = new List<Ticket>();
+
+            _unitOfWork.TicketRepository.ClearUserTicket(user);
 
             foreach (var item in command.Items)
             {
@@ -58,94 +156,38 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 var flightLoad = skyDiveEventItem.FlightLoads.FirstOrDefault(c => c.FlightLoadItems.Any(t => t.Id == item.FlightLoadItemId));
                 var flightLoadItem = flightLoad.FlightLoadItems.FirstOrDefault(c => c.Id == item.FlightLoadItemId);
 
-                if (flightLoadItem.SeatNumber - (flightLoadItem.Tickets.Count() + item.Qty) < 0)
+                if (flightLoadItem.SeatNumber - (flightLoadItem.Tickets.Where(c => !c.Locked && !c.Cancelled).Count() + item.Qty) < 0)
                     errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {flightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
                 else
                 {
-                    _unitOfWork.TicketRepository.AddTicket(flightLoadItem, user, flightLoad.Number, skyDiveEvent);
-                    //add to shopping cart
+                    tickets.Add(_unitOfWork.TicketRepository.AddTicket(flightLoadItem, user, flightLoad.Number, skyDiveEvent));
                 }
             }
 
-        }
-
-        public async Task Update(ReserveCommand command, Guid id)
-        {
-            List<string> errors = new List<string>();
-
-            var ticket = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).FirstOrDefault(c => c.Id == id);
-            if (ticket is null)
-                throw new ManagedException("بلیت مورد نظر یافت نشد.");
-
-            var previousReserves = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).Where(c => c.Id != id && c.FlightLoad.Id == command.FlightLoadId);
-
-            if (previousReserves.Any())
-            {
-                var reservedType1Seat = previousReserves.Sum(c => c.Type1SeatReservedQuantity);
-                var reservedType2Seat = previousReserves.Sum(c => c.Type2SeatReservedQuantity);
-                var reservedType3Seat = previousReserves.Sum(c => c.Type3SeatReservedQuantity);
-
-                if (reservedType1Seat < command.Type1SeatReservedQuantity)
-                    errors.Add("گنجایش صندلی‌های نوع 1 کمتر از میزان درخواستی شما است.");
-
-                if (reservedType2Seat < command.Type2SeatReservedQuantity)
-                    errors.Add("گنجایش صندلی‌های نوع 2 کمتر از میزان درخواستی شما است.");
-
-                if (reservedType3Seat < command.Type3SeatReservedQuantity)
-                    errors.Add("گنجایش صندلی‌های نوع 3 کمتر از میزان درخواستی شما است.");
-            }
-
             if (errors.Any())
                 throw new ManagedException(string.Join("\n", errors));
 
-            _unitOfWork.TicketRepository.UpdateTicket(ticket, command.Type1SeatReservedQuantity, command.Type2SeatReservedQuantity, command.Type3SeatReservedQuantity);
-
+            await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
+            await _unitOfWork.ShoppingCartRepository.AddToShoppingCart(user, tickets);
             await _unitOfWork.CommitAsync();
+
         }
 
-        public async Task<IEnumerable<TicketDTO>> GetTickets()
+        public async Task CancelTicketResponse(Guid id, bool response)
         {
-            var tickets = await _unitOfWork.TicketRepository.GetAllAsync();
+            var request = await _unitOfWork.AdminCartableRepository.GetByIdAsync(id);
+            if (request is null)
+                throw new ManagedException("درخواست مورد نظر یافت نشد.");
 
-            return tickets.Select(s =>
-                new TicketDTO(s.Id, s.CreatedAt, s.UpdatedAt, s.Amount, s.Type1SeatReservedQuantity, s.Type2SeatReservedQuantity, s.Type3SeatReservedQuantity,
-                s.ReserveTime, s.Status, new List<PassengerDTO>()));
-        }
+            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.RelatedAdminCartableRequest == request, c => c.RelatedAdminCartableRequest);
 
-        public async Task<TicketDTO> GetTicket(Guid id)
-        {
-            var ticket = await _unitOfWork.TicketRepository.GetTicketByIdAsync(id);
-
-            var ticketDto = new TicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.Amount, ticket.Type1SeatReservedQuantity, ticket.Type2SeatReservedQuantity, ticket.Type3SeatReservedQuantity,
-                ticket.ReserveTime, ticket.Status, new List<PassengerDTO>());
-
-            ticketDto.Passengers = ticket.Passengers.Select(p => new PassengerDTO(p.NationalCode, new CityDTO(p.City.Id, p.City.Province, p.City.State, p.City.City),
-                p.Height, p.Weight, p.EmergencyContact, p.EmergencyPhone, p.MedicalDocumentFileId, p.LogBookDocumentFileId, p.AttorneyDocumentFileId, p.NationalCardDocumentFileId));
-
-            return ticketDto;
-        }
-
-        public async Task RegisterIdentityDocuments(RegisterIdentityDocumentCommand command)
-        {
-            List<string> errors = new List<string>();
-
-            var ticket = _unitOfWork.TicketRepository.Include(c => c.FlightLoad).FirstOrDefault(c => c.Id == command.TicketId);
-            if (ticket is null)
-                throw new ManagedException("بلیت مورد نظر یافت نشد.");
-
-            foreach (var passengerCommand in command.Documents)
+            if (response)
             {
-                var city = await _unitOfWork.CityRepository.GetByIdAsync(passengerCommand.CityId);
-                if (city is null)
-                    errors.Add("مقدار شهر معتبر نیست.");
-
-                _unitOfWork.TicketRepository.AddTicketPassenger(ticket, passengerCommand.NationalCode, city, passengerCommand.Address, passengerCommand.Height, passengerCommand.Weight,
-                    passengerCommand.EmergencyContact, passengerCommand.EmergencyPhone, passengerCommand.MedicalDocumentFileId, passengerCommand.LogBookDocumentFileId,
-                    passengerCommand.AttorneyDocumentFileId, passengerCommand.NationalCardDocumentFileId);
+                _unitOfWork.TicketRepository.SetAsCancelled(ticket);
+                _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین تایید شد.");
             }
-
-            if (errors.Any())
-                throw new ManagedException(string.Join("\n", errors));
+            else
+                _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین رد شد.");
 
             await _unitOfWork.CommitAsync();
         }

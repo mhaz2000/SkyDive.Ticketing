@@ -1,30 +1,25 @@
-﻿using SkyDiveTicketing.Core.Entities;
-
-namespace SkyDiveTicketing.Application.DTOs.TicketDTOs
+﻿namespace SkyDiveTicketing.Application.DTOs.TicketDTOs
 {
-    public class TicketDTO : BaseDTO<Guid>
+    public class MyTicketDTO : BaseDTO<Guid>
     {
-        public TicketDTO(Guid id, DateTime createdAt, DateTime updatedAt, double amount,
-            int type1SeatReservedQuantity, int type2SeatReservedQuantity, int type3SeatReservedQuantity,
-            DateTime reserveTime, TicketStatus status, IEnumerable<PassengerDTO> passengers) : base(id, createdAt, updatedAt)
+        public MyTicketDTO(Guid id, DateTime createdAt, DateTime updatedAt, string ticketNumber, DateTime date, string flightNumber, string eventLocation, string ticketType, string termsAndConditionUrl, bool voidable)
+            : base(id, createdAt, updatedAt)
         {
-            Amount = amount;
-            Type1SeatReservedQuantity = type1SeatReservedQuantity;
-            Type2SeatReservedQuantity = type2SeatReservedQuantity;
-            Type3SeatReservedQuantity = type3SeatReservedQuantity;
-
-            ReserveTime = reserveTime;
-            Status = status;
-
-            Passengers = passengers;
+            TicketNumber = ticketNumber;
+            Date = date;
+            FlightNumber = flightNumber;
+            EventLocation = eventLocation;
+            TicketType = ticketType;
+            TermsAndConditionUrl = termsAndConditionUrl;
+            Voidable = voidable;
         }
-        public double Amount { get; set; }
-        public IEnumerable<PassengerDTO> Passengers { get; set; }
-        public int Type1SeatReservedQuantity { get; set; }
-        public int Type2SeatReservedQuantity { get; set; }
-        public int Type3SeatReservedQuantity { get; set; }
 
-        public DateTime ReserveTime { get; set; }
-        public TicketStatus Status { get; set; }
+        public string TicketNumber { get; set; }
+        public DateTime Date { get; set; }
+        public string FlightNumber { get; set; }
+        public string EventLocation { get; set; }
+        public string TicketType { get; set; }
+        public string TermsAndConditionUrl { get; set; }
+        public bool Voidable { get; set; }
     }
 }

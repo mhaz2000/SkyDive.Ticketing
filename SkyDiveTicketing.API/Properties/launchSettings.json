@@ -4,17 +4,17 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:6575",
-      "sslPort": 44360
+      "applicationUrl": "http://localhost:30974",
+      "sslPort": 44303
     }
   },
   "profiles": {
-    "FreeFallTicketing": {
+    "SkyDiveTicketing.API": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:4030",
+      "applicationUrl": "https://localhost:7016;http://localhost:5125",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

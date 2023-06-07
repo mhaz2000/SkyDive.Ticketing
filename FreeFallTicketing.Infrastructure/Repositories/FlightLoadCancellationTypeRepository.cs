@@ -15,7 +15,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
             foreach (var (hoursBeforeCancellation, rate) in cancellationTypes)
             {
-                flightLoad.AddCancellationTypes(new FlightLoadCancellationType(flightLoad, hoursBeforeCancellation, rate));
+                //flightLoad.AddCancellationTypes(new FlightLoadCancellationType(flightLoad, hoursBeforeCancellation, rate));
             }
         }
 

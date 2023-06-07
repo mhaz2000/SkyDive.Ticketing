@@ -11,8 +11,10 @@
         ISettingsRepository SettingsRepository { get; }
         IPassengerRepository PassengerRepository { get; }
         IFlightLoadRepository FlightLoadRepository { get; }
+        ITransactionRepository TransactionRepositroy { get; }
         IShoppingCartRepository ShoppingCartRepository { get; }
         ISkyDiveEventRepository SkyDiveEventRepository { get; }
+        IAdminCartableRepository AdminCartableRepository  { get; }
         ISkyDiveEventItemRepository SkyDiveEventItemRepository { get; }
         IPassengerDocumentRepository PassengerDocumentRepository { get; }
         ISkyDiveEventStatusRepository SkyDiveEventStatusRepository { get; }

@@ -94,19 +94,19 @@ namespace SkyDiveTicketing.API.Extensions
 
             if (!role.Result)
             {
-                var newAdminRole = new IdentityRole()
+                var newAdminRole = new IdentityRole<Guid>()
                 {
                     Name = "Admin",
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid(),
                     NormalizedName = "admin"
                 };
 
                 context.Roles.Add(newAdminRole);
 
-                var newUserRole = new IdentityRole()
+                var newUserRole = new IdentityRole<Guid>()
                 {
                     Name = "User",
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid(),
                 };
                 context.Roles.Add(newUserRole);
 

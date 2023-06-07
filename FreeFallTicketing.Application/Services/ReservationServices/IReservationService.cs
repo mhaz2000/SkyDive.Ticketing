@@ -5,11 +5,12 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 {
     public interface IReservationService
     {
-        Task CancelTicket(Guid id);
-        Task<Guid> Create(ReserveCommand command);
-        Task RegisterIdentityDocuments(RegisterIdentityDocumentCommand command);
-        Task Update(ReserveCommand command, Guid id);
-        Task<IEnumerable<TicketDTO>> GetTickets();
-        Task<TicketDTO> GetTicket(Guid id);
+        Task Update(ReserveCommand command, Guid userId);
+        Task UnlockTickets();
+        Task<(bool, string)> CheckTickets(Guid userId);
+        Task<IEnumerable<MyTicketDTO>> GetUserTickets(Guid userId);
+        Task<bool> SetAsPaid(Guid userId);
+        Task CancelTicketRequest(Guid id, Guid userId);
+        Task CancelTicketResponse(Guid id, bool response);
     }
 }
