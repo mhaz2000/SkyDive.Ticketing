@@ -26,10 +26,19 @@ namespace SkyDiveTicketing.Core.Entities
         public bool Paid { get; private set; }
         public bool Locked { get; private set; }
         public bool Cancelled { get; private set; }
+
+        /// <summary>
+        /// با توجه به اینکه قیمت بلیت های ممکن است تغییر کند.
+        /// </summary>
+        public double PaidAmount { get; set; }
         public AdminCartable? RelatedAdminCartableRequest { get; private set; }
 
         public void SetRequest(AdminCartable request) => RelatedAdminCartableRequest = request;
-        public void SetAsPaid() => Paid = true;
+        public void SetAsPaid(double amount)
+        {
+            Paid = true;
+            PaidAmount = amount;
+        }
         public void SetAsUnLock() => Locked = false;
         public void SetAsCancelled() => Cancelled = true;
 

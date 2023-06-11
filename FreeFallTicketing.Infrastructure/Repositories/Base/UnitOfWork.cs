@@ -11,16 +11,18 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
         private CityRepository? _cityRepository;
         private UserRepository? _userRepository;
         private TicketRepository? _ticketRepository;
+        private WalletRepository? _walletRepository;
         private MessageRepository? _messageRepository;
         private UserTypeRepository? _userTypeRepository;
         private SettingsRepository? _settingsRepository;
         private PassengerRepository? _passengerRepository;
         private FileModelRepository? _fileModelRepository;
         private FlightLoadRepository? _flightLoadRepository;
+        private JumpRecordRepository? _jumpRecordRepository;
         private TransactionRepository? _transactionRepository;
         private ShoppingCartRepository? _shoppingCartRepository;
         private SkyDiveEventRepository? _skyDiveEventRepository;
-        private AdminCartableRepository _adminCartableRepository;
+        private AdminCartableRepository? _adminCartableRepository;
         private SkyDiveEventItemRepository? _skyDiveEventItemRepository;
         private SkyDiveEventStatusRepository? _skyDiveEventStatusRepository;
         private SkyDiveEventTicketTypeRepository? _skyDiveEventTicketTypeRepository;
@@ -37,6 +39,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
 
         public IUserRepository UserRepository => _userRepository ?? new UserRepository(_context);
 
+        public IWalletRepository WalletRepository => _walletRepository ?? new WalletRepository(_context);
+
         public ITicketRepository TicketRepository => _ticketRepository ?? new TicketRepository(_context);
 
         public IMessageRepository MessageRepository => _messageRepository ?? new MessageRepository(_context);
@@ -51,6 +55,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
 
         public IFlightLoadRepository FlightLoadRepository => _flightLoadRepository ?? new FlightLoadRepository(_context);
 
+        public IJumpRecordRepository JumpRecordRepository => _jumpRecordRepository ?? new JumpRecordRepository(_context);
+
         public ITransactionRepository TransactionRepositroy => _transactionRepository ?? new TransactionRepository(_context);
 
         public IShoppingCartRepository ShoppingCartRepository => _shoppingCartRepository ?? new ShoppingCartRepository(_context);
@@ -61,7 +67,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
 
         public ISkyDiveEventItemRepository SkyDiveEventItemRepository => _skyDiveEventItemRepository ?? new SkyDiveEventItemRepository(_context);
 
-        public ISkyDiveEventStatusRepository SkyDiveEventStatusRepository => _skyDiveEventStatusRepository ??  new SkyDiveEventStatusRepository(_context);
+        public ISkyDiveEventStatusRepository SkyDiveEventStatusRepository => _skyDiveEventStatusRepository ?? new SkyDiveEventStatusRepository(_context);
 
         public ISkyDiveEventTicketTypeRepository SkyDiveEventTicketTypeRepository => _skyDiveEventTicketTypeRepository ?? new SkyDiveEventTicketTypeRepository(_context);
 
@@ -74,6 +80,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
         public IFlightLoadCancellationTypeRepository FlightLoadCancellationTypeRepository => _flightLoadCancellationTypeRepository ?? new FlightLoadCancellationTypeRepository(_context);
 
         public IPassengerNationalCardDocumentRepository PassengerNationalCardDocumentRepository => _passengerNationalCardDocumentRepository ?? new PassengerNationalCardDocumentRepository(_context);
+
 
         public async Task<int> CommitAsync()
         {

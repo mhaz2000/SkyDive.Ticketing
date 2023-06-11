@@ -8,7 +8,7 @@ namespace SkyDiveTicketing.Core.Repositories
         Ticket AddTicket(FlightLoadItem flightLoadItem, User user, int flightNumber, SkyDiveEvent skyDiveEvent);
         void ClearUserTicket(User user);
         void SetAsCancelled(Ticket ticket);
-        void SetAsPaid(Ticket ticket);
+        void SetAsPaid(Ticket ticket, double amount);
         void Unlock(Ticket ticket);
     }
 }

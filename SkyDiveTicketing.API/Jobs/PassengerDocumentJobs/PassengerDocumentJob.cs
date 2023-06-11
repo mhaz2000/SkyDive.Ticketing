@@ -1,6 +1,6 @@
 ﻿using SkyDiveTicketing.Application.Services.PassengerServices;
 
-namespace SkyDiveTicketing.API.Jobs
+namespace SkyDiveTicketing.API.Jobs.PassengerDocumentJobs
 {
     public class PassengerDocumentJob : IPassengerDocumentJob
     {

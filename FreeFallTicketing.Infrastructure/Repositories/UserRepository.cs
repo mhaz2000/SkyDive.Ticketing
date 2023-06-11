@@ -80,6 +80,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             var role = Context.Roles.FirstOrDefault(c => c.Name == "User");
             await Context.UserRoles.AddAsync(new IdentityUserRole<Guid>() { RoleId = role.Id, UserId = user.Id });
+            await Context.Wallets.AddAsync(new Wallet(0, user));
 
             return user.Id;
         }
@@ -146,6 +147,21 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
             user.OtpCode = otpCode;
             user.OtpRequestTime = DateTime.Now;
+        }
+
+        public void UpdateUser(User user, float? weight, float? height, DefaultCity? city, string? lastName, string? firstName, string? nationalCode, string emergencyPhone,
+            string address, DateTime? birthDate, string emergencyContact)
+        {
+            user.Passenger.Weight = weight;
+            user.Passenger.Height = height;
+            user.Passenger.City = city;
+            user.LastName = lastName;
+            user.FirstName = firstName;
+            user.NationalCode = nationalCode;
+            user.Passenger.EmergencyContact = emergencyContact;
+            user.Passenger.EmergencyPhone = emergencyPhone;
+            user.Passenger.Address = address;
+            user.BirthDate = birthDate;
         }
 
         public void UpdateUserPassword(string password, User user)

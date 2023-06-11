@@ -106,6 +106,25 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
+        [HttpGet("CheckUserExistence/{username}")]
+        public async Task<IActionResult> CheckUserExistence(string username)
+        {
+            try
+            {
+                await _userService.CheckUserExistence(username);
+                return OkResult("کاربر مورد نظر یافت شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
         [HttpPost("UserSecurityInformationCompletion")]
         public async Task<IActionResult> UserSecurityInformationCompletion(UserSecurityInformationCompletionCommand command)
         {

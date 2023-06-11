@@ -46,9 +46,9 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             ticket.SetAsCancelled();
         }
 
-        public void SetAsPaid(Ticket ticket)
+        public void SetAsPaid(Ticket ticket, double amount)
         {
-            ticket.SetAsPaid();
+            ticket.SetAsPaid(amount);
         }
 
         public void Unlock(Ticket ticket)

@@ -10,7 +10,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         Task OtpRequest(OtpUserCommand command);
 
-        Task Update(string id, CreateUserCommand command);
+        Task Update(UpdateUserCommand command);
 
         UserDTO GetUser(Guid id);
 
@@ -41,5 +41,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         Task<UserPersonalInformationDTO> GetPersonalInformation(Guid userId);
 
         Task<UserDocumentsDTO> GetUserDocuments(Guid userId);
+
+        Task CheckUserExistence(string username);
     }
 }

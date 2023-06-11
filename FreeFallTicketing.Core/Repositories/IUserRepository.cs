@@ -41,5 +41,8 @@ namespace SkyDiveTicketing.Core.Repositories
         void AddMessage(User user, string message);
 
         void AssignUserType(User user, UserType userType);
+
+        void UpdateUser(User user, float? weight, float? height, DefaultCity? city, string? lastName, string? firstName,
+            string? nationalCode, string emergencyPhone, string address, DateTime? birthDate, string emergencyContact);
     }
 }

@@ -126,5 +126,24 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
                 throw new SystemException("متاسفانه خطای سیستمی رخ داده");
             }
         }
+
+        [HttpGet("PrintTicket/{id}")]
+        public IActionResult PrintTicket(Guid id)
+        {
+            try
+            {
+                var ticketFile = _reservationService.PrintTicket(id);
+                return File(ticketFile, "application/octet-stream");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
     }
 }

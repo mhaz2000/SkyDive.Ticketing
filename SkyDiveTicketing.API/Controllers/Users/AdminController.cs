@@ -115,5 +115,30 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 throw new SystemException("متاسفانه خطای سیستمی رخ داده");
             }
         }
+
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUser(UpdateUserCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _userService.Update(command);
+                return OkResult("اطلاعات کاربر ویرایش شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
     }
 }

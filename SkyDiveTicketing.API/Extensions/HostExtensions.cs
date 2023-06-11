@@ -33,6 +33,7 @@ namespace SkyDiveTicketing.API.Extensions
                     SeedCities(dataContext);
                     CreateUserType(dataContext);
                     CreateSkyDiveEventTicketType(dataContext);
+                    CreateInitialSettings(dataContext);
 
                     logger.LogInformation("Migrating database");
                 }
@@ -52,13 +53,33 @@ namespace SkyDiveTicketing.API.Extensions
             return host;
         }
 
+        private static void CreateInitialSettings(DataContext dataContext)
+        {
+            if (!dataContext.Settings.Any())
+            {
+                dataContext.Settings.Add(new Settings()
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    IsDeleted = false,
+                    JumpDuration = 6,
+                    TermsAndConditionsUrl = string.Empty,
+                    UserStatusInfo = new List<UserStatusInfo>(),
+                    VAT = 0.9f
+                });
+
+                dataContext.SaveChanges();
+            }
+        }
+
         private static void SeedCities(DataContext dataContext)
         {
             if (!dataContext.Cities.Any())
             {
                 var filePath = Directory.GetCurrentDirectory() + @"\JsonFiles\cities.json";
                 using FileStream stream = File.OpenRead(filePath);
-                var cities = JsonSerializer.Deserialize<ICollection<DefaultCity>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false});
+                var cities = JsonSerializer.Deserialize<ICollection<DefaultCity>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
 
                 dataContext.Cities.AddRange(cities);
                 dataContext.SaveChanges();

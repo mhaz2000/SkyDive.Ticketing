@@ -13,8 +13,10 @@ using Microsoft.IdentityModel.Tokens;
 using Hangfire;
 using Hangfire.SqlServer;
 using System.Text;
-using SkyDiveTicketing.API.Jobs;
 using SkyDiveTicketing.Application.Helpers;
+using SkyDiveTicketing.API.Jobs.PassengerDocumentJobs;
+using SkyDiveTicketing.API.Jobs.TicketJobs;
+using SkyDiveTicketing.API.Jobs.JumpRecordJobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -152,5 +154,6 @@ app.MigrateDatabase<Program>();
 
 RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
 RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
+RecurringJob.AddOrUpdate<IJumpRecordJob>("UnlockTicket", c => c.CheckIfExpired(), Cron.Daily);
 
 app.Run();

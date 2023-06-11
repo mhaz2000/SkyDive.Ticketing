@@ -10,6 +10,7 @@ namespace SkyDiveTicketing.Infrastructure.Data
     public class DataContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Wallet> Wallets  { get; set; }
         public DbSet<FileModel> Files { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Settings> Settings { get; set; }
@@ -17,6 +18,7 @@ namespace SkyDiveTicketing.Infrastructure.Data
         public DbSet<UserType> UserTypes { get; set; }
         public DbSet<Passenger> Passengers { get; set; }
         public DbSet<FlightLoad> FlightLoads { get; set; }
+        public DbSet<JumpRecord> JumpRecords { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<SkyDiveEvent> SkyDiveEvents { get; set; }

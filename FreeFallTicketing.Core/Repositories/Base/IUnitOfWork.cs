@@ -4,6 +4,7 @@
     {
         IUserRepository UserRepository { get; }
         ICityRepository CityRepository { get; }
+        IWalletRepository WalletRepository { get; }
         ITicketRepository TicketRepository { get; }
         IFileModelRepository FileRepository { get; }
         IMessageRepository MessageRepository { get; }
@@ -11,6 +12,7 @@
         ISettingsRepository SettingsRepository { get; }
         IPassengerRepository PassengerRepository { get; }
         IFlightLoadRepository FlightLoadRepository { get; }
+        IJumpRecordRepository JumpRecordRepository { get; }
         ITransactionRepository TransactionRepositroy { get; }
         IShoppingCartRepository ShoppingCartRepository { get; }
         ISkyDiveEventRepository SkyDiveEventRepository { get; }

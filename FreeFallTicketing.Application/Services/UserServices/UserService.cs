@@ -89,7 +89,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public async Task<UserLoginDto> LoginUser(LoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
         {
             var user = await _unitOfWork.UserRepository
-                .FirstOrDefaultAsync(c => c.PhoneNumber == command.Username && c.Status != UserStatus.Inactive);
+                .FirstOrDefaultAsync(c => c.UserName == command.Username || c.PhoneNumber == command.Username || c.Email == command.Username && c.Status != UserStatus.Inactive);
 
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
@@ -203,9 +203,20 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await _unitOfWork.CommitAsync();
         }
 
-        public Task Update(string id, CreateUserCommand command)
+        public async Task Update(UpdateUserCommand command)
         {
-            throw new NotImplementedException();
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c=> c.Id == command.Id, c=> c.Passenger);
+            if (user is null) 
+                throw new ManagedException("کاربر مورد نظر یافت نشد.");
+
+            var city = command.CityId is not null ? await _unitOfWork.CityRepository.GetByIdAsync(command.CityId.Value) : null;
+            if (city is null && command.CityId is not null)
+                throw new ManagedException("شهر مورد نظر یافت نشد.");
+
+            _unitOfWork.UserRepository.UpdateUser(user, command.Weight, command.Height, city, command.LastName, command.FirstName,
+                command.NationalCode, command.EmergencyPhone, command.Address, command.BirthDate, command.EmergencyContact);
+
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task InactivateUser(UserCommand command)
@@ -316,6 +327,14 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 LogBookDocument = user.Passenger?.LogBookDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.LogBookDocumentFile.Id, user.Passenger.LogBookDocumentFile.ExpirationDate) : null,
                 NationalCardDocument = user.Passenger?.NationalCardDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.NationalCardDocumentFile.Id, user.Passenger.NationalCardDocumentFile.ExpirationDate) : null
             };
+        }
+
+        public async Task CheckUserExistence(string username)
+        {
+            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.UserName == username || c.PhoneNumber == username || c.Email == username);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
         }
     }
 }

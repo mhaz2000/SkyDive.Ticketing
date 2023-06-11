@@ -9,7 +9,7 @@ namespace SkyDiveTicketing.Core.Entities
 
         }
 
-        public Transaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, int invoiceNumber) : base()
+        public Transaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, int invoiceNumber, User payer) : base()
         {
             InvoiceNumber = invoiceNumber;
             EventName = eventName;
@@ -17,10 +17,11 @@ namespace SkyDiveTicketing.Core.Entities
             PaymentInformation = paymetInformation;
             Amount = amount;
             Type = type;
+            Payer = payer;
         }
 
         /// <summary>
-        /// شماره بلیت
+        /// اطلاعات بلیت ها
         /// </summary>
         public string TicketNumber { get; set; }
 
@@ -40,6 +41,16 @@ namespace SkyDiveTicketing.Core.Entities
         public double Amount { get; set; }
 
         /// <summary>
+        /// مالیات بر ارزش افزوده
+        /// </summary>
+        public double VAT { get; set; }
+
+        /// <summary>
+        /// مبلغ کل
+        /// </summary>
+        public double TotalAmount => VAT + Amount;
+
+        /// <summary>
         /// نوع
         /// </summary>
         public TransactionType Type { get; set; }
@@ -48,6 +59,11 @@ namespace SkyDiveTicketing.Core.Entities
         /// شماره فاکتور
         /// </summary>
         public int InvoiceNumber { get; set; }
+
+        /// <summary>
+        /// پرداخت کننده
+        /// </summary>
+        public User Payer { get; set; }
     }
     public enum TransactionType
     {

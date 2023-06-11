@@ -1,8 +1,10 @@
 ﻿using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.Reservation;
 using SkyDiveTicketing.Application.DTOs.TicketDTOs;
+using SkyDiveTicketing.Application.Helpers;
 using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace SkyDiveTicketing.Application.Services.ReservationServices
@@ -97,9 +99,10 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             foreach (var ticket in shoppingCart.Tickets)
             {
                 var ticketModel = ticketModels.FirstOrDefault(x => x.Ticket == ticket);
-                _unitOfWork.TicketRepository.SetAsPaid(ticket);
+                _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketModel.SkyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == ticketModel.FlightLoadItem.FlightLoadType.Id).Amount);
 
-                await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber, ticketModel.SkyDiveEvent.Location + "کد" + ticketModel.SkyDiveEvent.Code.ToString("000"), "", 0, TransactionType.Confirmed);
+                await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
+                    ticketModel.SkyDiveEvent.Location + "کد" + ticketModel.SkyDiveEvent.Code.ToString("000"), "", 0, TransactionType.Confirmed, user);
             }
 
             await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
@@ -160,7 +163,8 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {flightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
                 else
                 {
-                    tickets.Add(_unitOfWork.TicketRepository.AddTicket(flightLoadItem, user, flightLoad.Number, skyDiveEvent));
+                    for (int i = 0; i < item.Qty; i++)
+                        tickets.Add(_unitOfWork.TicketRepository.AddTicket(flightLoadItem, user, flightLoad.Number, skyDiveEvent));
                 }
             }
 
@@ -185,11 +189,28 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             {
                 _unitOfWork.TicketRepository.SetAsCancelled(ticket);
                 _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین تایید شد.");
+
+                var wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludeAsync(c => c.User == request.Applicant, c => c.User);
+                if (wallet is not null)
+                    _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, ticket.PaidAmount);
             }
             else
                 _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین رد شد.");
 
             await _unitOfWork.CommitAsync();
+        }
+
+        public MemoryStream PrintTicket(Guid id)
+        {
+            PersianCalendar pc = new PersianCalendar();
+
+            var ticket = _unitOfWork.SkyDiveEventRepository.GetDetails(c => c.Ticket.Id == id).FirstOrDefault();
+            if (ticket is null)
+                throw new ManagedException("بلیت مورد نظر یافت نشد.");
+
+            return PdfHelper.TicketPdf(ticket.Ticket.ReservedBy.FullName, ticket.FlightLoadItem.FlightLoadType.Title, ticket.Ticket.TicketNumber,
+                ticket.SkyDiveEvent.Location, $"{pc.GetYear(ticket.FlightLoad.Date)}/{pc.GetMonth(ticket.FlightLoad.Date)}/{pc.GetDayOfMonth(ticket.FlightLoad.Date)}",
+                ticket.FlightLoad.Number.ToString("000"), ticket.Ticket.ReservedBy.NationalCode ?? string.Empty);
         }
     }
 }

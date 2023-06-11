@@ -1,4 +1,4 @@
-﻿namespace SkyDiveTicketing.API.Jobs
+﻿namespace SkyDiveTicketing.API.Jobs.PassengerDocumentJobs
 {
     public interface IPassengerDocumentJob
     {
