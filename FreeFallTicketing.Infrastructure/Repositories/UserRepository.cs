@@ -43,7 +43,23 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public void CompeleteOtherUserPersonalInfo(string email, DefaultCity? city, string address, string emergencyContact, string emergencyPhone, float? height, float? weight, User user)
         {
-            user.Passenger = user.Passenger ?? new Passenger(user.NationalCode, city, address, height, weight, emergencyContact, emergencyPhone);
+            if (user.Passenger is not null)
+            {
+                user.Passenger.City = city;
+                user.Passenger.Address = address;
+                user.Passenger.Height = height;
+                user.Passenger.Weight = weight;
+                user.Passenger.EmergencyContact = emergencyContact;
+                user.Passenger.EmergencyPhone = emergencyPhone;
+                user.Passenger.NationalCode = user.NationalCode;
+            }
+            else
+            {
+                var entity = new Passenger(user.NationalCode, city, address, height, weight, emergencyContact, emergencyPhone);
+                Context.Passengers.Add(entity);
+                user.Passenger = entity;
+            }
+
             user.Email = email;
         }
 
@@ -144,6 +160,9 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public void PhoneConfirmed(User user)
         {
+            var lastCode = Context.Users.OrderByDescending(c => c.Code).FirstOrDefault()?.Code;
+
+            user.Code = lastCode is not null && lastCode != 0 ? lastCode.Value + 1 : 100001;
             user.PhoneNumberConfirmed = true;
         }
 

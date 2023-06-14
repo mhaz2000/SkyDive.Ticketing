@@ -41,7 +41,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -67,7 +67,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -87,7 +87,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -111,7 +111,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -137,7 +137,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -163,7 +163,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -189,7 +189,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -208,7 +208,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -227,7 +227,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -246,7 +246,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -265,7 +265,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -284,7 +284,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }

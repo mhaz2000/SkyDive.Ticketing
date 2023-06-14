@@ -30,9 +30,9 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             Expression<Func<User, object>>[] includeExpressions = {
                 c => c.Passenger.AttorneyDocumentFile,
                 c => c.Passenger.NationalCardDocumentFile,
-                c=> c.Passenger.LogBookDocumentFile,
-                c=> c.Passenger.MedicalDocumentFile,
-                c=> c.Messages
+                c => c.Passenger.LogBookDocumentFile,
+                c => c.Passenger.MedicalDocumentFile,
+                c => c.Messages
             };
 
             var user = _unitOfWork.UserRepository.Include(includeExpressions).FirstOrDefault(c => c.Id == command.Id && c.Status != UserStatus.Inactive);
@@ -55,9 +55,11 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 UploadDocument(user, command);
 
                 await _unitOfWork.UserRepository.AddMessage(user, "اطلاعات حساب کاربری جهت رسیدگی و تایید ارسال شد.");
+                await _unitOfWork.AdminCartableRepository.AddToCartable($"اطلاعات حساب کاربری {user.FirstName} {user.LastName} ثبت شد، لطفا نسبت به تایید یا رد آن ها اقدام فرمایید.",
+                    user, RequestType.UserInformationConfirmation);
+
                 _unitOfWork.UserRepository.ChangeUserStatus(user, UserStatus.Pending);
             }
-
 
             await _unitOfWork.CommitAsync();
         }
@@ -73,14 +75,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             _unitOfWork.UserRepository.CompeleteUserSecurityInfo(command.Username, command.Password, user);
             await _unitOfWork.CommitAsync();
-        }
-
-        public UserDTO GetUser(Guid id)
-        {
-            var user = _unitOfWork.UserRepository.Include(c => c.UserType).FirstOrDefault(c => c.Id == id);
-
-            return new UserDTO(user.Id, user.UserName, user.PhoneNumber, user.Email, user.FirstName,
-                user.LastName, user.Status, user.Code, user.UserType.Title, user.CreatedAt, user.UpdatedAt);
         }
 
         public IEnumerable<UserDTO> GetUsers(string search)
@@ -204,7 +198,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public async Task<Guid> Register(CreateUserCommand command)
         {
             var duplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower()
-                && (c.Status == UserStatus.Active || c.Status == UserStatus.AwaitingCompletion));
+                && c.Status != UserStatus.Active);
 
             if (duplicationCheck)
                 throw new ManagedException("این شماره قبلا ثبت شده است.");
@@ -227,8 +221,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task Update(UpdateUserCommand command)
         {
-            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c=> c.Id == command.Id, c=> c.Passenger);
-            if (user is null) 
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == command.Id, c => c.Passenger);
+            if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
             var city = command.CityId is not null ? await _unitOfWork.CityRepository.GetByIdAsync(command.CityId.Value) : null;
@@ -276,31 +270,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         }
 
-        private void UploadDocument(User user, UserPersonalInformationCompletionCommand command)
-        {
-            if (command.NationalCardDocument is not null)
-                _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, command.NationalCardDocument.FileId);
-
-            if (command.AttorneyDocument is not null)
-                _unitOfWork.PassengerRepository.AddAttorneyDocument(user.Passenger, command.AttorneyDocument.FileId, command.AttorneyDocument.ExpirationDate);
-
-            if (command.LogBookDocument is not null)
-                _unitOfWork.PassengerRepository.AddLogBookDocument(user.Passenger, command.LogBookDocument.FileId);
-
-            if (command.MedicalDocument is not null)
-                _unitOfWork.PassengerRepository.AddMedicalDocument(user.Passenger, command.MedicalDocument.FileId, command.MedicalDocument.ExpirationDate);
-        }
-
-        private async Task OtherPersonalInformation(User user, UserPersonalInformationCompletionCommand command)
-        {
-            var city = command.CityId is not null ? await _unitOfWork.CityRepository.GetByIdAsync(command.CityId.Value) : null;
-            if (city is null && command.CityId is not null)
-                throw new ManagedException("شهر مورد نظر یافت نشد.");
-
-            _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, city, command.Address ?? string.Empty, command.EmergencyContact ?? string.Empty,
-                command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
-        }
-
         public async Task<bool> CheckIfUserIsActive(Guid id)
         {
             var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Id == id && c.Status != UserStatus.Inactive);
@@ -344,10 +313,14 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             return new UserDocumentsDTO(userId, user.CreatedAt, user.UpdatedAt)
             {
-                AttorneyDocument = user.Passenger?.AttorneyDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.AttorneyDocumentFile.Id, user.Passenger.AttorneyDocumentFile.ExpirationDate) : null,
-                MedicalDocument = user.Passenger?.MedicalDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.MedicalDocumentFile.Id, user.Passenger.MedicalDocumentFile.ExpirationDate) : null,
-                LogBookDocument = user.Passenger?.LogBookDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.LogBookDocumentFile.Id, user.Passenger.LogBookDocumentFile.ExpirationDate) : null,
-                NationalCardDocument = user.Passenger?.NationalCardDocumentFile is not null ? new UserDocumentDetailDTO(user.Passenger.NationalCardDocumentFile.Id, user.Passenger.NationalCardDocumentFile.ExpirationDate) : null
+                AttorneyDocument = user.Passenger?.AttorneyDocumentFile is not null ?
+                    new UserDocumentDetailDTO(user.Passenger.AttorneyDocumentFile.Id, user.Passenger.AttorneyDocumentFile.ExpirationDate, user.Passenger.AttorneyDocumentFile.Status.GetDescription()) : null,
+                MedicalDocument = user.Passenger?.MedicalDocumentFile is not null ?
+                    new UserDocumentDetailDTO(user.Passenger.MedicalDocumentFile.Id, user.Passenger.MedicalDocumentFile.ExpirationDate, user.Passenger.MedicalDocumentFile.Status.GetDescription()) : null,
+                LogBookDocument = user.Passenger?.LogBookDocumentFile is not null ?
+                    new UserDocumentDetailDTO(user.Passenger.LogBookDocumentFile.Id, user.Passenger.LogBookDocumentFile.ExpirationDate, user.Passenger.LogBookDocumentFile.Status.GetDescription()) : null,
+                NationalCardDocument = user.Passenger?.NationalCardDocumentFile is not null ?
+                    new UserDocumentDetailDTO(user.Passenger.NationalCardDocumentFile.Id, user.Passenger.NationalCardDocumentFile.ExpirationDate, user.Passenger.NationalCardDocumentFile.Status.GetDescription()) : null
             };
         }
 
@@ -357,6 +330,41 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
+        }
+
+        private void UploadDocument(User user, UserPersonalInformationCompletionCommand command)
+        {
+            if (command.NationalCardDocument is not null)
+                _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, command.NationalCardDocument.FileId);
+
+            if (command.AttorneyDocument is not null)
+            {
+                if (command.AttorneyDocument.ExpirationDate is null)
+                    throw new ManagedException("تاریخ انقضای وکالتنامه محضری الزامی است.");
+
+                _unitOfWork.PassengerRepository.AddAttorneyDocument(user.Passenger, command.AttorneyDocument.FileId, command.AttorneyDocument.ExpirationDate);
+            }
+
+            if (command.LogBookDocument is not null)
+                _unitOfWork.PassengerRepository.AddLogBookDocument(user.Passenger, command.LogBookDocument.FileId);
+
+            if (command.MedicalDocument is not null)
+            {
+                if (command.MedicalDocument.ExpirationDate is null)
+                    throw new ManagedException("تاریخ انقضای مدارک پزشکی الزامی است.");
+
+                _unitOfWork.PassengerRepository.AddMedicalDocument(user.Passenger, command.MedicalDocument.FileId, command.MedicalDocument.ExpirationDate);
+            }
+        }
+
+        private async Task OtherPersonalInformation(User user, UserPersonalInformationCompletionCommand command)
+        {
+            var city = command.CityId is not null ? await _unitOfWork.CityRepository.GetByIdAsync(command.CityId.Value) : null;
+            if (city is null && command.CityId is not null)
+                throw new ManagedException("شهر مورد نظر یافت نشد.");
+
+            _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, city, command.Address ?? string.Empty, command.EmergencyContact ?? string.Empty,
+                command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
         }
     }
 }

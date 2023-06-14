@@ -1,4 +1,5 @@
 ﻿using SkyDiveTicketing.Core.Entities.Base;
+using System.ComponentModel;
 
 namespace SkyDiveTicketing.Core.Entities
 {
@@ -133,9 +134,13 @@ namespace SkyDiveTicketing.Core.Entities
 
     public enum DocumentStatus
     {
+        [Description("بارگذاری نشده")]
         NotLoaded = 0,
+        [Description("در انتظار تایید")]
         Pending,
+        [Description("منقضی شده")]
         Expired,
+        [Description("تایید شده")]
         Confirmed
     }
 }

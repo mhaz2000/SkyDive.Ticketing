@@ -270,11 +270,6 @@
     "Province": "نطنز"
   },
   {
-    "State": "&amp;nbsp;",
-    "City": "&amp;nbsp;",
-    "Province": "&amp;nbsp;"
-  },
-  {
     "State": "البرز",
     "City": "ساوجبلاغ",
     "Province": "ساوجبلاغ"
@@ -380,11 +375,6 @@
     "Province": "ایلام"
   },
   {
-    "State": "&amp;nbsp;",
-    "City": "&amp;nbsp;",
-    "Province": "&amp;nbsp;"
-  },
-  {
     "State": "آذربایجان شرقی",
     "City": "خراجو",
     "Province": "مراغه"
@@ -430,11 +420,6 @@
     "Province": "آذرشهر"
   },
   {
-    "State": "آذربایجانشرقی",
-    "City": "آذرشهر",
-    "Province": "&amp;nbsp;"
-  },
-  {
     "State": "آذربایجان شرقی",
     "City": "ممقان",
     "Province": "آذرشهر"
@@ -448,16 +433,6 @@
     "State": "آذربایجان شرقی",
     "City": "اسکو",
     "Province": "اسکو"
-  },
-  {
-    "State": "آذربایجان شرقی",
-    "City": "اسکو",
-    "Province": "&amp;nbsp;"
-  },
-  {
-    "State": "آذربایجان شرقی",
-    "City": "سراب",
-    "Province": "&amp;nbsp;"
   },
   {
     "State": "آذربایجان شرقی",
@@ -481,11 +456,6 @@
   },
   {
     "State": "آذربایجان شرقی",
-    "City": "تبریز",
-    "Province": "&amp;nbsp;"
-  },
-  {
-    "State": "آذربایجان شرقی",
     "City": "شرفخانه",
     "Province": "شبستر"
   },
@@ -493,11 +463,6 @@
     "State": "آذربایجان شرقی",
     "City": "شبستر",
     "Province": "شبستر"
-  },
-  {
-    "State": "آذربایجان شرقی",
-    "City": "شبستر",
-    "Province": "&amp;nbsp;"
   },
   {
     "State": "آذربایجان شرقی",
@@ -518,11 +483,6 @@
     "State": "آذربایجان شرقی",
     "City": "مرند",
     "Province": "مرند"
-  },
-  {
-    "State": "آذربایجان شرقی",
-    "City": "مرند",
-    "Province": "&amp;nbsp;"
   },
   {
     "State": "آذربایجان شرقی",
@@ -548,11 +508,6 @@
     "State": "آذربایجان شرقی",
     "City": "کلیبر",
     "Province": "کلیبر"
-  },
-  {
-    "State": "آذربایجان شرقی",
-    "City": "کلیبر",
-    "Province": "&amp;nbsp;"
   },
   {
     "State": "آذربایجان شرقی",
@@ -1020,11 +975,6 @@
     "Province": "&amp;nbsp;"
   },
   {
-    "State": "&amp;nbsp;",
-    "City": "&amp;nbsp;",
-    "Province": "&amp;nbsp;"
-  },
-  {
     "State": "تهران",
     "City": "ورامین",
     "Province": "ورامین"
@@ -1126,8 +1076,7 @@
   },
   {
     "State": "تهران",
-    "City": "شمیرانات",
-    "Province": "&amp;nbsp;"
+    "City": "شمیرانات"
   },
   {
     "State": "تهران",
@@ -1410,11 +1359,6 @@
     "Province": "&amp;nbsp;"
   },
   {
-    "State": "&amp;nbsp;",
-    "City": "&amp;nbsp;",
-    "Province": "&amp;nbsp;"
-  },
-  {
     "State": "خراسان رضوی",
     "City": "کاخک",
     "Province": "گناباد"
@@ -1601,7 +1545,7 @@
   },
   {
     "State": "خراسان رضوی",
-    "City": "&amp;nbsp;",
+    "City": "جغتای",
     "Province": "جغتای"
   },
   {
@@ -1648,11 +1592,6 @@
     "State": "خراسان رضوی",
     "City": "فیض‌آباد",
     "Province": "مه‌ولات"
-  },
-  {
-    "State": "&amp;nbsp;",
-    "City": "&amp;nbsp;",
-    "Province": "&amp;nbsp;"
   },
   {
     "State": "خراسان شمالی",
@@ -1708,11 +1647,6 @@
     "State": "خراسان شمالی",
     "City": "پیش‌قلعه",
     "Province": "مانه و سملقان"
-  },
-  {
-    "State": "&amp;nbsp;",
-    "City": "&amp;nbsp;",
-    "Province": "&amp;nbsp;"
   },
   {
     "State": "خوزستان",
@@ -1852,11 +1786,6 @@
   {
     "State": "خوزستان",
     "City": "دشت آزادگان",
-    "Province": "&amp;nbsp;"
-  },
-  {
-    "State": "&amp;nbsp;",
-    "City": "&amp;nbsp;",
     "Province": "&amp;nbsp;"
   },
   {

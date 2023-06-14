@@ -166,17 +166,18 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
             }
         }
 
-        public virtual async Task<TEntity> GetFirstWithIncludeAsync(Expression<Func<TEntity, bool>> filter = null, params Expression<Func<TEntity, object>>[] includeProperty)
+        public virtual async Task<TEntity> GetFirstWithIncludeAsync(Expression<Func<TEntity, bool>>? filter = null, params Expression<Func<TEntity, object>>[] includeProperty)
         {
             IQueryable<TEntity> query = _dbSet;
-
-            var ss = includeProperty.FirstOrDefault().ToString();
 
             //Apply eager loading
             foreach (Expression<Func<TEntity, object>> navigationProperty in includeProperty)
                 query = query.Include<TEntity, object>(navigationProperty);
 
-            return await query.Where(filter).FirstOrDefaultAsync();
+            if (filter is not null)
+                query = query.Where(filter);
+
+            return await query.FirstOrDefaultAsync();
         }
 
         public int GetTotal()

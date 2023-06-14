@@ -12,8 +12,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         Task Update(UpdateUserCommand command);
 
-        UserDTO GetUser(Guid id);
-
         IEnumerable<UserDTO> GetUsers(string search);
 
         Task<UserLoginDto> OtpRegisterConfirmation(OtpUserConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions);

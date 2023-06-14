@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkyDiveTicketing.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,13 +36,15 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
 
     public class UserDocumentDetailDTO
     {
-        public UserDocumentDetailDTO(Guid fileId, DateTime? expirationDate)
+        public UserDocumentDetailDTO(Guid fileId, DateTime? expirationDate, string status)
         {
             FileId = fileId;
             ExpirationDate = expirationDate;
+            Status = status;
         }
 
         public Guid FileId { get; set; }
         public DateTime? ExpirationDate { get; set; }
+        public string Status { get; set; }
     }
 }

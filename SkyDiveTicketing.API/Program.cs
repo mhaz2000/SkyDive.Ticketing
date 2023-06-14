@@ -146,6 +146,14 @@ if (app.Environment.IsDevelopment())
     //app.UseSwaggerUI();
 }
 
+app.UseCors(c =>
+{
+    c.AllowAnyHeader();
+    c.AllowAnyMethod();
+    c.AllowAnyOrigin();
+});
+
+
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseAuthorization();
@@ -153,8 +161,8 @@ app.MapControllers();
 
 app.MigrateDatabase<Program>();
 
-RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
-RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
-RecurringJob.AddOrUpdate<IJumpRecordJob>("UnlockTicket", c => c.CheckIfExpired(), Cron.Daily);
+//RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
+//RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
+//RecurringJob.AddOrUpdate<IJumpRecordJob>("UnlockTicket", c => c.CheckIfExpired(), Cron.Daily);
 
 app.Run();

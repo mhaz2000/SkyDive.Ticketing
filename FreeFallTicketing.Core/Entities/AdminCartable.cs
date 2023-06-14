@@ -35,6 +35,6 @@ namespace SkyDiveTicketing.Core.Entities
         [Description("درخواست لغو بلیت")]
         TicketCancellation,
         [Description("درخواست استرداد وجه")]
-        Refund,
+        Refund
     }
 }

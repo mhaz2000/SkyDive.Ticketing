@@ -46,7 +46,7 @@ namespace SkyDiveTicketing.API.Controllers.Files
             var cdStr = $"inline; filename=\"{fileName}\"";
 
             Response.Headers.Add("Access-Control-Allow-Headers", "Content-Disposition");
-            Response.Headers.Add("Content-Disposition", cdStr);
+            //Response.Headers.Add("Content-Disposition", cdStr);
             Response.Headers.Add("X-Content-Type-Options", "nosniff");
 
             return File(fileStream, contentType, fileName);

@@ -23,7 +23,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public void AddMedicalDocument(Passenger passenger, Guid fileId, DateTime? expirationDate)
         {
-            passenger.AttorneyDocumentFile?.Upload(fileId, expirationDate);
+            passenger.MedicalDocumentFile?.Upload(fileId, expirationDate);
         }
 
         public void AddNationalCardDocument(Passenger passenger, Guid fileId)
