@@ -5,6 +5,8 @@ using SkyDiveTicketing.Infrastructure.Repositories.Base;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Data;
+using static SkyDiveTicketing.Core.Entities.User;
 
 namespace SkyDiveTicketing.Infrastructure.Repositories
 {
@@ -14,9 +16,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public void AddMessage(User user, string message)
+        public async Task AddMessage(User user, string message)
         {
-            user.AddMessage(new Message(message));
+            var entity = new Message(message);
+            await Context.Messages.AddAsync(entity);
+            user.AddMessage(entity);
         }
 
         public void AssignUserType(User user, UserType userType)
@@ -174,6 +178,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
             var code = (await Context.Users.OrderByDescending(c => c.Code).FirstOrDefaultAsync())?.Code ?? 100000;
             return code++;
+        }
+
+        public void ResetFailedAttempts(User user)
+        {
+            user.LoginFailedAttempts = 0;
         }
     }
 }

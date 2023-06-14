@@ -7,7 +7,8 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
     {
         public LoginCommandValidator()
         {
-            RuleFor(x => x.Username).NotEmpty().NotNull().WithMessage("نام کاربری الزامی است.");
+            RuleFor(x => x.Username).NotNull().WithMessage("نام کاربری الزامی است.");
+            RuleFor(x => x.Password).NotNull().WithMessage("رمز عبور الزامی است.");
         }
     }
 }

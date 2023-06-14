@@ -12,9 +12,9 @@
     "SkyDiveTicketing.API": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7016;http://localhost:5125",
+      "applicationUrl": "http://localhost:4030",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

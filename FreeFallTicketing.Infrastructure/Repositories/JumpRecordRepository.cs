@@ -11,7 +11,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task AddJumpRecord(DateTime date, string location, string equipments, string planeType, float height, TimeOnly time, string description, User user)
+        public async Task AddJumpRecord(DateTime date, string location, string equipments, string planeType, float height, DateTime time, string description, User user)
         {
             await Context.JumpRecords.AddAsync(new JumpRecord(date, location, equipments, planeType, height, time, description, user));
         }

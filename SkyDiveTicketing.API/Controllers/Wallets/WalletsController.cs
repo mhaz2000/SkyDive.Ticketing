@@ -31,7 +31,7 @@ namespace SkyDiveTicketing.API.Controllers.Wallets
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }

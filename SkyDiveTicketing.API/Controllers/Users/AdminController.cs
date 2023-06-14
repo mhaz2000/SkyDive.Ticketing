@@ -43,7 +43,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -68,7 +68,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -87,7 +87,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -112,7 +112,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -137,7 +137,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }

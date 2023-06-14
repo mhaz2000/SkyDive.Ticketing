@@ -4,11 +4,11 @@ using SkyDiveTicketing.Core.Repositories.Base;
 
 namespace SkyDiveTicketing.Application.Services.UserMessageServices
 {
-    public class UserMessageServices : IUserMessageService
+    public class UserMessageService : IUserMessageService
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public UserMessageServices(IUnitOfWork unitOfWork)
+        public UserMessageService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

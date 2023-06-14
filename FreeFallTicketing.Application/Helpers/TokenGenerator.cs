@@ -3,6 +3,7 @@ using SkyDiveTicketing.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using static SkyDiveTicketing.Core.Entities.User;
+using SkyDiveTicketing.Core.Repositories.Base;
 
 namespace SkyDiveTicketing.Application.Helpers
 {
@@ -10,21 +11,20 @@ namespace SkyDiveTicketing.Application.Helpers
     {
         private readonly IJwtFactory _jwtFactory;
         private readonly ITokenFactory _tokenFactory;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public TokenGenerator(IJwtFactory jwtFactory, ITokenFactory tokenFactory)
+        public TokenGenerator(IJwtFactory jwtFactory, ITokenFactory tokenFactory, IUnitOfWork unitOfWork)
         {
             _jwtFactory = jwtFactory;
             _tokenFactory = tokenFactory;
+            _unitOfWork = unitOfWork;
         }
 
         public JwToken TokenGeneration(User user, JwtIssuerOptionsModel _jwtOptions, IList<IdentityRole<Guid>> userRoles)
         {
             var refreshToken = _tokenFactory.GenerateToken();
-            if (user.RefreshTokens == null)
-                user.RefreshTokens = new List<RefreshToken>();
-            user.AddRefreshToken(refreshToken, user.Id.ToString(), _jwtOptions.ExpireTimeTokenInMinute);
 
-            var identity = _jwtFactory.GenerateClaimsIdentity(user.Email, user.Id.ToString());
+            var identity = _jwtFactory.GenerateClaimsIdentity(user.PhoneNumber, user.Id.ToString());
             if (identity == null)
             {
                 throw new SystemException("در فراخوانی و تطابق اطلاعات حساب کاربری خطایی رخ داده است!");

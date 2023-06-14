@@ -53,7 +53,8 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
-            await _unitOfWork.JumpRecordRepository.AddJumpRecord(command.Date, command.Location, command.Equipments, command.PlaneType, command.Height, command.Time, command.Description, user);
+            await _unitOfWork.JumpRecordRepository.AddJumpRecord(command.Date, command.Location, command.Equipments, command.PlaneType, command.Height,
+                new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, command.Time.Hour, command.Time.Minute, command.Time.Second), command.Description, user);
             await _unitOfWork.CommitAsync();
         }
 
@@ -66,7 +67,8 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
             var jumpRecords = await _unitOfWork.JumpRecordRepository.GetListWithIncludeAsync("User", c => c.User == user);
 
             return jumpRecords.Select(jumpRecord => new JumpRecordDTO(jumpRecord.Id, jumpRecord.CreatedAt,
-                jumpRecord.UpdatedAt, jumpRecord.Date, jumpRecord.Location, jumpRecord.Equipments, jumpRecord.PlaneType, jumpRecord.Height, jumpRecord.Time, jumpRecord.Description, jumpRecord.Confirmed));
+                jumpRecord.UpdatedAt, jumpRecord.Date, jumpRecord.Location, jumpRecord.Equipments, jumpRecord.PlaneType, jumpRecord.Height,
+                new TimeOnly(jumpRecord.Time.Hour, jumpRecord.Time.Minute, jumpRecord.Time.Second), jumpRecord.Description, jumpRecord.Confirmed));
         }
     }
 }

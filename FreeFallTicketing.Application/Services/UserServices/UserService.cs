@@ -31,7 +31,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 c => c.Passenger.AttorneyDocumentFile,
                 c => c.Passenger.NationalCardDocumentFile,
                 c=> c.Passenger.LogBookDocumentFile,
-                c=> c.Passenger.MedicalDocumentFile
+                c=> c.Passenger.MedicalDocumentFile,
+                c=> c.Messages
             };
 
             var user = _unitOfWork.UserRepository.Include(includeExpressions).FirstOrDefault(c => c.Id == command.Id && c.Status != UserStatus.Inactive);
@@ -43,14 +44,17 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             _unitOfWork.UserRepository.CompeleteUserPersonalInfo(command.FirstName ?? string.Empty, command.LastName ?? string.Empty, command.NationalCode ?? string.Empty, command.BirthDate, user);
 
-            await OtherPersonalInformation(user, command);
-            UploadDocument(user, command);
-
             if (registration)
-                _unitOfWork.UserRepository.AddMessage(user, $"{command.FirstName} {command.LastName} عزیز لطفا جهت تهیه بلیت اطلاعات کاربری خود را تکمیل نمایید.");
+            {
+                await _unitOfWork.UserRepository.AddMessage(user, $"{command.FirstName} {command.LastName} عزیز لطفا جهت تهیه بلیت اطلاعات کاربری خود را تکمیل نمایید.");
+                //send message to user for compleing personal information
+            }
             else
             {
-                _unitOfWork.UserRepository.AddMessage(user, "اطلاعات حساب کاربری جهت رسیدگی و تایید ارسال شد.");
+                await OtherPersonalInformation(user, command);
+                UploadDocument(user, command);
+
+                await _unitOfWork.UserRepository.AddMessage(user, "اطلاعات حساب کاربری جهت رسیدگی و تایید ارسال شد.");
                 _unitOfWork.UserRepository.ChangeUserStatus(user, UserStatus.Pending);
             }
 
@@ -100,6 +104,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (!await _userManager.CheckPasswordAsync(user, command.Password))
             {
                 _unitOfWork.UserRepository.LoginFailed(user);
+                await _unitOfWork.CommitAsync();
+
                 throw new ManagedException("نام کاربری یا رمز عبور اشتباه می‌باشد.");
             }
 
@@ -119,13 +125,13 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             };
         }
 
-        public async Task<Guid> OtpRegisterConfirmation(OtpUserConfirmationCommand command)
+        public async Task<UserLoginDto> OtpRegisterConfirmation(OtpUserConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
         {
-            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.PhoneNumber == command.Phone && c.Status != UserStatus.Inactive);
+            var user = _unitOfWork.UserRepository.FirstOrDefault(c => c.PhoneNumber == command.Phone && c.Status != UserStatus.Inactive);
             if (user is null)
                 throw new ManagedException("کاربری با این شماره موبایل یافت نشد.");
 
-            if (user.OtpCode == command.Code && (user.OtpRequestTime - DateTime.Now).Value.TotalMinutes < 1)
+            if (user.OtpCode == command.Code && Math.Abs((user.OtpRequestTime - DateTime.Now).Value.TotalMinutes) < 1)
             {
                 _unitOfWork.UserRepository.ChangeUserStatus(user, UserStatus.AwaitingCompletion);
                 _unitOfWork.UserRepository.PhoneConfirmed(user);
@@ -133,19 +139,34 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             else
                 throw new ManagedException("کد وارد شده اشتباه است.");
 
-            return user.Id;
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, _roleManager.Roles.Where(c => userRoles.Any(t => t == c.Name)).ToList());
+
+            await _unitOfWork.CommitAsync();
+
+            return new UserLoginDto()
+            {
+                TokenType = token.TokenType,
+                ExpiresIn = token.expires_in,
+                AuthToken = token.AuthToken,
+                RefreshToken = token.RefreshToken
+            };
         }
 
-        public async Task<UserLoginDto> OtpLoginUser(OtpUserConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
+        public async Task<UserLoginDto> OtpLoginUser(OtpLoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
         {
-            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.PhoneNumber == command.Phone && c.Status != UserStatus.Inactive);
+            var user = _unitOfWork.UserRepository.FirstOrDefault(c => c.Id == command.Id && c.Status != UserStatus.Inactive);
             if (user is null)
                 throw new ManagedException("کاربری با این شماره موبایل یافت نشد.");
 
-            if (user.OtpCode == command.Code && (user.OtpRequestTime - DateTime.Now).Value.TotalMinutes < 1)
+            if (user.OtpCode == command.Code && Math.Abs((user.OtpRequestTime - DateTime.Now).Value.TotalMinutes) < 1)
             {
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, _roleManager.Roles.Where(c => userRoles.Any(t => t == c.Name)).ToList());
+                _unitOfWork.UserRepository.ResetFailedAttempts(user);
+
+                var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user);
+                var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles.ToList());
+
+                await _unitOfWork.CommitAsync();
 
                 return new UserLoginDto()
                 {
@@ -154,6 +175,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                     AuthToken = token.AuthToken,
                     RefreshToken = token.RefreshToken
                 };
+
             }
             else
                 throw new ManagedException("کد وارد شده اشتباه است.");
@@ -165,7 +187,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربری با این شماره موبایل یافت نشد.");
 
-            if (user.OtpRequestTime is not null && (user.OtpRequestTime - DateTime.Now).Value.TotalMinutes < 1)
+            if (user.OtpRequestTime is not null && Math.Abs((user.OtpRequestTime - DateTime.Now).Value.TotalMinutes) < 1)
             {
                 throw new ManagedException("از زمان درخواست شما کمتر از 1 دقیقه گذشته است.");
             }
@@ -193,9 +215,9 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             return userId;
         }
 
-        public async Task ResetPassword(UserResetPasswordCommand command)
+        public async Task ResetPassword(UserResetPasswordCommand command, Guid userId)
         {
-            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Id == command.Id && c.Status != UserStatus.Inactive);
+            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Id == userId && c.Status != UserStatus.Inactive);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 

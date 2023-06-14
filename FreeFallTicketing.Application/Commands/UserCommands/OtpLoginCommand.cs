@@ -4,11 +4,10 @@ using SkyDiveTicketing.Application.Validators.UserValidators;
 
 namespace SkyDiveTicketing.Application.Commands.UserCommands
 {
-    public class UserResetPasswordCommand : ICommandBase
+    public class OtpLoginCommand : ICommandBase
     {
-        public string? Password { get; set; }
-
-        public void Validate() => new UserResetPasswordCommandValidator().Validate(this).RaiseExceptionIfRequired();
-
+        public Guid Id { get; set; }
+        public string Code { get; set; }
+        public void Validate() => new OtpLoginCommandValidator().Validate(this).RaiseExceptionIfRequired();
     }
 }

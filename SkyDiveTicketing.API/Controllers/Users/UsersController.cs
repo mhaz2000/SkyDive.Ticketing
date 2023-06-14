@@ -36,8 +36,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 command.Validate();
 
-                await _userService.Register(command);
-                return OkResult("ثبت نام شما با موفقیت انجام شد.");
+                return OkResult("ثبت نام شما با موفقیت انجام شد.", await _userService.Register(command));
             }
             catch (ManagedException e)
             {
@@ -50,7 +49,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -76,7 +75,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -88,8 +87,8 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 command.Validate();
 
-                var userId = await _userService.OtpRegisterConfirmation(command);
-                return OkResult("کد وارد شده صحیح می‌باشد.", userId);
+                var token = await _userService.OtpRegisterConfirmation(command, _jwtIssuerOptions);
+                return OkResult("کد وارد شده صحیح می‌باشد.", token);
             }
             catch (ManagedException e)
             {
@@ -102,26 +101,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
-            }
-        }
-
-        [HttpGet("CheckUserExistence/{username}")]
-        public async Task<IActionResult> CheckUserExistence(string username)
-        {
-            try
-            {
-                await _userService.CheckUserExistence(username);
-                return OkResult("کاربر مورد نظر یافت شد.");
-            }
-            catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -146,7 +126,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -157,7 +137,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 command.Validate();
 
-                await _userService.ResetPassword(command);
+                await _userService.ResetPassword(command, UserId);
                 return OkResult("رمز عبور شما با موفقیت تغییر یافت.");
             }
             catch (ManagedException e)
@@ -171,7 +151,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -190,7 +170,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
 
             }
         }
@@ -201,6 +181,8 @@ namespace SkyDiveTicketing.API.Controllers.Users
         {
             try
             {
+                command.Validate();
+
                 var loginDto = await _userService.LoginUser(command, _jwtIssuerOptions);
                 return OkResult("شما با موفقیت وارد شدید.", loginDto);
             }
@@ -215,7 +197,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -227,10 +209,12 @@ namespace SkyDiveTicketing.API.Controllers.Users
         /// <exception cref="SystemException"></exception>
         [AllowAnonymous]
         [HttpPost("OtpLogin")]
-        public async Task<IActionResult> OtpLogin(OtpUserConfirmationCommand command)
+        public async Task<IActionResult> OtpLogin(OtpLoginCommand command)
         {
             try
             {
+                command.Validate();
+
                 var loginDto = await _userService.OtpLoginUser(command, _jwtIssuerOptions);
                 return OkResult("شما با موفقیت وارد شدید.", loginDto);
             }
@@ -245,7 +229,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -277,7 +261,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -301,7 +285,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -326,10 +310,9 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
-
 
         /// <summary>
         /// اطلاعات شخصی
@@ -351,9 +334,28 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("CheckUserExistence/{username}")]
+        public async Task<IActionResult> CheckUserExistence(string username)
+        {
+            try
+            {
+                await _userService.CheckUserExistence(username);
+                return OkResult("کاربر مورد نظر یافت شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
     }
 }

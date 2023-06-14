@@ -5,7 +5,7 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface IJumpRecordRepository : IRepository<JumpRecord>
     {
-        Task AddJumpRecord(DateTime date, string location, string equipments, string planeType, float height, TimeOnly time, string description, User user);
+        Task AddJumpRecord(DateTime date, string location, string equipments, string planeType, float height, DateTime time, string description, User user);
         void ConfirmJumpRecord(JumpRecord jumpRecord);
         void ExpireJumpRecord(JumpRecord record);
     }

@@ -22,8 +22,8 @@ namespace SkyDiveTicketing.API.Controllers.Users
         {
             try
             {
-                await _userMessageService.GetUserMessages(userId);
-                return OkResult("لیست پیام های کاربر");
+                var messages = await _userMessageService.GetUserMessages(userId);
+                return OkResult("لیست پیام های کاربر", messages, messages.Count());
             }
             catch (ManagedException e)
             {
@@ -32,7 +32,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -41,8 +41,8 @@ namespace SkyDiveTicketing.API.Controllers.Users
         {
             try
             {
-                await _userMessageService.GetUserMessage(id);
-                return OkResult("پیام کاربر");
+                var message = await _userMessageService.GetUserMessage(id);
+                return OkResult("پیام کاربر", message);
             }
             catch (ManagedException e)
             {
@@ -51,11 +51,11 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> MessageHasBeenSeen(Guid id)
         {
             try
@@ -70,7 +70,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                throw new SystemException("متاسفانه خطای سیستمی رخ داده");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }

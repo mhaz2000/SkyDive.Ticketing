@@ -8,6 +8,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
     {
         private readonly DataContext _context;
 
+        private RoleRepository? _roleRepository;
         private CityRepository? _cityRepository;
         private UserRepository? _userRepository;
         private TicketRepository? _ticketRepository;
@@ -34,6 +35,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories.Base
 
 
         public UnitOfWork(DataContext context) => _context = context;
+
+        public IRoleRepository RoleRepository => _roleRepository ?? new RoleRepository(_context);
 
         public ICityRepository CityRepository => _cityRepository ?? new CityRepository(_context);
 

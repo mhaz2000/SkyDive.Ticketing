@@ -16,17 +16,17 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         IEnumerable<UserDTO> GetUsers(string search);
 
-        Task<Guid> OtpRegisterConfirmation(OtpUserConfirmationCommand command);
+        Task<UserLoginDto> OtpRegisterConfirmation(OtpUserConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
 
         Task CompeleteUserPersonalInformation(UserPersonalInformationCompletionCommand command, bool registration);
 
         Task CompeleteUserSecurityInformation(UserSecurityInformationCompletionCommand command);
 
-        Task ResetPassword(UserResetPasswordCommand command);
+        Task ResetPassword(UserResetPasswordCommand command, Guid userId);
 
         Task<UserLoginDto> LoginUser(LoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
 
-        Task<UserLoginDto> OtpLoginUser(OtpUserConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
+        Task<UserLoginDto> OtpLoginUser(OtpLoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
 
         Task InactivateUser(UserCommand command);
 

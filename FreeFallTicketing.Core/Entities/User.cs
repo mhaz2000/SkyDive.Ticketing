@@ -13,6 +13,7 @@ namespace SkyDiveTicketing.Core.Entities
             SecurityStamp = Guid.NewGuid().ToString();
             Messages = new List<Message>();
             PersonalInformationIsCompeleted = false;
+            LoginFailedAttempts = 0;
         }
 
         /// <summary>
@@ -90,8 +91,6 @@ namespace SkyDiveTicketing.Core.Entities
         /// </summary>
         public ICollection<Message>? Messages { get; private set; }
 
-        public List<RefreshToken> RefreshTokens { get; set; }
-
         public string FullName => FirstName + " " + LastName;
 
 
@@ -100,27 +99,6 @@ namespace SkyDiveTicketing.Core.Entities
             Messages.Add(message);
         }
 
-        public void AddRefreshToken(string token, string userId, double min = 10)
-        {
-            RefreshTokens.Add(new RefreshToken(token, DateTime.Now.AddMinutes(min), userId));
-        }
-
-        public class RefreshToken
-        {
-            public Guid Id { get; set; }
-            public string Token { get; private set; }
-            public DateTime Expires { get; private set; }
-            public string UserId { get; private set; }
-            public bool Active => DateTime.Now <= Expires;
-
-            public RefreshToken(string token, DateTime expires, string userId)
-            {
-                Id = Guid.NewGuid();
-                Token = token;
-                Expires = expires;
-                UserId = userId;
-            }
-        }
     }
 
     public enum UserStatus

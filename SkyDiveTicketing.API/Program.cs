@@ -142,10 +142,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseHangfireDashboard();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

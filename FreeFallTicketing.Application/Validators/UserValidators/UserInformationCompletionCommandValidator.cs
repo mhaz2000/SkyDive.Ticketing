@@ -7,8 +7,9 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
     {
         public UserPersonalInformationCompletionCommandValidator()
         {
-            RuleFor(c => c.Id).NotEmpty().NotNull().WithMessage("شناسه کاربر نمی‌تواند خالی باشد.");
-            RuleFor(c => c.BirthDate).NotEmpty().NotNull().WithMessage("تاریخ تولد نمی‌تواند خالی باشد.");
+            RuleFor(c => c.Id).NotNull().WithMessage("شناسه کاربر نمی‌تواند خالی باشد.");
+
+            RuleFor(c => c.BirthDate).NotNull().WithMessage("تاریخ تولد نمی‌تواند خالی باشد.");
         }
     }
 }

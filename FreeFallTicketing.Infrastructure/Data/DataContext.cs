@@ -4,13 +4,14 @@ using SkyDiveTicketing.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace SkyDiveTicketing.Infrastructure.Data
 {
     public class DataContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<Wallet> Wallets  { get; set; }
+        public DbSet<Wallet> Wallets { get; set; }
         public DbSet<FileModel> Files { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Settings> Settings { get; set; }
@@ -22,7 +23,7 @@ namespace SkyDiveTicketing.Infrastructure.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<SkyDiveEvent> SkyDiveEvents { get; set; }
-        public DbSet<AdminCartable> AdminCartables  { get; set; }
+        public DbSet<AdminCartable> AdminCartables { get; set; }
         public DbSet<FlightLoadItem> FlightLoadItems { get; set; }
         public DbSet<MedicalDocument> MedicalDocuments { get; set; }
         public DbSet<LogBookDocument> LogBookDocuments { get; set; }
@@ -48,25 +49,21 @@ namespace SkyDiveTicketing.Infrastructure.Data
                 .HasOne(p => p.MedicalDocumentFile)
                 .WithOne()
                 .HasForeignKey<Passenger>(p => p.MedicalDocumentFileId);
-            //.OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Passenger>()
                 .HasOne(p => p.LogBookDocumentFile)
                 .WithOne()
                 .HasForeignKey<Passenger>(p => p.LogBookDocumentFileId);
-                //.OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Passenger>()
                 .HasOne(p => p.AttorneyDocumentFile)
                 .WithOne()
                 .HasForeignKey<Passenger>(p => p.AttorneyDocumentFileId);
-                //.OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Passenger>()
                 .HasOne(p => p.NationalCardDocumentFile)
                 .WithOne()
                 .HasForeignKey<Passenger>(p => p.NationalCardDocumentFileId);
-                //.OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
