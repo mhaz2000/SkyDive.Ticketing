@@ -198,7 +198,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         private async Task<int> GetUserCode()
         {
             var code = (await Context.Users.OrderByDescending(c => c.Code).FirstOrDefaultAsync())?.Code ?? 100000;
-            return code++;
+            return ++code;
         }
 
         public void ResetFailedAttempts(User user)
