@@ -5,7 +5,7 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
     public class UserDTO : BaseDTO<Guid>
     {
         public UserDTO(Guid id, string username, string phone, string email, string firstName, string lastName,
-            UserStatus status, int code, string userType, DateTime createdAt, DateTime updatedAt)
+            string status, int code, string userType, DateTime createdAt, DateTime updatedAt)
             : base(id, createdAt, updatedAt)
         {
             Username = username;
@@ -23,7 +23,7 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public UserStatus Status { get; set; }
+        public string Status { get; set; }
         public string UserType { get; set; }
         public int Code { get; set; }
     }

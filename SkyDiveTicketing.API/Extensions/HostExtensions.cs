@@ -28,8 +28,8 @@ namespace SkyDiveTicketing.API.Extensions
                     _userStore = new UserStore<User, IdentityRole<Guid>, DataContext, Guid>(dataContext);
                     _userManager = new UserManager<User>(_userStore, null, new PasswordHasher<User>(), null, null, null, null, null, null);
                     dataContext.Database.Migrate();
-                    CreateAdminSeed(dataContext, _userManager);
                     CreateRolesSeed(dataContext);
+                    CreateAdminSeed(dataContext, _userManager);
                     SeedCities(dataContext);
                     CreateUserType(dataContext);
                     CreateSkyDiveEventTicketType(dataContext);
@@ -96,7 +96,7 @@ namespace SkyDiveTicketing.API.Extensions
                 {
                     FirstName = "Admin",
                     LastName = "Admin",
-                    UserName = "admin",
+                    UserName = "Admin",
                     NormalizedUserName = "admin",
                     Status = UserStatus.Active,
                     PersonalInformationIsCompeleted = true

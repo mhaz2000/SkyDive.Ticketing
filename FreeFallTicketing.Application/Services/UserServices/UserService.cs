@@ -77,11 +77,22 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await _unitOfWork.CommitAsync();
         }
 
-        public IEnumerable<UserDTO> GetUsers(string search)
+        public IEnumerable<UserDTO> GetUsers(string search, DateTime? minDate, DateTime? maxDate, UserStatus? userStatus)
         {
-            return _unitOfWork.UserRepository.Include(c => c.UserType)
-                 .Where(c => c.UserName.Contains(search) || c.FullName.Contains(search))
-                 .Select(user => new UserDTO(user.Id, user.UserName, user.PhoneNumber, user.Email, user.FirstName, user.LastName, user.Status, user.Code, user.UserType.Title, user.CreatedAt, user.UpdatedAt));
+            var users = _unitOfWork.UserRepository.Include(c => c.UserType)
+                 .Where(c => c.UserName.Contains(search) || c.FullName.Contains(search));
+
+            var adminUsers = _unitOfWork.RoleRepository.GetAdminUsers();
+            users = users.Where(c => !adminUsers.Contains(c.Id));
+
+            if (minDate is not null && maxDate is not null)
+                users = users.Where(c => c.CreatedAt >= minDate && c.CreatedAt <= maxDate);
+
+            if(userStatus is not null)
+                users = users.Where(c=> c.Status== userStatus);
+
+            return users.Select(user => new UserDTO(user.Id, user.UserName, user.PhoneNumber, user.Email, user.FirstName,
+                user.LastName, user.Status.GetDescription(), user.Code, user.UserType?.Title, user.CreatedAt, user.UpdatedAt));
         }
 
         public async Task<UserLoginDto> LoginUser(LoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
@@ -105,8 +116,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             _unitOfWork.UserRepository.LoginSucceeded(user);
 
-            var userRoles = await _userManager.GetRolesAsync(user);
-            var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, _roleManager.Roles.Where(c => userRoles.Any(t => t == c.Name)).ToList());
+            var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user);
+            var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles.ToList());
 
             await _unitOfWork.CommitAsync();
 

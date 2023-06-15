@@ -6,6 +6,8 @@ using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.UserCommands;
 using SkyDiveTicketing.Application.Services.PassengerServices;
 using SkyDiveTicketing.Application.Services.UserServices;
+using SkyDiveTicketing.Core.Entities;
+using System.Reflection.Metadata;
 
 namespace SkyDiveTicketing.API.Controllers.Users
 {
@@ -137,6 +139,25 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex+"\n----------------------");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+        [HttpGet("GetUsers")]
+        public IActionResult GetUsers([FromQuery] PageQuery pageQuery, DateTime? minDate, DateTime? maxDate, UserStatus? userStatus, string? search = "")
+        {
+            try
+            {
+                var users = _userService.GetUsers(search ?? string.Empty, minDate, maxDate, userStatus);
+                return OkResult("اصلاعات کاربران", users.ToPagingAndSorting(pageQuery), users.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }

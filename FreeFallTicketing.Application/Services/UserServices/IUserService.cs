@@ -1,6 +1,7 @@
 ﻿using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.UserCommands;
 using SkyDiveTicketing.Application.DTOs.UserDTOs;
+using SkyDiveTicketing.Core.Entities;
 
 namespace SkyDiveTicketing.Application.Services.UserServices
 {
@@ -12,7 +13,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         Task Update(UpdateUserCommand command);
 
-        IEnumerable<UserDTO> GetUsers(string search);
+        IEnumerable<UserDTO> GetUsers(string search, DateTime? minDate, DateTime? maxDate, UserStatus? userStatus);
 
         Task<UserLoginDto> OtpRegisterConfirmation(OtpUserConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
 

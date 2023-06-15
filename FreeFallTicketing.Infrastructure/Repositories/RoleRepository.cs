@@ -13,6 +13,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
+        public IEnumerable<Guid> GetAdminUsers()
+        {
+            var adminRole = Context.Roles.FirstOrDefault(c=> c.Name == "Admin");
+            return Context.UserRoles.Where(c => c.RoleId == adminRole.Id).Select(c=> c.UserId);
+        }
+
         public IQueryable<IdentityRole<Guid>> GetUserRoles(User user)
         {
             var roles = Context.UserRoles.Where(c => c.UserId == user.Id).Select(s=> s.RoleId);
