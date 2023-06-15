@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Data;
-using static SkyDiveTicketing.Core.Entities.User;
 
 namespace SkyDiveTicketing.Infrastructure.Repositories
 {
@@ -172,8 +171,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             user.OtpRequestTime = DateTime.Now;
         }
 
-        public void UpdateUser(User user, float? weight, float? height, DefaultCity? city, string? lastName, string? firstName, string? nationalCode, string emergencyPhone,
-            string address, DateTime? birthDate, string emergencyContact)
+        public void UpdateUser(User user, float? weight, float? height, DefaultCity? city, string? lastName, string? firstName, string? nationalCode, string? emergencyPhone,
+            string? address, DateTime? birthDate, string? emergencyContact, string email, string phone, string username)
         {
             user.Passenger.Weight = weight;
             user.Passenger.Height = height;
@@ -184,7 +183,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             user.Passenger.EmergencyContact = emergencyContact;
             user.Passenger.EmergencyPhone = emergencyPhone;
             user.Passenger.Address = address;
+            user.Email= email;
+            user.PhoneNumber= phone;
             user.BirthDate = birthDate;
+            user.UserName = username;
         }
 
         public void UpdateUserPassword(string password, User user)

@@ -13,7 +13,7 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
             _unitOfWork = unitOfWork;
         }
 
-        public async Task CheckPassengerDocument(Guid documentId, bool isConfirmed)
+        public async Task CheckUserDocument(Guid documentId, bool isConfirmed)
         {
             var medicalDocument = await _unitOfWork.PassengerMedicalDocumentRepository.GetByIdAsync(documentId);
             var attorneyDocument = await _unitOfWork.PassengerAttorneyDocumentRepository.GetByIdAsync(documentId);
@@ -52,7 +52,7 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
             if (activeCondition)
             {
                 _unitOfWork.UserRepository.ChangeUserStatus(user, UserStatus.Active);
-                _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.");
+                await _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.");
 
                 //send sms
             }

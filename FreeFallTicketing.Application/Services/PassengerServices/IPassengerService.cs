@@ -9,7 +9,7 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
 {
     public interface IPassengerService
     {
-        Task CheckPassengerDocument(Guid documentId, bool isConfirmed);
+        Task CheckUserDocument(Guid documentId, bool isConfirmed);
         Task CheckPassengerDocumentExpirationDate();
     }
 }

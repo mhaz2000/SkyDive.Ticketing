@@ -71,7 +71,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
         }
 
         [HttpGet]
-        public IActionResult Get(string search, PageQuery page)
+        public IActionResult Get([FromQuery] PageQuery page, string? search = "")
         {
             try
             {

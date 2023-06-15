@@ -39,7 +39,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// آدرس
         /// </summary>
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         /// <summary>
         /// قد
@@ -54,12 +54,12 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// نام شخص برای تماس اضطراری
         /// </summary>
-        public string EmergencyContact { get; set; }
+        public string? EmergencyContact { get; set; }
 
         /// <summary>
         /// شماره تماس اضطراری
         /// </summary>
-        public string EmergencyPhone { get; set; }
+        public string? EmergencyPhone { get; set; }
 
         /// <summary>
         /// سایر اطلاعات مربوط به کاربران

@@ -88,11 +88,11 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (minDate is not null && maxDate is not null)
                 users = users.Where(c => c.CreatedAt >= minDate && c.CreatedAt <= maxDate);
 
-            if(userStatus is not null)
-                users = users.Where(c=> c.Status== userStatus);
+            if (userStatus is not null)
+                users = users.Where(c => c.Status == userStatus);
 
             return users.Select(user => new UserDTO(user.Id, user.UserName, user.PhoneNumber, user.Email, user.FirstName,
-                user.LastName, user.Status.GetDescription(), user.Code, user.UserType?.Title, user.CreatedAt, user.UpdatedAt));
+                user.LastName, user.Status.GetDescription(), user.Code, user.UserType?.Title, user.CreatedAt, user.UpdatedAt, user.NationalCode, user.BirthDate));
         }
 
         public async Task<UserLoginDto> LoginUser(LoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
@@ -241,7 +241,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 throw new ManagedException("شهر مورد نظر یافت نشد.");
 
             _unitOfWork.UserRepository.UpdateUser(user, command.Weight, command.Height, city, command.LastName, command.FirstName,
-                command.NationalCode, command.EmergencyPhone, command.Address, command.BirthDate, command.EmergencyContact);
+                command.NationalCode, command.EmergencyPhone, command.Address, command.BirthDate, command.EmergencyContact, command.Email,
+                command.Phone, command.Username);
 
             await _unitOfWork.CommitAsync();
         }
@@ -263,6 +264,13 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 throw new ManagedException("کاربری یافت نشد.");
 
             _unitOfWork.UserRepository.CheckPersonalInformation(user, command.IsConfirmed);
+
+            if (command.IsConfirmed)
+            {
+                await _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.");
+                //sending sms
+            }
+
             await _unitOfWork.CommitAsync();
         }
 

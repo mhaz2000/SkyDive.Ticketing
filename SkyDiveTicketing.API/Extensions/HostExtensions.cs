@@ -142,6 +142,8 @@ namespace SkyDiveTicketing.API.Extensions
             if (!context.UserTypes.Any())
             {
                 context.UserTypes.Add(new UserType("تعیین نشده") { IsDefault = true });
+                context.UserTypes.Add(new UserType("همراه با مربی") { IsDefault = false });
+                context.UserTypes.Add(new UserType("آزاد") { IsDefault = false });
                 context.SaveChanges();
             }
         }

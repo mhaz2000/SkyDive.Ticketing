@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
+using SkyDiveTicketing.API.Extensions;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.UserCommands;
 using SkyDiveTicketing.Application.Services.PassengerServices;
@@ -21,7 +22,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
         public AdminController(IUserService userService, IPassengerService passengerService)
         {
             _userService = userService;
-            _passengerService= passengerService;
+            _passengerService = passengerService;
         }
 
         [HttpPost("InactivateUser")]
@@ -44,7 +45,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -69,17 +70,17 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
-        [HttpPut("CheckPassengerDocument/{documentId}/{isConfirmed}")]
-        public async Task<IActionResult> CheckPassengerDocument(Guid documentId, bool isConfirmed)
+        [HttpPut("CheckUserDocument/{documentId}/{isConfirmed}")]
+        public async Task<IActionResult> CheckUserDocument(Guid documentId, bool isConfirmed)
         {
             try
             {
-                await _passengerService.CheckPassengerDocument(documentId, isConfirmed);
+                await _passengerService.CheckUserDocument(documentId, isConfirmed);
                 return OkResult(isConfirmed ? "مدرک کاربر با موفقیت تایید شد." : "مدرک کاربر رد شد.");
             }
             catch (ManagedException e)
@@ -88,7 +89,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -113,7 +114,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -138,17 +139,20 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
         [HttpGet("GetUsers")]
-        public IActionResult GetUsers([FromQuery] PageQuery pageQuery, DateTime? minDate, DateTime? maxDate, UserStatus? userStatus, string? search = "")
+        public IActionResult GetUsers([FromQuery] PageQuery pageQuery, string? minDate, string? maxDate, UserStatus? userStatus, string? search = "")
         {
             try
             {
-                var users = _userService.GetUsers(search ?? string.Empty, minDate, maxDate, userStatus);
+                var min = minDate?.ToDateTime();
+                var max = maxDate?.ToDateTime();
+
+                var users = _userService.GetUsers(search ?? string.Empty, min, max, userStatus);
                 return OkResult("اصلاعات کاربران", users.ToPagingAndSorting(pageQuery), users.Count());
             }
             catch (ManagedException e)

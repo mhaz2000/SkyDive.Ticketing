@@ -7,7 +7,7 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
     {
         public AssignUserTypeCommandValidator()
         {
-            RuleFor(c=> c.UserTypeId).NotNull().NotEmpty().WithMessage("نوع کاربر نمی‌تواند خالی باشد.");
+            RuleFor(c=> c.UserTypeId).NotNull().WithMessage("نوع کاربر نمی‌تواند خالی باشد.");
         }
     }
 }
