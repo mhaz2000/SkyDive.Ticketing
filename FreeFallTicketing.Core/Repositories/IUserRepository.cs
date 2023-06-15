@@ -47,5 +47,8 @@ namespace SkyDiveTicketing.Core.Repositories
             string? email, string? phone, string? username);
 
         void ResetFailedAttempts(User user);
+
+        Task AddUser(string password, string? nationalCode, float? height, float? weight, string? firstName, string? lastName, string? email, DateTime? birthDate,
+            string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, DefaultCity? city);
     }
 }

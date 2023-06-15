@@ -73,6 +73,10 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (!user.PhoneNumberConfirmed)
                 throw new ManagedException("تلفن همراه شما تایید نشده است.");
 
+            var checkUsernameDuplication = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username);
+            if (checkUsernameDuplication)
+                throw new ManagedException("نام کاربری تکراری است.");
+
             _unitOfWork.UserRepository.CompeleteUserSecurityInfo(command.Username, command.Password, user);
             await _unitOfWork.CommitAsync();
         }
@@ -230,9 +234,9 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task Update(UpdateUserCommand command)
+        public async Task Update(AdminUserCommand command, Guid userId)
         {
-            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == command.Id, c => c.Passenger);
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId, c => c.Passenger);
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
@@ -384,6 +388,36 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, city, command.Address ?? string.Empty, command.EmergencyContact ?? string.Empty,
                 command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
+        }
+
+        public async Task CreateUser(AdminUserCommand command)
+        {
+            var errors = new List<string>();
+
+            var phoneDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower() && c.Status != UserStatus.Inactive);
+            var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName== command.Username);
+            var emailDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.Email.ToLower() == command.Email.ToLower() && c.Status != UserStatus.Inactive);
+
+            if (phoneDuplicationCheck)
+                errors.Add("شماره موبایل تکراری است.");
+
+            if (usernameDuplicationCheck)
+                errors.Add("نام کاربری تکراری است.");
+
+            if (emailDuplicationCheck)
+                errors.Add("ایمیل تکراری است.");
+
+            var city = command.CityId is not null ? await _unitOfWork.CityRepository.GetByIdAsync(command.CityId.Value) : null;
+            if (city is null && command.CityId is not null)
+                throw new ManagedException("شهر مورد نظر یافت نشد.");
+
+            if(errors.Any())
+                throw new ManagedException(string.Join("\n", errors));
+
+            await _unitOfWork.UserRepository.AddUser(command.Password, command.NationalCode, command.Height, command.Weight, command.FirstName, command.LastName, command.Email,
+                command.BirthDate, command.Phone, command.Username, command.Address, command.EmergencyContact, command.EmergencyPhone, city);
+
+            await _unitOfWork.CommitAsync();
         }
     }
 }

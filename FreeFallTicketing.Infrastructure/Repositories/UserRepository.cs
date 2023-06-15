@@ -183,8 +183,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             user.Passenger.EmergencyContact = emergencyContact;
             user.Passenger.EmergencyPhone = emergencyPhone;
             user.Passenger.Address = address;
-            user.Email= email;
-            user.PhoneNumber= phone;
+            user.Email = email;
+            user.PhoneNumber = phone;
             user.BirthDate = birthDate;
             user.UserName = username;
         }
@@ -204,6 +204,39 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public void ResetFailedAttempts(User user)
         {
             user.LoginFailedAttempts = 0;
+        }
+
+        public async Task AddUser(string password, string? nationalCode, float? height, float? weight, string? firstName, string? lastName, string? email,
+            DateTime? birthDate, string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, DefaultCity? city)
+        {
+            var defaultType = await Context.UserTypes.FirstOrDefaultAsync(c => c.IsDefault);
+            var user = new User()
+            {
+                Status = UserStatus.AwaitingCompletion,
+                PhoneNumber = phone,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                Code = await GetUserCode(),
+                UserType = defaultType,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                NationalCode = nationalCode,
+                BirthDate = birthDate,
+                PhoneNumberConfirmed = true,
+                UserName = username
+            };
+
+            var passenger = new Passenger(nationalCode, city, address, height, weight, emergencyContact, emergencyPhone);
+            await Context.Passengers.AddAsync(passenger);
+
+            await Context.Users.AddAsync(user);
+
+            var role = Context.Roles.FirstOrDefault(c => c.Name == "User");
+            await Context.UserRoles.AddAsync(new IdentityUserRole<Guid>() { RoleId = role.Id, UserId = user.Id });
+            await Context.Wallets.AddAsync(new Wallet(0, user));
+
+            var _passwordHasher = new PasswordHasher<User>();
+            user.PasswordHash = _passwordHasher.HashPassword(user, password);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         Task OtpRequest(OtpUserCommand command);
 
-        Task Update(UpdateUserCommand command);
+        Task Update(AdminUserCommand command, Guid userId);
 
         IEnumerable<UserDTO> GetUsers(string search, DateTime? minDate, DateTime? maxDate, UserStatus? userStatus);
 
@@ -42,5 +42,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         Task<UserDocumentsDTO> GetUserDocuments(Guid userId);
 
         Task CheckUserExistence(string username);
+
+        Task CreateUser(AdminUserCommand command);
     }
 }

@@ -1,10 +1,9 @@
 ﻿using SkyDiveTicketing.Application.Validators.Extensions;
 using SkyDiveTicketing.Application.Validators.UserValidators;
-using SkyDiveTicketing.Core.Entities;
 
 namespace SkyDiveTicketing.Application.Commands.UserCommands
 {
-    public class UpdateUserCommand : UserCommand
+    public class AdminUserCommand
     {
         public string? Username { get; set; }
 
@@ -32,11 +31,11 @@ namespace SkyDiveTicketing.Application.Commands.UserCommands
 
         public string? Phone { get; set; }
 
+        public string Password { get; set; }
 
-        public override void Validate()
+        public void Validate()
         {
-            base.Validate();
-            new UpdateUserCommandValidator().Validate(this).RaiseExceptionIfRequired();
+            new AdminUserCommandValidator().Validate(this).RaiseExceptionIfRequired();
         }
     }
 }

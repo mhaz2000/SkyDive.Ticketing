@@ -119,14 +119,14 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
-        [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser(UpdateUserCommand command)
+        [HttpPut("UpdateUser/{id}")]
+        public async Task<IActionResult> UpdateUser(AdminUserCommand command, Guid id)
         {
             try
             {
                 command.Validate();
 
-                await _userService.Update(command);
+                await _userService.Update(command, id);
                 return OkResult("اطلاعات کاربر ویرایش شد.");
             }
             catch (ManagedException e)
@@ -165,5 +165,31 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
+
+        [HttpPost("CreateUser")]
+        public async Task<IActionResult> CreateUser(AdminUserCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _userService.CreateUser(command);
+                return OkResult("کاربر جدید با موفقیت ایجاد شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex + "\n----------------------");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
     }
 }
