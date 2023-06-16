@@ -300,7 +300,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
         [HttpGet("GetUserInformation")]
         public async Task<IActionResult> GetUserInformation()
         {
-
             try
             {
                 var user = await _userService.GetUserInformation(UserId);

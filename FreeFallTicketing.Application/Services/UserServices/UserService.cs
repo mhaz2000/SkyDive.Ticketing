@@ -164,7 +164,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task<UserLoginDto> OtpLoginUser(OtpLoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
         {
-            var user = _unitOfWork.UserRepository.FirstOrDefault(c => c.Id == command.Id && c.Status != UserStatus.Inactive);
+            var user = _unitOfWork.UserRepository.FirstOrDefault(c => c.PhoneNumber == command.Phone && c.Status != UserStatus.Inactive);
             if (user is null)
                 throw new ManagedException("کاربری با این شماره موبایل یافت نشد.");
 
@@ -308,7 +308,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            return new UserInformationDTO(userId, user.CreatedAt, user.UpdatedAt, user.Code, user.UserName, user.PhoneNumber, user.Status.GetDescription(), user.UserType.Title);
+            return new UserInformationDTO(userId, user.CreatedAt, user.UpdatedAt, user.Code, user.UserName, user.PhoneNumber,
+                user.Status.GetDescription(), user.UserType.Title, user.FirstName, user.LastName);
         }
 
         public async Task<UserPersonalInformationDTO> GetPersonalInformation(Guid userId)

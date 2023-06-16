@@ -2,15 +2,20 @@
 {
     public class UserInformationDTO : BaseDTO<Guid>
     {
-        public UserInformationDTO(Guid id, DateTime createdAt, DateTime updatedAt, int code, string userName, string mobile, string userStatus, string userType) : base(id, createdAt, updatedAt)
+        public UserInformationDTO(Guid id, DateTime createdAt, DateTime updatedAt, int code, string userName, string mobile,
+            string userStatus, string userType, string firstName, string lastName) : base(id, createdAt, updatedAt)
         {
             Code = code;
             UserName = userName;
             Mobile = mobile;
             UserStatus = userStatus;
             UserType = userType;
+            FirstName = firstName;
+            LastName = lastName;
         }
 
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public int Code { get; set; }
         public string UserName { get; set; }
         public string Mobile { get; set; }

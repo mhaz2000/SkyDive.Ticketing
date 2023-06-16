@@ -7,7 +7,7 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
     {
         public OtpLoginCommandValidator()
         {
-            RuleFor(c => c.Id).NotNull().WithMessage("شناسه کاربر نمی‌تواند خالی باشد.");
+            RuleFor(c => c.Phone).NotNull().WithMessage("شماره موبایل نمی‌تواند خالی باشد.");
             RuleFor(c => c.Code).NotNull().WithMessage("کد نمی‌تواند خالی باشد.");
         }
     }
