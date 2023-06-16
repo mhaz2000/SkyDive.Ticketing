@@ -9,7 +9,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
     {
         Task<Guid> Register(CreateUserCommand command);
 
-        Task OtpRequest(OtpUserCommand command);
+        Task<string> OtpRequest(OtpUserCommand command);
 
         Task Update(AdminUserCommand command, Guid userId);
 
@@ -44,5 +44,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         Task CheckUserExistence(string username);
 
         Task CreateUser(AdminUserCommand command);
+
+        Task<UserLoginDto> OtpRequestConfirmation(OtpRequestConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
     }
 }

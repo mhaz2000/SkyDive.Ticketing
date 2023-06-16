@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.Application.Services.PassengerServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Newtonsoft.Json.Linq;
 
 namespace SkyDiveTicketing.API.Controllers.Users
 {
@@ -61,8 +62,8 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 command.Validate();
 
-                await _userService.OtpRequest(command);
-                return OkResult("ارسال پیامک با موفقیت انجام شد.");
+                var phone = await _userService.OtpRequest(command);
+                return OkResult("ارسال پیامک با موفقیت انجام شد.", phone);
             }
             catch (ManagedException e)
             {
@@ -75,6 +76,32 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (Exception ex)
             {
                 Console.WriteLine(ex+"\n----------------------");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
+        [HttpPost("OtpRequestConfirmation")]
+        [AllowAnonymous]
+        public async Task<IActionResult> OtpRequestConfirmation(OtpRequestConfirmationCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                var token = await _userService.OtpRequestConfirmation(command, _jwtIssuerOptions);
+                return OkResult("کد وارد شده صحیح می‌باشد.", token);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }

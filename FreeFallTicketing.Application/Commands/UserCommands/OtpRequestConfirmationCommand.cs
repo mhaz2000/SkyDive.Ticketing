@@ -4,10 +4,11 @@ using SkyDiveTicketing.Application.Validators.UserValidators;
 
 namespace SkyDiveTicketing.Application.Commands.UserCommands
 {
-    public class OtpLoginCommand : ICommandBase
+    public class OtpRequestConfirmationCommand : ICommandBase
     {
-        public string Username { get; set; }
+        public string Phone { get; set; }
         public string Code { get; set; }
-        public void Validate() => new OtpLoginCommandValidator().Validate(this).RaiseExceptionIfRequired();
+
+        public void Validate() => new OtpRequestConfirmationCommandValidator().Validate(this).RaiseExceptionIfRequired();
     }
 }

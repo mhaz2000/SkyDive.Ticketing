@@ -7,7 +7,7 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
     {
         public OtpUserCommandValidator()
         {
-            RuleFor(c => c.Phone).NotEmpty().NotNull().WithMessage("شماره موبایل نمی‌تواند خالی باشد.");
+            RuleFor(c => c.Username).NotEmpty().NotNull().WithMessage("شماره موبایل نمی‌تواند خالی باشد.");
 
         }
     }

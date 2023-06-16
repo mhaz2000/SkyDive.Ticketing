@@ -36,15 +36,17 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
 
     public class UserDocumentDetailDTO
     {
-        public UserDocumentDetailDTO(Guid fileId, DateTime? expirationDate, string status)
+        public UserDocumentDetailDTO(Guid fileId, DateTime? expirationDate, string statusDisplay, DocumentStatus status)
         {
             FileId = fileId;
             ExpirationDate = expirationDate;
-            Status = status;
+            Status = status.ToString();
+            StatusDisplay = statusDisplay;
         }
 
         public Guid FileId { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public string Status { get; set; }
+        public string StatusDisplay { get; set; }
     }
 }
