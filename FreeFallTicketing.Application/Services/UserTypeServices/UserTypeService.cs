@@ -14,6 +14,24 @@ namespace SkyDiveTicketing.Application.Services.UserTypeServices
             _unitOfWork = unitOfWork;
         }
 
+        public async Task AssignTicketType(AssignTicketTypeCommand command)
+        {
+            var userType = await _unitOfWork.UserTypeRepository.GetFirstWithIncludeAsync(c => c.Id == command.UserTypeId, c => c.AllowedTicketTypes);
+            if (userType is null)
+                throw new ManagedException("نوع کاربری مورد نظر یافت نشد.");
+
+            foreach (var ticketTypeId in command.TicketTypes)
+            {
+                var ticketType = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetByIdAsync(ticketTypeId);
+                if (ticketType is null)
+                    throw new ManagedException("نوع بلیط یافت نشد.");
+
+                _unitOfWork.UserTypeRepository.AddTicketType(ticketType, userType);
+            }
+
+            await _unitOfWork.CommitAsync();
+        }
+
         public async Task Create(UserTypeCommand command)
         {
             var duplicateTitle = await _unitOfWork.UserTypeRepository.AnyAsync(c => c.Title == command.Title);
@@ -26,20 +44,22 @@ namespace SkyDiveTicketing.Application.Services.UserTypeServices
 
         public IEnumerable<UserTypeDTO> GetAllTypes(string search)
         {
-            var userTypes = _unitOfWork.UserTypeRepository.GetAll()
+            var userTypes = _unitOfWork.UserTypeRepository.Include(c=> c.AllowedTicketTypes)
                 .Where(c => c.Title.Contains(search))
-                .Select(userType => new UserTypeDTO(userType.Title, userType.IsDefault, userType.Id, userType.CreatedAt, userType.UpdatedAt));
+                .Select(userType => new UserTypeDTO(userType.Title, userType.IsDefault, userType.Id, userType.CreatedAt,
+                userType.UpdatedAt, userType.AllowedTicketTypes.Select(ticketType => new UserTypeAllowedTicketTypeDTO(ticketType.Id, ticketType.CreatedAt, ticketType.UpdatedAt, ticketType.Title))));
 
             return userTypes;
         }
 
         public async Task<UserTypeDTO> GetUserType(Guid id)
         {
-            var userType = await _unitOfWork.UserTypeRepository.GetByIdAsync(id);
+            var userType = await _unitOfWork.UserTypeRepository.GetFirstWithIncludeAsync(c=> c.Id == id, c=> c.AllowedTicketTypes);
             if (userType is null)
                 throw new ManagedException("نوع کاربری مورد نظر یافت نشد.");
 
-            return new UserTypeDTO(userType.Title, userType.IsDefault, userType.Id, userType.CreatedAt, userType.UpdatedAt);
+            return new UserTypeDTO(userType.Title, userType.IsDefault, userType.Id, userType.CreatedAt, userType.UpdatedAt,
+                userType.AllowedTicketTypes.Select(ticketType => new UserTypeAllowedTicketTypeDTO(ticketType.Id, ticketType.CreatedAt, ticketType.UpdatedAt, ticketType.Title)));
         }
 
         public async Task Remove(Guid id)

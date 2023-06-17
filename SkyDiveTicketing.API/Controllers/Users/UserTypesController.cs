@@ -138,5 +138,30 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
+
+        [HttpPost("AssignTicketType")]
+        public async Task<IActionResult> AssignTicketType(AssignTicketTypeCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _userTypeService.AssignTicketType(command);
+                return OkResult("دسترسی رزور بلیط برای این نوع کاربری بروزرسانی شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex + "\n----------------------");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
     }
 }

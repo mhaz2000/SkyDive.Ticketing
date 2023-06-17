@@ -335,6 +335,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public async Task<UserDocumentsDTO> GetUserDocuments(Guid userId)
         {
             Expression<Func<User, object>>[] includeExpressions = {
+                c=> c.Passenger,
                 c => c.Passenger.AttorneyDocumentFile,
                 c => c.Passenger.NationalCardDocumentFile,
                 c=> c.Passenger.LogBookDocumentFile,
@@ -348,20 +349,24 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             return new UserDocumentsDTO(userId, user.CreatedAt, user.UpdatedAt)
             {
                 AttorneyDocument = user.Passenger?.AttorneyDocumentFile is not null ?
-                    new UserDocumentDetailDTO(user.Passenger.AttorneyDocumentFile.Id, user.Passenger.AttorneyDocumentFile.ExpirationDate,
-                    user.Passenger.AttorneyDocumentFile.Status.GetDescription(), user.Passenger.AttorneyDocumentFile.Status) : null,
+                    new UserDocumentDetailDTO(user.Passenger.AttorneyDocumentFile.Id, user.Passenger.AttorneyDocumentFile.CreatedAt, user.Passenger.AttorneyDocumentFile.UpdatedAt,
+                    user.Passenger.AttorneyDocumentFile.FileId, user.Passenger.AttorneyDocumentFile.ExpirationDate, user.Passenger.AttorneyDocumentFile.Status.GetDescription(),
+                    user.Passenger.AttorneyDocumentFile.Status) : null,
 
                 MedicalDocument = user.Passenger?.MedicalDocumentFile is not null ?
-                    new UserDocumentDetailDTO(user.Passenger.MedicalDocumentFile.Id, user.Passenger.MedicalDocumentFile.ExpirationDate,
-                    user.Passenger.MedicalDocumentFile.Status.GetDescription(), user.Passenger.MedicalDocumentFile.Status) : null,
+                    new UserDocumentDetailDTO(user.Passenger.MedicalDocumentFile.Id, user.Passenger.MedicalDocumentFile.CreatedAt, user.Passenger.MedicalDocumentFile.UpdatedAt,
+                    user.Passenger.MedicalDocumentFile.FileId, user.Passenger.MedicalDocumentFile.ExpirationDate, user.Passenger.MedicalDocumentFile.Status.GetDescription(),
+                    user.Passenger.MedicalDocumentFile.Status) : null,
 
                 LogBookDocument = user.Passenger?.LogBookDocumentFile is not null ?
-                    new UserDocumentDetailDTO(user.Passenger.LogBookDocumentFile.Id, user.Passenger.LogBookDocumentFile.ExpirationDate,
-                    user.Passenger.LogBookDocumentFile.Status.GetDescription(), user.Passenger.LogBookDocumentFile.Status) : null,
+                    new UserDocumentDetailDTO(user.Passenger.LogBookDocumentFile.Id, user.Passenger.LogBookDocumentFile.CreatedAt, user.Passenger.LogBookDocumentFile.UpdatedAt,
+                    user.Passenger.LogBookDocumentFile.FileId, user.Passenger.LogBookDocumentFile.ExpirationDate, user.Passenger.LogBookDocumentFile.Status.GetDescription(),
+                    user.Passenger.LogBookDocumentFile.Status) : null,
 
                 NationalCardDocument = user.Passenger?.NationalCardDocumentFile is not null ?
-                    new UserDocumentDetailDTO(user.Passenger.NationalCardDocumentFile.Id, user.Passenger.NationalCardDocumentFile.ExpirationDate,
-                    user.Passenger.NationalCardDocumentFile.Status.GetDescription(), user.Passenger.NationalCardDocumentFile.Status) : null
+                    new UserDocumentDetailDTO(user.Passenger.NationalCardDocumentFile.Id, user.Passenger.NationalCardDocumentFile.CreatedAt, user.Passenger.NationalCardDocumentFile.UpdatedAt,
+                    user.Passenger.NationalCardDocumentFile.FileId, user.Passenger.NationalCardDocumentFile.ExpirationDate, user.Passenger.NationalCardDocumentFile.Status.GetDescription(),
+                    user.Passenger.NationalCardDocumentFile.Status) : null
             };
         }
 
@@ -375,26 +380,26 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         private void UploadDocument(User user, UserPersonalInformationCompletionCommand command)
         {
-            if (command.NationalCardDocument is not null)
-                _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, command.NationalCardDocument.FileId);
+            if (command.NationalCardDocument is not null && command.NationalCardDocument.FileId is not null)
+                _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, command.NationalCardDocument.FileId.Value);
 
-            if (command.AttorneyDocument is not null)
+            if (command.AttorneyDocument is not null && command.AttorneyDocument.FileId is not null)
             {
                 if (command.AttorneyDocument.ExpirationDate is null)
                     throw new ManagedException("تاریخ انقضای وکالتنامه محضری الزامی است.");
 
-                _unitOfWork.PassengerRepository.AddAttorneyDocument(user.Passenger, command.AttorneyDocument.FileId, command.AttorneyDocument.ExpirationDate);
+                _unitOfWork.PassengerRepository.AddAttorneyDocument(user.Passenger, command.AttorneyDocument.FileId.Value, command.AttorneyDocument.ExpirationDate);
             }
 
-            if (command.LogBookDocument is not null)
-                _unitOfWork.PassengerRepository.AddLogBookDocument(user.Passenger, command.LogBookDocument.FileId);
+            if (command.LogBookDocument is not null && command.LogBookDocument.FileId is not null )
+                _unitOfWork.PassengerRepository.AddLogBookDocument(user.Passenger, command.LogBookDocument.FileId.Value);
 
             if (command.MedicalDocument is not null)
             {
-                if (command.MedicalDocument.ExpirationDate is null)
+                if (command.MedicalDocument.ExpirationDate is null && command.MedicalDocument.FileId is not null)
                     throw new ManagedException("تاریخ انقضای مدارک پزشکی الزامی است.");
 
-                _unitOfWork.PassengerRepository.AddMedicalDocument(user.Passenger, command.MedicalDocument.FileId, command.MedicalDocument.ExpirationDate);
+                _unitOfWork.PassengerRepository.AddMedicalDocument(user.Passenger, command.MedicalDocument.FileId.Value, command.MedicalDocument.ExpirationDate);
             }
         }
 

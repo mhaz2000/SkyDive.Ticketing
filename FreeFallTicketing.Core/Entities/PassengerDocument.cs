@@ -14,7 +14,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// شناسه فایل
         /// </summary>
-        public Guid FileId { get; set; }
+        public Guid? FileId { get; set; }
 
         /// <summary>
         /// وضعیت مدرک
@@ -46,7 +46,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// شناسه فایل
         /// </summary>
-        public Guid FileId { get; set; }
+        public Guid? FileId { get; set; }
 
         /// <summary>
         /// وضعیت مدرک
@@ -78,7 +78,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// شناسه فایل
         /// </summary>
-        public Guid FileId { get; set; }
+        public Guid? FileId { get; set; }
 
         /// <summary>
         /// وضعیت مدرک
@@ -110,7 +110,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// شناسه فایل
         /// </summary>
-        public Guid FileId { get; set; }
+        public Guid? FileId { get; set; }
 
         /// <summary>
         /// وضعیت مدرک

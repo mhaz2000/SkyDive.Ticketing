@@ -7,6 +7,7 @@ using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.UserCommands;
 using SkyDiveTicketing.Application.Services.PassengerServices;
 using SkyDiveTicketing.Application.Services.UserServices;
+using SkyDiveTicketing.Application.Services.UserTypeServices;
 using SkyDiveTicketing.Core.Entities;
 using System.Reflection.Metadata;
 
@@ -19,10 +20,13 @@ namespace SkyDiveTicketing.API.Controllers.Users
     {
         private readonly IUserService _userService;
         private readonly IPassengerService _passengerService;
-        public AdminController(IUserService userService, IPassengerService passengerService)
+        private readonly IUserTypeService _userTypeService;
+
+        public AdminController(IUserService userService, IPassengerService passengerService, IUserTypeService userTypeService)
         {
             _userService = userService;
             _passengerService = passengerService;
+            _userTypeService = userTypeService;
         }
 
         [HttpPost("InactivateUser")]
@@ -190,6 +194,5 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
-
     }
 }

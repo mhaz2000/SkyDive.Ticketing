@@ -17,6 +17,8 @@ using SkyDiveTicketing.Application.Helpers;
 using SkyDiveTicketing.API.Jobs.PassengerDocumentJobs;
 using SkyDiveTicketing.API.Jobs.TicketJobs;
 using SkyDiveTicketing.API.Jobs.JumpRecordJobs;
+using Newtonsoft;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +28,8 @@ builder.Services.AddDbContext<DataContext>(opt => opt.UseSqlServer(builder.Confi
 builder.Services.AddControllers().AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.Converters.Add(new PersianDateTimeConverter());
-
+    opt.JsonSerializerOptions.Converters.Add(new DictionaryTKeyEnumTValueConverter());
+    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
 builder.Services.AddEndpointsApiExplorer();

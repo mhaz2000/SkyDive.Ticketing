@@ -44,7 +44,7 @@ namespace SkyDiveTicketing.Application.Commands.UserCommands
 
     public class UploadDocumentDetailCommand : ICommandBase
     {
-        public Guid FileId { get; set; }
+        public Guid? FileId { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public virtual void Validate() => new UploadDocumentDetailCommandValidator().Validate(this).RaiseExceptionIfRequired();
     }

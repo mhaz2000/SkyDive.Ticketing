@@ -34,9 +34,9 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
         public UserDocumentDetailDTO? NationalCardDocument { get; set; }
     }
 
-    public class UserDocumentDetailDTO
+    public class UserDocumentDetailDTO : BaseDTO<Guid>
     {
-        public UserDocumentDetailDTO(Guid fileId, DateTime? expirationDate, string statusDisplay, DocumentStatus status)
+        public UserDocumentDetailDTO(Guid id, DateTime createdAt, DateTime updatedAt, Guid? fileId, DateTime? expirationDate, string statusDisplay, DocumentStatus status) : base(id, createdAt, updatedAt)
         {
             FileId = fileId;
             ExpirationDate = expirationDate;
@@ -44,7 +44,7 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
             StatusDisplay = statusDisplay;
         }
 
-        public Guid FileId { get; set; }
+        public Guid? FileId { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public string Status { get; set; }
         public string StatusDisplay { get; set; }

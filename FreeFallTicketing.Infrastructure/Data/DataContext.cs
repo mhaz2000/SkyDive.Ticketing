@@ -24,6 +24,7 @@ namespace SkyDiveTicketing.Infrastructure.Data
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<SkyDiveEvent> SkyDiveEvents { get; set; }
         public DbSet<AdminCartable> AdminCartables { get; set; }
+        public DbSet<UserStatusInfo> UserStatusInfo { get; set; }
         public DbSet<FlightLoadItem> FlightLoadItems { get; set; }
         public DbSet<MedicalDocument> MedicalDocuments { get; set; }
         public DbSet<LogBookDocument> LogBookDocuments { get; set; }

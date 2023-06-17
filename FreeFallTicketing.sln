@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyDiveTicketing.API", "SkyDiveTicketing.API\SkyDiveTicketing.API.csproj", "{E865E676-34C7-4BBC-82EA-E8212B542650}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyDiveTicketing.API", "SkyDiveTicketing.API\SkyDiveTicketing.API.csproj", "{E865E676-34C7-4BBC-82EA-E8212B542650}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,20 +24,20 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A5E64F6B-D4C6-4CF6-A6E3-B73E338EA6B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A5E64F6B-D4C6-4CF6-A6E3-B73E338EA6B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5E64F6B-D4C6-4CF6-A6E3-B73E338EA6B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5E64F6B-D4C6-4CF6-A6E3-B73E338EA6B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5E64F6B-D4C6-4CF6-A6E3-B73E338EA6B6}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5E64F6B-D4C6-4CF6-A6E3-B73E338EA6B6}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{1DEF8C68-B829-42A0-BE8A-2BF9F964FF81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1DEF8C68-B829-42A0-BE8A-2BF9F964FF81}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DEF8C68-B829-42A0-BE8A-2BF9F964FF81}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DEF8C68-B829-42A0-BE8A-2BF9F964FF81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DEF8C68-B829-42A0-BE8A-2BF9F964FF81}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DEF8C68-B829-42A0-BE8A-2BF9F964FF81}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{D1CEEB9E-079A-4731-A47F-5338E05C8734}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D1CEEB9E-079A-4731-A47F-5338E05C8734}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1CEEB9E-079A-4731-A47F-5338E05C8734}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1CEEB9E-079A-4731-A47F-5338E05C8734}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1CEEB9E-079A-4731-A47F-5338E05C8734}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1CEEB9E-079A-4731-A47F-5338E05C8734}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{E865E676-34C7-4BBC-82EA-E8212B542650}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E865E676-34C7-4BBC-82EA-E8212B542650}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E865E676-34C7-4BBC-82EA-E8212B542650}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E865E676-34C7-4BBC-82EA-E8212B542650}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E865E676-34C7-4BBC-82EA-E8212B542650}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{E865E676-34C7-4BBC-82EA-E8212B542650}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

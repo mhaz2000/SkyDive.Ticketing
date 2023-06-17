@@ -31,6 +31,8 @@ namespace SkyDiveTicketing.Application.Services.SettingsServices
             {
                 await _unitOfWork.SettingsRepository.UpdateUserStatusInfo(item.Status, item.Description);
             }
+            
+            await _unitOfWork.CommitAsync();
         }
     }
 }

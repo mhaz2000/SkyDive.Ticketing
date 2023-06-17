@@ -7,5 +7,6 @@ namespace SkyDiveTicketing.Core.Repositories
     {
         void Update(UserType userType, string title);
         Task Create(string title);
+        void AddTicketType(SkyDiveEventTicketType ticketType, UserType userType);
     }
 }

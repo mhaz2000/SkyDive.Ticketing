@@ -11,6 +11,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
+        public void AddTicketType(SkyDiveEventTicketType ticketType, UserType userType)
+        {
+            if (!userType.AllowedTicketTypes.Contains(ticketType))
+                userType.AllowedTicketTypes.Add(ticketType);
+        }
+
         public async Task Create(string title)
         {
             await Context.UserTypes.AddAsync(new UserType(title));
@@ -18,8 +24,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public void Update(UserType userType, string title)
         {
-            userType.Title= title;
-            userType.UpdatedAt= DateTime.Now;
+            userType.Title = title;
+            userType.UpdatedAt = DateTime.Now;
         }
     }
 }

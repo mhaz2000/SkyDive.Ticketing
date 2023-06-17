@@ -229,6 +229,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             var passenger = new Passenger(nationalCode, city, address, height, weight, emergencyContact, emergencyPhone);
             await Context.Passengers.AddAsync(passenger);
 
+            user.Passenger = passenger;
+
             await Context.Users.AddAsync(user);
 
             var role = Context.Roles.FirstOrDefault(c => c.Name == "User");

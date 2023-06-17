@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.SettingsCommands;
 using SkyDiveTicketing.Application.Services.SettingsServices;
+using System.Data;
 
 namespace SkyDiveTicketing.API.Controllers.Settings
 {
@@ -19,7 +21,8 @@ namespace SkyDiveTicketing.API.Controllers.Settings
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(SettingsCommand command)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update([FromBody] SettingsCommand command)
         {
             try
             {
