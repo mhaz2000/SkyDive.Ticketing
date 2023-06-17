@@ -12,5 +12,6 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
         public string AuthToken { get; internal set; }
         public string RefreshToken { get; internal set; }
         public int ExpiresIn { get; internal set; }
+        public bool IsAdmin { get; set; }
     }
 }

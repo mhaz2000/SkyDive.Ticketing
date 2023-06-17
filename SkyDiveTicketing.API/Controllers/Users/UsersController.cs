@@ -47,11 +47,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpPost("OtpRequest")]
@@ -72,11 +67,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -99,11 +89,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpPost("OtpRegisterConfirmation")]
@@ -125,11 +110,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpPost("UserSecurityInformationCompletion")]
@@ -149,11 +129,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -175,11 +150,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpPut("Inactivate")]
@@ -193,12 +163,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-
             }
         }
 
@@ -220,11 +184,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -252,11 +211,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -288,11 +242,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         /// <summary>
@@ -311,11 +260,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -336,11 +280,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         /// <summary>
@@ -360,11 +299,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [AllowAnonymous]
@@ -380,11 +314,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpGet("GetUserDocument")]
@@ -399,10 +328,19 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
+        }
+
+        [HttpPut("AcceptTermsAndCondition")]
+        public async Task<IActionResult> AcceptingTermsAndConditions()
+        {
+            try
             {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+                await _userService.AcceptingTermsAndConditions(UserId);
+                return OkResult("قوانین و شرایط پذیرفته شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }

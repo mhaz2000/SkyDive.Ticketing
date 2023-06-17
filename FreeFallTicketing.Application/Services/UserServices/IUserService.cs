@@ -46,5 +46,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         Task CreateUser(AdminUserCommand command);
 
         Task<UserLoginDto> OtpRequestConfirmation(OtpRequestConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
+
+        Task AcceptingTermsAndConditions(Guid userId);
     }
 }

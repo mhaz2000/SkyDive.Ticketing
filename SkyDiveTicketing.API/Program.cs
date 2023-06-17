@@ -11,19 +11,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Hangfire;
-using Hangfire.SqlServer;
 using System.Text;
 using SkyDiveTicketing.Application.Helpers;
 using SkyDiveTicketing.API.Jobs.PassengerDocumentJobs;
 using SkyDiveTicketing.API.Jobs.TicketJobs;
-using SkyDiveTicketing.API.Jobs.JumpRecordJobs;
-using Newtonsoft;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DataContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Main")));
-
+builder.Services.AddDbContext<LogContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LogDb")));
 
 builder.Services.AddControllers().AddJsonOptions(opt =>
 {
@@ -67,9 +64,12 @@ var identityBuilder = builder.Services.AddIdentity<User, IdentityRole<Guid>>(o =
     o.Password.RequiredLength = 6;
     o.Tokens.ChangePhoneNumberTokenProvider = "Phone";
 });
+
 identityBuilder = new IdentityBuilder(identityBuilder.UserType, typeof(IdentityRole<Guid>), builder.Services);
 
 identityBuilder.AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
+identityBuilder.AddEntityFrameworkStores<LogContext>().AddDefaultTokenProviders();
+
 
 var tokenValidationParameters = new TokenValidationParameters
 {
@@ -110,6 +110,9 @@ builder.Services.AddScoped<ITokenFactory, TokenFactory>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IPassengerDocumentJob, PassengerDocumentJob>();
 builder.Services.AddScoped<ITicketJob, TicketJob>();
+builder.Services.AddScoped<ILogUnitOfWork, LogUnitOfWork>();
+builder.Services.AddScoped<ExceptionLogger>();
+
 
 
 builder.Services.AddHangfire(configuration => configuration
@@ -157,6 +160,7 @@ app.UseCors(c =>
 });
 
 
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseAuthorization();

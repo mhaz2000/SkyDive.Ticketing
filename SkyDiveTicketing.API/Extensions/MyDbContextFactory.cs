@@ -22,4 +22,24 @@ namespace SkyDiveTicketing.API.Extensions
             return new DataContext(optionsBuilder.Options);
         }
     }
+
+    public class LogContextFactory : IDesignTimeDbContextFactory<LogContext>
+    {
+        public LogContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<LogContext>();
+
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+            var connectionString = configuration.GetConnectionString("LogDb");
+
+
+            optionsBuilder.UseSqlServer(connectionString);
+
+            return new LogContext(optionsBuilder.Options);
+        }
+
+    }
 }

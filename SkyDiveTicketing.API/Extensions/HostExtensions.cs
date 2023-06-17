@@ -10,6 +10,8 @@ namespace SkyDiveTicketing.API.Extensions
     public static class HostExtensions
     {
         private static readonly MyDbContextFactory MyDbContextFactory = new MyDbContextFactory();
+        private static readonly LogContextFactory LogContextFactory = new LogContextFactory();
+
         private static IUserStore<User> _userStore;
         private static UserManager<User> _userManager;
         public static IHost MigrateDatabase<TContext>(this IHost host, int? retry = 0)
@@ -24,10 +26,13 @@ namespace SkyDiveTicketing.API.Extensions
                 try
                 {
                     var dataContext = MyDbContextFactory.CreateDbContext(new[] { string.Empty });
+                    var logContext = LogContextFactory.CreateDbContext(new[] { string.Empty });
 
                     _userStore = new UserStore<User, IdentityRole<Guid>, DataContext, Guid>(dataContext);
                     _userManager = new UserManager<User>(_userStore, null, new PasswordHasher<User>(), null, null, null, null, null, null);
                     dataContext.Database.Migrate();
+                    logContext.Database.Migrate();
+
                     CreateRolesSeed(dataContext);
                     CreateAdminSeed(dataContext, _userManager);
                     SeedCities(dataContext);

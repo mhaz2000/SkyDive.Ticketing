@@ -84,7 +84,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public IEnumerable<UserDTO> GetUsers(string search, DateTime? minDate, DateTime? maxDate, UserStatus? userStatus)
         {
             var users = _unitOfWork.UserRepository.Include(c => c.UserType)
-                 .Where(c => c.UserName.Contains(search) || c.FullName.Contains(search));
+                 .Where(c => (c.UserName?.Contains(search) ?? false) || (c.FullName?.Contains(search) ?? false));
 
             var adminUsers = _unitOfWork.RoleRepository.GetAdminUsers();
             users = users.Where(c => !adminUsers.Contains(c.Id));
@@ -120,13 +120,14 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             _unitOfWork.UserRepository.LoginSucceeded(user);
 
-            var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user);
-            var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles.ToList());
+            var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user).ToList();
+            var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles);
 
             await _unitOfWork.CommitAsync();
 
             return new UserLoginDto()
             {
+                IsAdmin = userRoles.Any(c => c.Name.ToLower() == "admin"),
                 TokenType = token.TokenType,
                 ExpiresIn = token.expires_in,
                 AuthToken = token.AuthToken,
@@ -148,13 +149,14 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             else
                 throw new ManagedException("کد وارد شده اشتباه است.");
 
-            var userRoles = await _userManager.GetRolesAsync(user);
-            var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, _roleManager.Roles.Where(c => userRoles.Any(t => t == c.Name)).ToList());
+            var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user).ToList();
+            var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles);
 
             await _unitOfWork.CommitAsync();
 
             return new UserLoginDto()
             {
+                IsAdmin = userRoles.Any(c => c.Name.ToLower() == "admin"),
                 TokenType = token.TokenType,
                 ExpiresIn = token.expires_in,
                 AuthToken = token.AuthToken,
@@ -175,13 +177,14 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             {
                 _unitOfWork.UserRepository.ResetFailedAttempts(user);
 
-                var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user);
-                var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles.ToList());
+                var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user).ToList();
+                var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles);
 
                 await _unitOfWork.CommitAsync();
 
                 return new UserLoginDto()
                 {
+                    IsAdmin = userRoles.Any(c => c.Name.ToLower() == "admin"),
                     TokenType = token.TokenType,
                     ExpiresIn = token.expires_in,
                     AuthToken = token.AuthToken,
@@ -391,7 +394,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 _unitOfWork.PassengerRepository.AddAttorneyDocument(user.Passenger, command.AttorneyDocument.FileId.Value, command.AttorneyDocument.ExpirationDate);
             }
 
-            if (command.LogBookDocument is not null && command.LogBookDocument.FileId is not null )
+            if (command.LogBookDocument is not null && command.LogBookDocument.FileId is not null)
                 _unitOfWork.PassengerRepository.AddLogBookDocument(user.Passenger, command.LogBookDocument.FileId.Value);
 
             if (command.MedicalDocument is not null)
@@ -452,13 +455,14 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             if (user.OtpCode == command.Code && Math.Abs((user.OtpRequestTime - DateTime.Now).Value.TotalMinutes) < 1)
             {
-                var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user);
-                var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles.ToList());
+                var userRoles = _unitOfWork.RoleRepository.GetUserRoles(user).ToList();
+                var token = _tokenGenerator.TokenGeneration(user, jwtIssuerOptions, userRoles);
 
                 await _unitOfWork.CommitAsync();
 
                 return new UserLoginDto()
                 {
+                    IsAdmin = userRoles.Any(c => c.Name.ToLower() == "admin"),
                     TokenType = token.TokenType,
                     ExpiresIn = token.expires_in,
                     AuthToken = token.AuthToken,
@@ -468,6 +472,18 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             }
             else
                 throw new ManagedException("کد وارد شده اشتباه است.");
+        }
+
+        public async Task AcceptingTermsAndConditions(Guid userId)
+        {
+            var user = _unitOfWork.UserRepository.FirstOrDefault(c => c.Id == userId && c.Status != UserStatus.Inactive);
+
+            if (user is null)
+                throw new ManagedException("کاربری با این اطلاعات یافت نشد یافت نشد.");
+
+            _unitOfWork.UserRepository.AcceptingTermsAndConditions(user);
+
+            await _unitOfWork.CommitAsync();
         }
     }
 }

@@ -240,5 +240,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             var _passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = _passwordHasher.HashPassword(user, password);
         }
+
+        public void AcceptingTermsAndConditions(User user)
+        {
+            user.TermsAndConditionsAcceptance = true;
+        }
     }
 }

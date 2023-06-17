@@ -47,11 +47,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpPut("CheckUserPersonalInformation")]
@@ -91,11 +86,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpPut("AssignUserType")]
@@ -115,11 +105,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -141,11 +126,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpGet("GetUsers")]
@@ -162,11 +142,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -187,11 +162,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }
