@@ -33,6 +33,7 @@ namespace SkyDiveTicketing.Infrastructure.Data
         public DbSet<SkyDiveEventStatus> SkyDiveEventStatuses { get; set; }
         public DbSet<NationalCardDocument> NationalCardDocuments { get; set; }
         public DbSet<SkyDiveEventTicketType> SkyDiveEventTicketTypes { get; set; }
+        public DbSet<SkyDiveEventTicketTypeAmount> SkyDiveEventTicketTypeAmounts { get; set; }
 
         //public DbSet<FlightLoadCancellationType> FlightLoadCancellationTypes { get; set; }
 

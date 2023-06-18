@@ -9,11 +9,13 @@ namespace SkyDiveTicketing.Core.Entities
 
         }
 
-        public SkyDiveEventStatus(string title) : base()
+        public SkyDiveEventStatus(string title, bool reservable) : base()
         {
             Title = title;
+            Reservable = reservable;
         }
 
         public string Title { get; set; }
+        public bool Reservable { get; set; }
     }
 }

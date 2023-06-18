@@ -6,7 +6,6 @@ namespace SkyDiveTicketing.Application.Commands.SkyDiveEventCommands
 {
     public class AddEventTypeFeeCommand : ICommandBase
     {
-        public Guid SkyEventTypeId { get; set; }
         public List<EventTypeItemCommand> Items { get; set; }
         public void Validate()
         {

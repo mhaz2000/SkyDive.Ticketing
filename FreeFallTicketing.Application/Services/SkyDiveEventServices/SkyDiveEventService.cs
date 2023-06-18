@@ -18,15 +18,11 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
         public async Task Create(SkyDiveEventCommand command)
         {
-            var duplicatedCode = await _unitOfWork.SkyDiveEventRepository.AnyAsync(c => c.Code == int.Parse(command.Code));
-            if (duplicatedCode)
-                throw new ManagedException("کد تکراری است.");
-
             var status = await _unitOfWork.SkyDiveEventStatusRepository.GetByIdAsync(command.StatusId);
             if (status is null)
                 throw new ManagedException("وضعیت رویداد معتبر نیست.");
 
-            await _unitOfWork.SkyDiveEventRepository.Create(int.Parse(command.Code), command.Title, command.Location, command.Voidable,
+            await _unitOfWork.SkyDiveEventRepository.Create(command.Title, command.Location, command.Voidable,
                 command.SubjecToVAT, command.Image, command.StartDate, command.EndDate, status);
 
             await _unitOfWork.CommitAsync();
@@ -176,7 +172,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 if (ticketType is null)
                     throw new ManagedException("نوع بلیت یافت نشد.");
 
-                _unitOfWork.SkyDiveEventRepository.AddTicketTypeAmount(skyDiveEvent, ticketType, item.Amount);
+                await _unitOfWork.SkyDiveEventRepository.AddTicketTypeAmount(skyDiveEvent, ticketType, item.Amount);
             }
 
             await _unitOfWork.CommitAsync();

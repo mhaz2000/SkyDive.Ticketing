@@ -13,7 +13,7 @@ namespace SkyDiveTicketing.Core.Entities
         {
             Code = code;
             Title = title;
-            Image = image ;
+            Image = image;
             StartDate = startDate;
             EndDate = endDate;
             IsActive = false;
@@ -24,11 +24,6 @@ namespace SkyDiveTicketing.Core.Entities
             TypesAmount = new LinkedList<SkyDiveEventTicketTypeAmount>();
 
             Items = new List<SkyDiveEventItem>();
-
-            for (int i = 0; i < (startDate - endDate).TotalDays + 1; i++)
-            {
-                Items.Add(new SkyDiveEventItem(startDate.AddDays(i), 0));
-            }
         }
 
         /// <summary>

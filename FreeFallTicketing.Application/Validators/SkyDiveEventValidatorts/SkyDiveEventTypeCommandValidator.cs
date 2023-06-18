@@ -8,6 +8,7 @@ namespace SkyDiveTicketing.Application.Validators.SkyDiveEventValidatorts
         public SkyDiveEventStatusCommandValidator()
         {
             RuleFor(c=> c.Title).NotNull().NotEmpty().WithMessage("عنوان نمی‌تواند خالی باشد.");
+            RuleFor(c=> c.Reservable).NotNull().WithMessage("وضعیت رزرو باید مشخص گردد.");
         }
     }
 }

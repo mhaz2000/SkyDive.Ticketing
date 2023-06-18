@@ -20,7 +20,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (duplicatedStatus)
                 throw new ManagedException("عنوان وضعیت تکراری است.");
 
-            await _unitOfWork.SkyDiveEventStatusRepository.Create(command.Title);
+            await _unitOfWork.SkyDiveEventStatusRepository.Create(command.Title, command.Reservable);
             await _unitOfWork.CommitAsync();
         }
 
@@ -30,13 +30,13 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (status is null)
                 throw new ManagedException("وضعیت رویداد یافت نشد.");
 
-            return new SkyDiveEventStatusDTO(status.Id, status.CreatedAt, status.UpdatedAt, status.Title);
+            return new SkyDiveEventStatusDTO(status.Id, status.CreatedAt, status.UpdatedAt, status.Title, status.Reservable);
         }
 
         public IEnumerable<SkyDiveEventStatusDTO> GetStatuses()
         {
             return _unitOfWork.SkyDiveEventStatusRepository.GetAll()
-                .Select(status => new SkyDiveEventStatusDTO(status.Id, status.CreatedAt, status.UpdatedAt, status.Title));
+                .Select(status => new SkyDiveEventStatusDTO(status.Id, status.CreatedAt, status.UpdatedAt, status.Title, status.Reservable));
         }
 
         public async Task Remove(Guid id)
@@ -44,6 +44,9 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             var status = await _unitOfWork.SkyDiveEventStatusRepository.GetByIdAsync(id);
             if (status is null)
                 throw new ManagedException("وضعیت رویداد یافت نشد.");
+
+            if (_unitOfWork.SkyDiveEventRepository.Include(c => c.Status).Any(status => status.Id == id))
+                throw new ManagedException("این وضعیت برای رویدادی ثبت شده است.");
 
             _unitOfWork.SkyDiveEventStatusRepository.Remove(status);
             await _unitOfWork.CommitAsync();
@@ -55,7 +58,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (status is null)
                 throw new ManagedException("وضعیت رویداد یافت نشد.");
 
-            _unitOfWork.SkyDiveEventStatusRepository.Update(command.Title, status);
+            _unitOfWork.SkyDiveEventStatusRepository.Update(command.Title, command.Reservable, status);
             await _unitOfWork.CommitAsync();
         }
     }

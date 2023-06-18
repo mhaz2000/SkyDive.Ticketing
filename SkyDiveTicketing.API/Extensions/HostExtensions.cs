@@ -38,6 +38,7 @@ namespace SkyDiveTicketing.API.Extensions
                     SeedCities(dataContext);
                     CreateUserType(dataContext);
                     CreateSkyDiveEventTicketType(dataContext);
+                    CreateSkyDiveEventStatuses(dataContext);
                     CreateInitialSettings(dataContext);
 
                     logger.LogInformation("Migrating database");
@@ -56,6 +57,19 @@ namespace SkyDiveTicketing.API.Extensions
             }
 
             return host;
+        }
+
+        private static void CreateSkyDiveEventStatuses(DataContext dataContext)
+        {
+            if(!dataContext.SkyDiveEventStatuses.Any())
+            {
+                dataContext.SkyDiveEventStatuses.Add(new SkyDiveEventStatus("برگزار شده", false));
+                dataContext.SkyDiveEventStatuses.Add(new SkyDiveEventStatus("لغو شده", false));
+                dataContext.SkyDiveEventStatuses.Add(new SkyDiveEventStatus("غیر قابل رزرو", false));
+                dataContext.SkyDiveEventStatuses.Add(new SkyDiveEventStatus("آماده رزرو", true));
+
+                dataContext.SaveChanges();
+            }
         }
 
         private static void CreateInitialSettings(DataContext dataContext)
@@ -99,8 +113,8 @@ namespace SkyDiveTicketing.API.Extensions
             {
                 var newUser = new User()
                 {
-                    FirstName = "Admin",
-                    LastName = "Admin",
+                    FirstName = "کاربر",
+                    LastName = "ادمین",
                     UserName = "Admin",
                     NormalizedUserName = "admin",
                     Status = UserStatus.Active,

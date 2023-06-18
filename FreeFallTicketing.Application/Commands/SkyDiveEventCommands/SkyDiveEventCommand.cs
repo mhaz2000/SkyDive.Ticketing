@@ -7,7 +7,6 @@ namespace SkyDiveTicketing.Application.Commands.SkyDiveEventCommands
     public class SkyDiveEventCommand : ICommandBase
     {
         public string? Title { get; set; }
-        public string? Code { get; set; }
         public string? Location { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

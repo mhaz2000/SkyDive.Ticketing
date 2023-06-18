@@ -37,9 +37,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             }
         }
 
-        public void AddTicketTypeAmount(SkyDiveEvent skyDiveEvent, SkyDiveEventTicketType ticketType, double amount)
+        public async Task AddTicketTypeAmount(SkyDiveEvent skyDiveEvent, SkyDiveEventTicketType ticketType, double amount)
         {
-            skyDiveEvent.TypesAmount.Add(new SkyDiveEventTicketTypeAmount(ticketType, amount));
+            var entity = new SkyDiveEventTicketTypeAmount(ticketType, amount);
+            await Context.SkyDiveEventTicketTypeAmounts.AddAsync(entity);
+
+            skyDiveEvent.TypesAmount.Add(entity);
         }
 
         public void ClearTicketTypesAmount(SkyDiveEvent skyDiveEvent)
@@ -47,9 +50,18 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             skyDiveEvent.TypesAmount.Clear();
         }
 
-        public async Task Create(int code, string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status)
+        public async Task Create(string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status)
         {
-            var skyDiveEvent = new SkyDiveEvent(code, title, location, voidable, subjecToVAT, image, startDate, endDate, status);
+            var lastCode = Context.SkyDiveEvents.OrderByDescending(x => x.Code).FirstOrDefault()?.Code ?? 0;
+            var skyDiveEvent = new SkyDiveEvent(++lastCode, title, location, voidable, subjecToVAT, image, startDate, endDate, status);
+
+            for (int i = 0; i < (endDate - startDate).TotalDays + 1; i++)
+            {
+                var entity = new SkyDiveEventItem(startDate.AddDays(i), 0);
+                await Context.SkyDiveEventItems.AddAsync(entity);
+
+                skyDiveEvent.Items.Add(entity);
+            }
 
             await Context.SkyDiveEvents.AddAsync(skyDiveEvent);
         }

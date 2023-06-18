@@ -5,7 +5,7 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface ISkyDiveEventStatusRepository : IRepository<SkyDiveEventStatus>
     {
-        Task Create(string title);
-        void Update(string title, SkyDiveEventStatus status);
+        Task Create(string title, bool reservable);
+        void Update(string title, bool reservable, SkyDiveEventStatus status);
     }
 }

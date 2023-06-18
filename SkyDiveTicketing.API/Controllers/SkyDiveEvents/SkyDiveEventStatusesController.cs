@@ -1,15 +1,18 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.SkyDiveEventCommands;
 using SkyDiveTicketing.Application.Services.SkyDiveEventServices;
+using System.Data;
 
 namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class SkyDiveEventStatusesController : ApiControllerBase
     {
         private readonly ISkyDiveEventStatusService _skyDiveEventStatusService;
@@ -37,11 +40,6 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpPut("{id}")]
@@ -62,11 +60,6 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpGet]
@@ -81,11 +74,6 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpGet("{id}")]
@@ -99,11 +87,6 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -122,11 +105,6 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }

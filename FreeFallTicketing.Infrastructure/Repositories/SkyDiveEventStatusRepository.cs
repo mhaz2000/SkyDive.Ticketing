@@ -16,14 +16,15 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task Create(string title)
+        public async Task Create(string title, bool reservalbe)
         {
-            await Context.SkyDiveEventStatuses.AddAsync(new SkyDiveEventStatus(title));
+            await Context.SkyDiveEventStatuses.AddAsync(new SkyDiveEventStatus(title, reservalbe));
         }
 
-        public void Update(string title, SkyDiveEventStatus status)
+        public void Update(string title, bool reservable, SkyDiveEventStatus status)
         {
             status.Title = title;
+            status.Reservable = reservable;
         }
     }
 }

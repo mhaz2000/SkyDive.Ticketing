@@ -322,7 +322,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 throw new ManagedException("کاربری یافت نشد.");
 
             return new UserInformationDTO(userId, user.CreatedAt, user.UpdatedAt, user.Code, user.UserName, user.PhoneNumber,
-                user.Status.GetDescription(), user.Status, user.UserType.Title, user.FirstName, user.LastName);
+                user.Status.GetDescription(), user.Status, user.UserType?.Title, user.FirstName, user.LastName);
         }
 
         public async Task<UserPersonalInformationDTO> GetPersonalInformation(Guid userId)
