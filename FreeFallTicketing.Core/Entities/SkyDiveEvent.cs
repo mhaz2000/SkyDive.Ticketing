@@ -57,11 +57,6 @@ namespace SkyDiveTicketing.Core.Entities
         public DateTime EndDate { get; set; }
 
         /// <summary>
-        /// ظرفیت رویداد
-        /// </summary>
-        public int Capacity { get; set; }
-
-        /// <summary>
         /// مشمول مالیات ارزش افزوده
         /// </summary>
         public bool SubjecToVAT { get; set; }
@@ -107,10 +102,9 @@ namespace SkyDiveTicketing.Core.Entities
 
         }
 
-        public SkyDiveEventItem(DateTime date, int capacity) : base()
+        public SkyDiveEventItem(DateTime date) : base()
         {
             Date = date;
-            Capacity = capacity;
             FlightLoads = new List<FlightLoad>();
         }
 
@@ -123,11 +117,6 @@ namespace SkyDiveTicketing.Core.Entities
         /// تعداد پرواز
         /// </summary>
         public int FlightNumber { get; set; }
-
-        /// <summary>
-        /// گنجایش
-        /// </summary>
-        public int Capacity { get; set; }
 
         /// <summary>
         /// پرواز ها

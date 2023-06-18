@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
+using SkyDiveTicketing.API.Extensions;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.SkyDiveEventCommands;
 using SkyDiveTicketing.Application.Services.SkyDiveEventServices;
@@ -161,11 +162,14 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
         }
 
         [HttpGet]
-        public IActionResult Get(Guid? statusId, DateTime? start, DateTime? end, PageQuery page)
+        public IActionResult Get([FromQuery] PageQuery page, Guid? statusId, string? start, string? end)
         {
             try
             {
-                var events = _skyDiveEventService.GetEvents(statusId, start, end);
+                var min = start?.ToDateTime();
+                var max = end?.ToDateTime();
+
+                var events = _skyDiveEventService.GetEvents(statusId, min, max);
                 return OkResult("اطلاعات رویداد ها.", events.ToPagingAndSorting(page), events.Count());
             }
             catch (ManagedException e)

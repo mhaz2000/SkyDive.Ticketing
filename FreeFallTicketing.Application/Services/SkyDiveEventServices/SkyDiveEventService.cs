@@ -3,7 +3,9 @@ using SkyDiveTicketing.Application.Commands.SkyDiveEventCommands;
 using SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs;
 using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
+using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 {
@@ -30,18 +32,21 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
         public async Task<SkyDiveEventDTO> GetEvent(Guid id)
         {
-            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.Status);
+            PersianCalendar pc = new PersianCalendar();
+            var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Id == id).FirstOrDefault();
             if (skyDiveEvent is null)
                 throw new ManagedException("رویداد مورد نظر یافت نشد.");
 
             return new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
-                skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Capacity, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
-                skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions, skyDiveEvent.Status.Title);
+                skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Items?.Sum(c => c.FlightLoads?.Sum(t => t.Capacity) ?? 0) ?? 0, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
+                skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title,
+                skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id)));
         }
 
         public IEnumerable<SkyDiveEventDTO> GetEvents(Guid? statusId, DateTime? start, DateTime? end)
         {
-            var events = _unitOfWork.SkyDiveEventRepository.Include(c => c.Status);
+            PersianCalendar pc = new PersianCalendar();
+            var events = _unitOfWork.SkyDiveEventRepository.FindEvents();
 
             if (statusId is not null)
                 events = events.Where(c => c.Status.Id == statusId);
@@ -53,8 +58,9 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 events = events.Where(c => c.EndDate <= end);
 
             return events.Select(skyDiveEvent => new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
-                skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Capacity, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
-                skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions, skyDiveEvent.Status.Title));
+                skyDiveEvent.Image, skyDiveEvent.IsActive, ResolveCapacity(skyDiveEvent.Items), skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
+                skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title,
+                skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id))));
         }
 
         public async Task ToggleActivationEvent(Guid id)
@@ -116,7 +122,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
             int sum = 0;
             IDictionary<SkyDiveEventTicketType, int> typesAmount = new Dictionary<SkyDiveEventTicketType, int>();
-            foreach (var item in command.TickTypes)
+            foreach (var item in command.TicketTypes)
             {
                 var ticketType = ticketTypes.FirstOrDefault(c => c.Id == item.TypeId);
                 sum += item.Qty * ticketType.Capacity;
@@ -124,10 +130,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 typesAmount.Add(ticketType, item.Qty);
             }
 
-            if (sum - command.VoidableNumber != skyDiveEvent.Capacity)
-                throw new ManagedException("مجموع ظرفیت وارد شده با ظرفیت پرواز ها متفاوت است.");
-
-            _unitOfWork.SkyDiveEventRepository.AddFlights(skyDiveEventDay, typesAmount, command.FlightNumber, command.VoidableNumber);
+            await _unitOfWork.SkyDiveEventRepository.AddFlightsAsync(skyDiveEvent, skyDiveEventDay, typesAmount, command.FlightQty, command.VoidableQty, sum + command.VoidableQty);
 
             await _unitOfWork.CommitAsync();
         }
@@ -198,7 +201,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
             return new SkyDiveEventItemDTO(skyDiveEventItem.Id, skyDiveEventItem.CreatedAt, skyDiveEventItem.UpdatedAt, skyDiveEventItem.Date)
             {
-                Flights = skyDiveEventItem.FlightLoads.OrderBy(c=> c.Number).Take(pageSize).Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number)
+                Flights = skyDiveEventItem.FlightLoads.OrderBy(c => c.Number).Take(pageSize).Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number)
                 {
                     Tickets = flight.FlightLoadItems.Select(flightLoadItem => new TicketDTO(flightLoadItem.Id, flightLoadItem.CreatedAt, flightLoadItem.UpdatedAt,
                         flightLoadItem.FlightLoadType.Title, GetTicketTypeAmount(skyDiveEvent, flightLoadItem.FlightLoadType.Id), flightLoadItem.SeatNumber - flightLoadItem.Tickets.Count()))
@@ -228,5 +231,9 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             });
         }
 
+        private int ResolveCapacity(ICollection<SkyDiveEventItem>? items)
+        {
+            return items?.Sum(c => c.FlightLoads?.Sum(t => t.Capacity) ?? 0) ?? 0;
+        }
     }
 }

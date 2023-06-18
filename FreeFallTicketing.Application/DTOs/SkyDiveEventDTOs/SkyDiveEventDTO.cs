@@ -4,7 +4,7 @@ namespace SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs
     public class SkyDiveEventDTO : BaseDTO<Guid>
     {
         public SkyDiveEventDTO(Guid id, DateTime createdAt, DateTime updatedAt, string title, DateTime startDate,
-            DateTime endDate, Guid image, bool isActive, int capacity, string code, string location, bool subjectToVAT, bool voidable, string termsAndConditions, string statusTitle)
+            DateTime endDate, Guid image, bool isActive, int capacity, string code, string location, bool subjectToVAT, bool voidable, string termsAndConditions, string statusTitle, IEnumerable<SkyDiveEventDayDTO> days)
             : base(id, createdAt, updatedAt)
         {
             Title = title;
@@ -19,6 +19,7 @@ namespace SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs
             TermsAndConditions = termsAndConditions;
             StatusTitle = statusTitle;
             Voidable = voidable;
+            Days = days;
         }
 
         public string Code { get; set; }
@@ -33,5 +34,19 @@ namespace SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs
         public bool Voidable { get; set; }
         public string? TermsAndConditions { get; set; }
         public string StatusTitle { get; set; }
+
+        public IEnumerable<SkyDiveEventDayDTO> Days { get; set; }
+    }
+
+    public class SkyDiveEventDayDTO
+    {
+        public SkyDiveEventDayDTO(string date, Guid id)
+        {
+            Date = date;
+            Id = id;
+        }
+
+        public string Date { get; set; }
+        public Guid Id { get; set; }
     }
 }

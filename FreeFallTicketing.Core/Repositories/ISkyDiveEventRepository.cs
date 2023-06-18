@@ -11,7 +11,7 @@ namespace SkyDiveTicketing.Core.Repositories
         Task Create(string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status);
         void ToggleActivation(SkyDiveEvent skyDiveEvent);
         void Update(string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status, SkyDiveEvent skyDiveEvent);
-        void AddFlights(SkyDiveEventItem skyDiveEventDay, IDictionary<SkyDiveEventTicketType, int> typesQty, int flightNumber, int voidableNumber);
+        Task AddFlightsAsync(SkyDiveEvent skyDiveEvent, SkyDiveEventItem skyDiveEventDay, IDictionary<SkyDiveEventTicketType, int> typesQty, int flightNumber, int voidableNumber, int capacity);
         Task AddTicketTypeAmount(SkyDiveEvent skyDiveEvent, SkyDiveEventTicketType ticketType, double amount);
         void AddConditionsAndTerms(SkyDiveEvent skyDiveEvent, string conditionsAndTerms);
         void ClearTicketTypesAmount(SkyDiveEvent skyDiveEvent);

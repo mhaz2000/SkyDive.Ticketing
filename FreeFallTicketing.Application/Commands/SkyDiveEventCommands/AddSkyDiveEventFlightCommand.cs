@@ -6,14 +6,14 @@ namespace SkyDiveTicketing.Application.Commands.SkyDiveEventCommands
 {
     public class AddSkyDiveEventFlightCommand : ICommandBase
     {
-        public int FlightNumber { get; set; }
-        public int VoidableNumber { get; set; }
+        public int FlightQty { get; set; }
+        public int VoidableQty { get; set; }
 
-        public List<TicketTypeCommand> TickTypes { get; set; }
+        public List<TicketTypeCommand> TicketTypes { get; set; }
 
         public void Validate()
         {
-            TickTypes.ForEach(c=> c.Validate());
+            TicketTypes.ForEach(c=> c.Validate());
             new AddSkyDiveEventFlightCommandValidator().Validate(this).RaiseExceptionIfRequired();
         }
     }

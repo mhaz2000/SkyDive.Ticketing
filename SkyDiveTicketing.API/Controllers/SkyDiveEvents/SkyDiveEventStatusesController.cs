@@ -12,7 +12,6 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class SkyDiveEventStatusesController : ApiControllerBase
     {
         private readonly ISkyDiveEventStatusService _skyDiveEventStatusService;
@@ -22,6 +21,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             _skyDiveEventStatusService = skyDiveEventStatusService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(SkyDiveEventStatusCommand command)
         {
@@ -42,6 +42,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] SkyDiveEventStatusCommand command)
         {
@@ -90,6 +91,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

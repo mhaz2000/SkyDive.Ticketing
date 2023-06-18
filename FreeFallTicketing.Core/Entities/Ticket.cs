@@ -8,7 +8,7 @@ namespace SkyDiveTicketing.Core.Entities
         {
 
         }
-        public Ticket(string ticketNumber, bool voidable, User reservedBy, bool reservedByAdmin) : base()
+        public Ticket(string ticketNumber, bool voidable, User? reservedBy, bool reservedByAdmin) : base()
         {
             TicketNumber = ticketNumber;
             Voidable = voidable;
@@ -21,7 +21,7 @@ namespace SkyDiveTicketing.Core.Entities
 
         public string TicketNumber { get; set; }
         public bool Voidable { get; set; }
-        public User ReservedBy { get; set; }
+        public User? ReservedBy { get; set; }
         public bool ReservedByAdmin { get; set; }
         public bool Paid { get; private set; }
         public bool Locked { get; private set; }
