@@ -1,9 +1,9 @@
 ﻿using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Commands.FileCommands;
 using SkyDiveTicketing.Application.Services.FileServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SkyDiveTicketing.API.Controllers.Files
 {
@@ -29,6 +29,7 @@ namespace SkyDiveTicketing.API.Controllers.Files
             return Ok(fileId);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<FileResult> Get(Guid id)
         {

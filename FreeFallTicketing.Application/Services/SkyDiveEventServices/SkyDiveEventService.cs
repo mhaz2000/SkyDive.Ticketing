@@ -57,8 +57,9 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (end is not null)
                 events = events.Where(c => c.EndDate <= end);
 
-            return events.Select(skyDiveEvent => new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
-                skyDiveEvent.Image, skyDiveEvent.IsActive, ResolveCapacity(skyDiveEvent.Items), skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
+            return events.OrderByDescending(c => c.StartDate)
+                .Select(skyDiveEvent => new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
+                skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Capacity, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
                 skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title,
                 skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id))));
         }
@@ -191,7 +192,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             await _unitOfWork.CommitAsync();
         }
 
-        public SkyDiveEventItemDTO GetEventDayFlights(Guid id, int pageSize)
+        public SkyDiveEventItemDTO GetEventDayFlights(Guid id, int pageSize, int pageIndex)
         {
             var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Items.Any(c => c.Id == id)).FirstOrDefault();
             if (skyDiveEvent is null)
@@ -201,11 +202,8 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
             return new SkyDiveEventItemDTO(skyDiveEventItem.Id, skyDiveEventItem.CreatedAt, skyDiveEventItem.UpdatedAt, skyDiveEventItem.Date)
             {
-                Flights = skyDiveEventItem.FlightLoads.OrderBy(c => c.Number).Take(pageSize).Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number)
-                {
-                    Tickets = flight.FlightLoadItems.Select(flightLoadItem => new TicketDTO(flightLoadItem.Id, flightLoadItem.CreatedAt, flightLoadItem.UpdatedAt,
-                        flightLoadItem.FlightLoadType.Title, GetTicketTypeAmount(skyDiveEvent, flightLoadItem.FlightLoadType.Id), flightLoadItem.SeatNumber - flightLoadItem.Tickets.Count()))
-                })
+                Flights = skyDiveEventItem.FlightLoads.OrderBy(c => c.Number).Skip((pageIndex - 1) * pageSize).Take(pageSize)
+                    .Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number,  flight.Capacity, flight.VoidableNumber))
             };
         }
 
@@ -231,9 +229,9 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             });
         }
 
-        private int ResolveCapacity(ICollection<SkyDiveEventItem>? items)
+        public object GetFlightTickets(Guid id, int pageSize, int pageIndex)
         {
-            return items?.Sum(c => c.FlightLoads?.Sum(t => t.Capacity) ?? 0) ?? 0;
+            throw new NotImplementedException();
         }
     }
 }

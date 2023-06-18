@@ -221,11 +221,25 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
         }
 
         [HttpGet("EventDayFlights/{id}")]
-        public IActionResult GetEventDayFlights(Guid id, PageQuery page)
+        public IActionResult GetEventDayFlights(Guid id, [FromQuery] PageQuery page)
         {
             try
             {
-                var tickets = _skyDiveEventService.GetEventDayFlights(id, page.PageSize);
+                var tickets = _skyDiveEventService.GetEventDayFlights(id, page.PageSize, page.PageIndex);
+                return OkResult("بلیت های رویداد", tickets, tickets.Flights.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("Tickets/{flightId}")]
+        public IActionResult GetTickets(Guid id, [FromQuery] PageQuery page)
+        {
+            try
+            {
+                var tickets = _skyDiveEventService.GetFlightTickets(id, page.PageSize, page.PageIndex);
                 return OkResult("بلیت های رویداد", tickets, tickets.Flights.Count());
             }
             catch (ManagedException e)

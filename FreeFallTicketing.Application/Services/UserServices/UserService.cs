@@ -215,6 +215,24 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             //send via otp
 
+            try
+            {
+                var sender = "1000596446";
+                var receptor = user.PhoneNumber;
+                var api = new Kavenegar.KavenegarApi("3855427A2B677749795636547468526D4479474249466E786E33476658454537593677652F51592F4D476F3D");
+                api.VerifyLookup(receptor, otpCode, "verfiy");
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+
+            //
+
+
             _unitOfWork.UserRepository.SetOtpCode(user, otpCode);
             await _unitOfWork.CommitAsync();
 

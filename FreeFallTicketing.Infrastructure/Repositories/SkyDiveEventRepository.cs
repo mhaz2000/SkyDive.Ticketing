@@ -83,11 +83,15 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public IQueryable<SkyDiveEvent> FindEvents(Expression<Func<SkyDiveEvent, bool>>? predicate = null)
         {
-            return Context.SkyDiveEvents
+            var events = Context.SkyDiveEvents
                 .Include(c => c.TypesAmount).ThenInclude(c => c.Type)
                 .Include(c => c.Status)
-                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy)
-                .Where(predicate);
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy).AsQueryable();
+
+            if(predicate is not null)
+                events = events.Where(predicate).AsQueryable();
+
+            return events;
         }
 
         public IEnumerable<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null)

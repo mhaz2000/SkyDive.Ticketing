@@ -1,8 +1,13 @@
 ﻿
+using MD.PersianDateTime;
+using System.Globalization;
+
 namespace SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs
 {
     public class SkyDiveEventDTO : BaseDTO<Guid>
     {
+        PersianCalendar pc = new PersianCalendar();
+
         public SkyDiveEventDTO(Guid id, DateTime createdAt, DateTime updatedAt, string title, DateTime startDate,
             DateTime endDate, Guid image, bool isActive, int capacity, string code, string location, bool subjectToVAT, bool voidable, string termsAndConditions, string statusTitle, IEnumerable<SkyDiveEventDayDTO> days)
             : base(id, createdAt, updatedAt)
@@ -34,6 +39,9 @@ namespace SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs
         public bool Voidable { get; set; }
         public string? TermsAndConditions { get; set; }
         public string StatusTitle { get; set; }
+
+        public string Duration => 
+            $"{pc.GetDayOfMonth(StartDate)} {PersianDateTime.GetPersianMonthName(pc.GetMonth(StartDate))} تا {pc.GetDayOfMonth(EndDate)} {PersianDateTime.GetPersianMonthName(pc.GetMonth(EndDate))}";
 
         public IEnumerable<SkyDiveEventDayDTO> Days { get; set; }
     }

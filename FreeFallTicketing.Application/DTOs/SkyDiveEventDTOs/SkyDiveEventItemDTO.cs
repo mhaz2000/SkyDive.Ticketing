@@ -9,20 +9,21 @@
         }
 
         public DateTime Date { get; set; }
-        public int TotalAvailableTicketsNumber => Flights.Sum(flight => flight.Tickets.Sum(ticket => ticket.AvailableTicketsNumber));
         public IEnumerable<FlightDTO> Flights { get; set; }
     }
 
     public class FlightDTO : BaseDTO<Guid>
     {
-        public FlightDTO(Guid id, DateTime createdAt, DateTime updatedAt, int flightNumber) : base(id, createdAt, updatedAt)
+        public FlightDTO(Guid id, DateTime createdAt, DateTime updatedAt, int flightNumber, int capacity, int voidableQty) : base(id, createdAt, updatedAt)
         {
             FlightNumber = flightNumber;
-            Tickets = new List<TicketDTO>();
+            Capacity = capacity;
+            VoidableQty = voidableQty;
         }
 
         public int FlightNumber { get; set; }
-        public IEnumerable<TicketDTO> Tickets { get; set; }
+        public int Capacity { get; set; }
+        public int VoidableQty { get; set; }
     }
 
     public class TicketDTO : BaseDTO<Guid>

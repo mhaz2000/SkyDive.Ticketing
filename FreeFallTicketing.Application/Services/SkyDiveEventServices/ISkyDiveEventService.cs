@@ -16,6 +16,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
         Task<IEnumerable<SkyDiveEventDaysDTO>> GetEventDays(Guid id, Guid userId);
         Task AddEventTypeFee(AddEventTypeFeeCommand command, Guid id);
         Task AddConditionsAndTerms(AddEventConditionsAndTermsCommand command, Guid id);
-        SkyDiveEventItemDTO GetEventDayFlights(Guid id, int pageSize);
+        SkyDiveEventItemDTO GetEventDayFlights(Guid id, int pageSize, int pageIndex);
+        object GetFlightTickets(Guid id, int pageSize, int pageIndex);
     }
 }
