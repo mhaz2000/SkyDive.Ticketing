@@ -15,7 +15,7 @@ namespace SkyDiveTicketing.Core.Entities
             ReservedBy = reservedBy;
             ReservedByAdmin = reservedByAdmin;
             Paid = false;
-            Locked = true;
+            Locked = false;
             Cancelled = false;
         }
 
@@ -40,6 +40,7 @@ namespace SkyDiveTicketing.Core.Entities
             PaidAmount = amount;
         }
         public void SetAsUnLock() => Locked = false;
+        public void SetAsLock() => Locked = true;
         public void SetAsCancelled() => Cancelled = true;
 
     }

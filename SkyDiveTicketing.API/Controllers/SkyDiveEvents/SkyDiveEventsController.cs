@@ -22,6 +22,8 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             _skyDiveEventService = skyDiveEventService;
         }
 
+        #region Admin Apies
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(SkyDiveEventCommand command)
@@ -161,6 +163,72 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet("EventDayFlights/{id}")]
+        public IActionResult GetEventDayFlights(Guid id, [FromQuery] PageQuery page)
+        {
+            try
+            {
+                var tickets = _skyDiveEventService.GetEventDayFlights(id, page.PageSize, page.PageIndex);
+                return OkResult("بلیت های رویداد", tickets, tickets.Flights.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("Tickets/{flightId}")]
+        public async Task<IActionResult> GetTickets(Guid flightId, [FromQuery] PageQuery page)
+        {
+            try
+            {
+                var tickets = await _skyDiveEventService.GetFlightTickets(flightId);
+                return OkResult("بلیت های رویداد", tickets.ToPagingAndSorting(page), tickets.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("UpdateTicket")]
+        public async Task<IActionResult> UpdateTicket(UpdateTicketCommand command)
+        {
+            try
+            {
+                await _skyDiveEventService.UpdateTicket(command);
+                return OkResult("ویرایش بلیت با موفقیت انجام شد.");
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("PublishEvent/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> PublishEvent(Guid id)
+        {
+            try
+            {
+                await _skyDiveEventService.PublishEvent(id);
+                return OkResult("رویداد با موفقیت فعال شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        #endregion
+
         [HttpGet]
         public IActionResult Get([FromQuery] PageQuery page, Guid? statusId, string? start, string? end)
         {
@@ -220,27 +288,13 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
-        [HttpGet("EventDayFlights/{id}")]
-        public IActionResult GetEventDayFlights(Guid id, [FromQuery] PageQuery page)
+        [HttpGet("EventDayTickets/{id}")]
+        public IActionResult GetEventDayTickets(Guid id, [FromQuery] PageQuery pageQuery)
         {
             try
             {
-                var tickets = _skyDiveEventService.GetEventDayFlights(id, page.PageSize, page.PageIndex);
-                return OkResult("بلیت های رویداد", tickets, tickets.Flights.Count());
-            }
-            catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
-        [HttpGet("Tickets/{flightId}")]
-        public IActionResult GetTickets(Guid id, [FromQuery] PageQuery page)
-        {
-            try
-            {
-                var tickets = _skyDiveEventService.GetFlightTickets(id, page.PageSize, page.PageIndex);
-                return OkResult("بلیت های رویداد", tickets, tickets.Flights.Count());
+                (var tickets, var count) = _skyDiveEventService.GetEventDayTickets(id, pageQuery.PageIndex, pageQuery.PageSize);
+                return OkResult("بلیت های روز", tickets, count);
             }
             catch (ManagedException e)
             {

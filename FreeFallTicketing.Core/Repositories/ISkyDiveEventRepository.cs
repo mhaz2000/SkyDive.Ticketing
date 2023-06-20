@@ -16,5 +16,6 @@ namespace SkyDiveTicketing.Core.Repositories
         void AddConditionsAndTerms(SkyDiveEvent skyDiveEvent, string conditionsAndTerms);
         void ClearTicketTypesAmount(SkyDiveEvent skyDiveEvent);
         IEnumerable<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null);
+        void PublishEvent(SkyDiveEvent skyDiveEvent);
     }
 }

@@ -110,6 +110,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                    }).Where(predicate);
         }
 
+        public void PublishEvent(SkyDiveEvent skyDiveEvent)
+        {
+            skyDiveEvent.ToggleActivation();
+        }
+
         public void ToggleActivation(SkyDiveEvent skyDiveEvent)
         {
             skyDiveEvent.ToggleActivation();

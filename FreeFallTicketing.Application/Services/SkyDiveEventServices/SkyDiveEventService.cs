@@ -1,6 +1,8 @@
 ﻿using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.SkyDiveEventCommands;
+using SkyDiveTicketing.Application.DTOs.FlightLoadDTOs;
 using SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs;
+using SkyDiveTicketing.Application.DTOs.TicketDTOs;
 using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
 using System.Globalization;
@@ -158,7 +160,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
             return skyDiveEvent.Items
                 .Select(skyDiveEventDay => new SkyDiveEventDaysDTO(skyDiveEventDay.Id, skyDiveEventDay.CreatedAt, skyDiveEvent.UpdatedAt,
-                skyDiveEventDay.Date, GetEmptyCapacity(skyDiveEventDay), skyDiveEventDay.FlightNumber, GetUserEventTicker(skyDiveEventDay, user)));
+                skyDiveEventDay.Date, GetEmptyCapacity(skyDiveEventDay), skyDiveEventDay.FlightNumber, GetUserEventTicket(skyDiveEventDay, user)));
         }
 
         public async Task AddEventTypeFee(AddEventTypeFeeCommand command, Guid id)
@@ -203,35 +205,95 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             return new SkyDiveEventItemDTO(skyDiveEventItem.Id, skyDiveEventItem.CreatedAt, skyDiveEventItem.UpdatedAt, skyDiveEventItem.Date)
             {
                 Flights = skyDiveEventItem.FlightLoads.OrderBy(c => c.Number).Skip((pageIndex - 1) * pageSize).Take(pageSize)
-                    .Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number,  flight.Capacity, flight.VoidableNumber))
+                    .Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number, flight.Capacity, flight.VoidableNumber))
             };
         }
 
-        private double GetTicketTypeAmount(SkyDiveEvent skyDiveEvent, Guid typeId)
+        public async Task<IEnumerable<FlightLoadItemTicketDTO>> GetFlightTickets(Guid id)
         {
-            return skyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == typeId)?.Amount ?? 0;
+            var flightLoad = await _unitOfWork.FlightLoadRepository.GetExpandedById(id);
+            if (flightLoad is null)
+                throw new ManagedException("روز رویداد یافت نشد.");
+
+            return flightLoad.FlightLoadItems.SelectMany(item => item.Tickets, (item, ticket) =>
+                new FlightLoadItemTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, item.FlightLoadType.Title,
+                !ticket.ReservedByAdmin, ticket.ReservedBy is null ?
+                (ticket.ReservedByAdmin ? "رزرو شده (admin)" : "رزرو نشده") :
+                $"رزرو شده ({ticket.ReservedBy.FullName + " " + ticket.ReservedBy.Code})")).OrderBy(c => c.TicketNumber);
+        }
+
+        public async Task UpdateTicket(UpdateTicketCommand command)
+        {
+            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == command.Id, c => c.ReservedBy);
+            if (ticket is null)
+                throw new ManagedException("بلیت مورد نظر یافت نشد.");
+
+            if (ticket.ReservedBy is not null && !ticket.ReservedByAdmin)
+                throw new ManagedException("امکان ویرایش بلیت های رزور شده وجود ندارد.");
+
+            var flightItem = await _unitOfWork.FlightLoadRepository.GetFlightItemByTicket(ticket);
+            if (flightItem is null)
+                throw new ManagedException("اطلاعات پرواز یافت نشد.");
+
+            var ticketType = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetByIdAsync(command.TicketTypeId);
+            if (ticketType is null)
+                throw new ManagedException("نوع بلیت معتبر نیست.");
+
+            await _unitOfWork.FlightLoadRepository.UpdateFlightTicket(flightItem, ticket, ticketType, command.Reservable);
+            await _unitOfWork.CommitAsync();
+        }
+
+        public async Task PublishEvent(Guid id)
+        {
+            var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Id == id).FirstOrDefault();
+            if (skyDiveEvent is null)
+                throw new ManagedException("رویداد مورد نظر یافت نشد.");
+
+            if (skyDiveEvent.Items.All(c => c.FlightLoads.Any()))
+                _unitOfWork.SkyDiveEventRepository.PublishEvent(skyDiveEvent);
+            else
+                throw new ManagedException("اطلاعات رویداد ناقص است. برای تمامی روز های رویداد پرواز ایجاد نمایید..");
+
+            await _unitOfWork.CommitAsync();
         }
 
         private int GetEmptyCapacity(SkyDiveEventItem skyDiveEventItem)
         {
             return skyDiveEventItem.FlightLoads.Sum(flightLoad =>
             {
-                var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Count());
+                var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(c => c.ReservedBy is null).Count());
                 return flightLoad.Capacity - ticketsNumber;
             });
         }
 
-        private int GetUserEventTicker(SkyDiveEventItem skyDiveEventItem, User user)
+        private int GetUserEventTicket(SkyDiveEventItem skyDiveEventItem, User user)
         {
             return skyDiveEventItem.FlightLoads.Sum(flightLoad =>
             {
-                return flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(ticket => ticket.ReservedBy.Id == user.Id).Count());
+                return flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(ticket => ticket.ReservedBy?.Id == user.Id).Count());
             });
         }
 
-        public object GetFlightTickets(Guid id, int pageSize, int pageIndex)
+        public (ReservingTicketDTO reservingTicketDTO, int count) GetEventDayTickets(Guid id, int index, int size)
         {
-            throw new NotImplementedException();
+            var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Items.Any(t => t.Id == id)).FirstOrDefault();
+            if (skyDiveEvent is null) //must check if skydive is published or not
+                throw new ManagedException("رویداد مورد نظر یافت نشد.");
+
+            var skyDiveEventDay = skyDiveEvent.Items.First(c => c.Id == id);
+
+            var dto = new ReservingTicketDTO(skyDiveEventDay.Date, skyDiveEventDay.FlightLoads.Select(flightLoad => new TicketFlightDTO(flightLoad.Number,
+                flightLoad.FlightLoadItems
+                .Select(item => new TicketDetailDTO(item.FlightLoadType.Title, skyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == item.FlightLoadType.Id)?.Amount ?? 0,
+                item.Tickets.Where(c => c.ReservedBy is null && !c.Locked && !c.ReservedByAdmin).Count())))).OrderBy(c => c.FlightNumber));
+
+            dto.Qty = dto.Flights.Sum(flight => flight.Tickets.Sum(ticket => ticket.Qty));
+
+            int count = dto.Flights.Count();
+
+            dto.Flights = dto.Flights.Skip((index - 1) * size).Take(size);
+
+            return (dto, count);
         }
     }
 }
