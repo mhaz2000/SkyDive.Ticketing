@@ -113,7 +113,8 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
         public async Task UnlockTickets()
         {
-            var tickets = _unitOfWork.TicketRepository.AsEnumerable().Where(x => Math.Abs((DateTime.Now - x.CreatedAt).TotalMinutes) >= 15);
+            var tickets = _unitOfWork.TicketRepository.AsEnumerable()
+                .Where(x => x.ReserveTime is not null && Math.Abs((DateTime.Now - x.ReserveTime.Value).TotalMinutes) >= 15);
 
             foreach (var ticket in tickets)
                 _unitOfWork.TicketRepository.Unlock(ticket);
@@ -149,22 +150,39 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             _unitOfWork.TicketRepository.ClearUserTicket(user);
 
+            //var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.IsActive).AsEnumerable();
+            var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.FindEvents().AsEnumerable();
+
             foreach (var item in command.Items)
             {
-                var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Items.Any(c => c.Id == item.SkyDiveItemId)).FirstOrDefault();
+                SkyDiveEventItem skyDiveEventItem = null;
+
+                var skyDiveEvent = skyDiveEvents
+                    .Where(skyDiveEvent =>
+                    {
+                        skyDiveEventItem = skyDiveEvent.Items.FirstOrDefault(day => day.FlightLoads.Any(flight => flight.Id == item.FlightLoadId));
+                        if (skyDiveEventItem is null)
+                            throw new ManagedException("پرواز مورد نظر یافت نشد.");
+
+                        return true;
+
+                    }).FirstOrDefault();
+
                 if (skyDiveEvent is null)
                     throw new ManagedException("رویدادی پیدا نشد.");
 
-                var skyDiveEventItem = skyDiveEvent.Items.FirstOrDefault(c => c.Id == item.SkyDiveItemId);
-                var flightLoad = skyDiveEventItem.FlightLoads.FirstOrDefault(c => c.FlightLoadItems.Any(t => t.Id == item.FlightLoadItemId));
-                var flightLoadItem = flightLoad.FlightLoadItems.FirstOrDefault(c => c.Id == item.FlightLoadItemId);
+                var flightLoad = skyDiveEventItem.FlightLoads.FirstOrDefault(c => c.Id == item.FlightLoadId);
+                var flightLoadItem = flightLoad.FlightLoadItems.FirstOrDefault(c => c.FlightLoadType.Id == item.TicketTypeId);
 
-                if (flightLoadItem.SeatNumber - (flightLoadItem.Tickets.Where(c => !c.Locked && !c.Cancelled).Count() + item.Qty) < 0)
+                var availableTickets = flightLoadItem.Tickets.Where(c => !c.Locked && !c.Cancelled && !c.ReservedByAdmin && c.ReservedBy is null).Take(item.Qty).ToList();
+                if (availableTickets is null || !availableTickets.Any())
                     errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {flightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
                 else
                 {
-                    for (int i = 0; i < item.Qty; i++)
-                        tickets.Add(_unitOfWork.TicketRepository.AddTicket(flightLoadItem, user, flightLoad.Number, skyDiveEvent));
+                    foreach (var ticket in availableTickets)
+                        _unitOfWork.TicketRepository.ReserveTicket(ticket, user);
+
+                    tickets.AddRange(availableTickets);
                 }
             }
 

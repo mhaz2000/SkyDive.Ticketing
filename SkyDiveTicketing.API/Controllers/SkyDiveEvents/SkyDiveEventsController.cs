@@ -279,8 +279,8 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
         {
             try
             {
-                var eventDays = await _skyDiveEventService.GetEventDays(id, UserId);
-                return OkResult("روز های رویداد", eventDays, eventDays.Count());
+                (var eventName, var eventDays) = await _skyDiveEventService.GetEventDays(id, UserId);
+                return OkResult(eventName, eventDays, eventDays.Count());
             }
             catch (ManagedException e)
             {

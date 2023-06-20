@@ -16,8 +16,8 @@ namespace SkyDiveTicketing.Application.Commands.Reservation
 
     public class ReserveDetailCommand : ICommandBase
     {
-        public Guid SkyDiveItemId { get; set; }
-        public Guid FlightLoadItemId { get; set; }
+        public Guid FlightLoadId { get; set; }
+        public Guid TicketTypeId { get; set; }
         public int Qty { get; set; }
 
         public void Validate() => new ReserveDetailCommandValidator().Validate(this).RaiseExceptionIfRequired();

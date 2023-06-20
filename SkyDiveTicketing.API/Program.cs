@@ -16,6 +16,7 @@ using SkyDiveTicketing.Application.Helpers;
 using SkyDiveTicketing.API.Jobs.PassengerDocumentJobs;
 using SkyDiveTicketing.API.Jobs.TicketJobs;
 using System.Text.Json.Serialization;
+using SkyDiveTicketing.API.Jobs.JumpRecordJobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -168,8 +169,8 @@ app.MapControllers();
 
 app.MigrateDatabase<Program>();
 
-//RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
-//RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
-//RecurringJob.AddOrUpdate<IJumpRecordJob>("UnlockTicket", c => c.CheckIfExpired(), Cron.Daily);
+RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
+RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
+RecurringJob.AddOrUpdate<IJumpRecordJob>("ExpiredJumpRecord", c => c.CheckIfExpired(), Cron.Daily);
 
 app.Run();

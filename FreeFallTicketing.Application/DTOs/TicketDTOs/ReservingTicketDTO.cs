@@ -21,13 +21,16 @@ namespace SkyDiveTicketing.Application.DTOs.TicketDTOs
 
     public class TicketFlightDTO
     {
-        public TicketFlightDTO(int flightNumber, IEnumerable<TicketDetailDTO> tickets)
+        public TicketFlightDTO(int flightNumber, IEnumerable<TicketDetailDTO> tickets, Guid flightId)
         {
             FlightNumber = flightNumber;
             Tickets = tickets;
+            FlightId = flightId;
         }
 
         public int FlightNumber { get; set; }
+
+        public Guid FlightId { get; set; }
 
         public IEnumerable<TicketDetailDTO> Tickets { get; set; }
     }

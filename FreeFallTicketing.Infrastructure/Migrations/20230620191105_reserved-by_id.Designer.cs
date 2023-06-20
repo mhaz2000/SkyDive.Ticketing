@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyDiveTicketing.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkyDiveTicketing.Infrastructure.Data;
 namespace SkyDiveTicketing.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230620191105_reserved-by_id")]
+    partial class reservedby_id
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -870,7 +873,9 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("RelatedAdminCartableRequestId");
 
-                    b.HasIndex("ReservedById");
+                    b.HasIndex("ReservedById")
+                        .IsUnique()
+                        .HasFilter("[ReservedById] IS NOT NULL");
 
                     b.HasIndex("ShoppingCartId");
 
@@ -1362,8 +1367,8 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .HasForeignKey("RelatedAdminCartableRequestId");
 
                     b.HasOne("SkyDiveTicketing.Core.Entities.User", "ReservedBy")
-                        .WithMany()
-                        .HasForeignKey("ReservedById");
+                        .WithOne()
+                        .HasForeignKey("SkyDiveTicketing.Core.Entities.Ticket", "ReservedById");
 
                     b.HasOne("SkyDiveTicketing.Core.Entities.ShoppingCart", null)
                         .WithMany("Tickets")

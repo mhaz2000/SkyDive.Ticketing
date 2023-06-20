@@ -32,13 +32,16 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public void ClearUserTicket(User user)
         {
             var userTickets = Context.Tickets.Include(c => c.ReservedBy).Where(x => x.ReservedBy == user);
-            var flightLoadItems = Context.FlightLoadItems.Include(c => c.Tickets);
 
             foreach (var ticket in userTickets)
-            {
-                var flightLoadItem = flightLoadItems.FirstOrDefault(c => c.Tickets.Contains(ticket));
-                flightLoadItem.Tickets.Remove(ticket);
-            }
+                ticket.ReservedBy = null;
+        }
+
+        public void ReserveTicket(Ticket ticket, User user)
+        {
+            ticket.SetAsLock();
+            ticket.ReserveTime = DateTime.Now;
+            ticket.ReservedBy = user;
         }
 
         public void SetAsCancelled(Ticket ticket)
@@ -53,6 +56,9 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public void Unlock(Ticket ticket)
         {
+            ticket.ReserveTime = null;
+            ticket.ReservedBy = null;
+            ticket.ReservedById = null;
             ticket.SetAsUnLock();
         }
     }

@@ -66,6 +66,8 @@ namespace SkyDiveTicketing.Infrastructure.Data
                 .HasOne(p => p.NationalCardDocumentFile)
                 .WithOne()
                 .HasForeignKey<Passenger>(p => p.NationalCardDocumentFileId);
+
+            modelBuilder.Entity<Ticket>().HasOne(c => c.ReservedBy).WithMany().HasForeignKey("ReservedById");
         }
     }
 }

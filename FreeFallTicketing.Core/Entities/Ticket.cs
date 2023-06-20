@@ -22,10 +22,12 @@ namespace SkyDiveTicketing.Core.Entities
         public string TicketNumber { get; set; }
         public bool Voidable { get; set; }
         public User? ReservedBy { get; set; }
+        public Guid? ReservedById { get; set; }
         public bool ReservedByAdmin { get; set; }
         public bool Paid { get; private set; }
         public bool Locked { get; private set; }
         public bool Cancelled { get; private set; }
+        public DateTime? ReserveTime { get; set; }
 
         /// <summary>
         /// با توجه به اینکه قیمت بلیت های ممکن است تغییر کند.

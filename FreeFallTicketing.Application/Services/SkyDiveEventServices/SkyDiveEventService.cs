@@ -148,7 +148,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 return "001";
         }
 
-        public async Task<IEnumerable<SkyDiveEventDaysDTO>> GetEventDays(Guid id, Guid userId)
+        public async Task<(string, IEnumerable<SkyDiveEventDaysDTO>)> GetEventDays(Guid id, Guid userId)
         {
             var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Id == id).FirstOrDefault();
             if (skyDiveEvent is null)
@@ -158,9 +158,9 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            return skyDiveEvent.Items
+            return (skyDiveEvent.Title, skyDiveEvent.Items
                 .Select(skyDiveEventDay => new SkyDiveEventDaysDTO(skyDiveEventDay.Id, skyDiveEventDay.CreatedAt, skyDiveEvent.UpdatedAt,
-                skyDiveEventDay.Date, GetEmptyCapacity(skyDiveEventDay), skyDiveEventDay.FlightNumber, GetUserEventTicket(skyDiveEventDay, user)));
+                skyDiveEventDay.Date, GetEmptyCapacity(skyDiveEventDay), skyDiveEventDay.FlightNumber, GetUserEventTicket(skyDiveEventDay, user))));
         }
 
         public async Task AddEventTypeFee(AddEventTypeFeeCommand command, Guid id)
@@ -283,9 +283,9 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             var skyDiveEventDay = skyDiveEvent.Items.First(c => c.Id == id);
 
             var dto = new ReservingTicketDTO(skyDiveEventDay.Date, skyDiveEventDay.FlightLoads.Select(flightLoad => new TicketFlightDTO(flightLoad.Number,
-                flightLoad.FlightLoadItems
-                .Select(item => new TicketDetailDTO(item.FlightLoadType.Title, skyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == item.FlightLoadType.Id)?.Amount ?? 0,
-                item.Tickets.Where(c => c.ReservedBy is null && !c.Locked && !c.ReservedByAdmin).Count())))).OrderBy(c => c.FlightNumber));
+                flightLoad.FlightLoadItems.Select(item => 
+                    new TicketDetailDTO(item.FlightLoadType.Title, skyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == item.FlightLoadType.Id)?.Amount ?? 0,
+                item.Tickets.Where(c => c.ReservedBy is null && !c.Locked && !c.ReservedByAdmin).Count())), flightLoad.Id)).OrderBy(c => c.FlightNumber));
 
             dto.Qty = dto.Flights.Sum(flight => flight.Tickets.Sum(ticket => ticket.Qty));
 

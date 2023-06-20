@@ -16,7 +16,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
             var shoppingCart = await Context.ShoppingCarts.Include(c=>c.User).Where(c => c.User == user).FirstOrDefaultAsync();
             if (shoppingCart is null)
-                await Context.ShoppingCarts.AddAsync(new ShoppingCart(tickets, user));
+            {
+                var entity = new ShoppingCart(tickets, user);
+                await Context.ShoppingCarts.AddAsync(entity);
+            }
             else
                 shoppingCart.Tickets = tickets.ToList();
         }
