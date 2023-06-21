@@ -22,14 +22,14 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
         {
             Expression<Func<ShoppingCart, object>>[] includeExpressions = {
                 c=> c.User,
-                c=> c.Tickets,
+                c=> c.ShoppingCartTickets,
             };
 
             var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, includeExpressions);
-            if (shoppingCart is null || !shoppingCart.Tickets.Any())
+            if (shoppingCart is null || !shoppingCart.ShoppingCartTickets.Any())
                 throw new ManagedException("سبد خرید شما خالی است.");
 
-            var unLockedTickets = shoppingCart.Tickets.Where(c => !c.Locked);
+            var unLockedTickets = shoppingCart.ShoppingCartTickets.Where(c => !c.Ticket.Locked).Select(c => c.Ticket);
             if (unLockedTickets.Any())
             {
                 List<string> errors = new List<string>();
@@ -85,7 +85,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             Expression<Func<ShoppingCart, object>>[] includeExpressions = {
                 c=> c.User,
-                c=> c.Tickets,
+                c=> c.ShoppingCartTickets,
             };
 
             var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, includeExpressions);
@@ -96,12 +96,13 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             var ticketModels = _unitOfWork.SkyDiveEventRepository.GetDetails();
 
-            foreach (var ticket in shoppingCart.Tickets)
+            foreach (var shoppingCartTicket in shoppingCart.ShoppingCartTickets)
             {
-                var ticketModel = ticketModels.FirstOrDefault(x => x.Ticket == ticket);
-                _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketModel.SkyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == ticketModel.FlightLoadItem.FlightLoadType.Id).Amount);
+                var ticketModel = ticketModels.FirstOrDefault(x => x.Ticket == shoppingCartTicket.Ticket);
+                _unitOfWork.TicketRepository.SetAsPaid(shoppingCartTicket.Ticket,
+                    ticketModel.SkyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == ticketModel.FlightLoadItem.FlightLoadType.Id).Amount);
 
-                await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
+                await _unitOfWork.TransactionRepositroy.AddTransaction(shoppingCartTicket.Ticket.TicketNumber,
                     ticketModel.SkyDiveEvent.Location + "کد" + ticketModel.SkyDiveEvent.Code.ToString("000"), "", 0, TransactionType.Confirmed, user);
             }
 
@@ -110,7 +111,6 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             return true;
 
         }
-
         public async Task UnlockTickets()
         {
             var tickets = _unitOfWork.TicketRepository.AsEnumerable()
@@ -141,7 +141,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
         public async Task Update(ReserveCommand command, Guid userId)
         {
-            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            var user = await _unitOfWork.UserRepository.GetUserWithInclude(c => c.Id == userId);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
@@ -155,6 +155,13 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             foreach (var item in command.Items)
             {
+                var ticketType = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetByIdAsync(item.TicketTypeId);
+                if (ticketType is null)
+                    throw new ManagedException("نوع بلیت مورد نظر وجود ندارد.");
+
+                if (!user.UserType.AllowedTicketTypes.Any(c => c.TicketTypeId == item.TicketTypeId))
+                    errors.Add($"نوع کاربری شما مجاز به رزرو بلیت های نوع '{ticketType.Title}' نیست.");
+
                 SkyDiveEventItem skyDiveEventItem = null;
 
                 var skyDiveEvent = skyDiveEvents

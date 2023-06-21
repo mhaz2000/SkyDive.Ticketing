@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyDiveTicketing.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkyDiveTicketing.Infrastructure.Data;
 namespace SkyDiveTicketing.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230621062028_shopping-cart-ticket")]
+    partial class shoppingcartticket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -784,7 +787,12 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("UserTypeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserTypeId");
 
                     b.ToTable("SkyDiveEventTicketTypes");
                 });
@@ -1138,21 +1146,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                     b.ToTable("UserTypes");
                 });
 
-            modelBuilder.Entity("SkyDiveTicketing.Core.Entities.UserTypeTicketType", b =>
-                {
-                    b.Property<Guid>("TicketTypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserTypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("TicketTypeId", "UserTypeId");
-
-                    b.HasIndex("UserTypeId");
-
-                    b.ToTable("UserTypeTicketTypes");
-                });
-
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Wallet", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1368,6 +1361,13 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .HasForeignKey("SkyDiveEventId");
                 });
 
+            modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEventTicketType", b =>
+                {
+                    b.HasOne("SkyDiveTicketing.Core.Entities.UserType", null)
+                        .WithMany("AllowedTicketTypes")
+                        .HasForeignKey("UserTypeId");
+                });
+
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEventTicketTypeAmount", b =>
                 {
                     b.HasOne("SkyDiveTicketing.Core.Entities.SkyDiveEvent", null)
@@ -1442,25 +1442,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .HasForeignKey("SettingsId");
                 });
 
-            modelBuilder.Entity("SkyDiveTicketing.Core.Entities.UserTypeTicketType", b =>
-                {
-                    b.HasOne("SkyDiveTicketing.Core.Entities.SkyDiveEventTicketType", "TicketType")
-                        .WithMany("AllowedUserTypes")
-                        .HasForeignKey("TicketTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SkyDiveTicketing.Core.Entities.UserType", "UserType")
-                        .WithMany("AllowedTicketTypes")
-                        .HasForeignKey("UserTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TicketType");
-
-                    b.Navigation("UserType");
-                });
-
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Wallet", b =>
                 {
                     b.HasOne("SkyDiveTicketing.Core.Entities.User", "User")
@@ -1507,11 +1488,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEventItem", b =>
                 {
                     b.Navigation("FlightLoads");
-                });
-
-            modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEventTicketType", b =>
-                {
-                    b.Navigation("AllowedUserTypes");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Ticket", b =>

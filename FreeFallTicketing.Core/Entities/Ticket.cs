@@ -17,6 +17,7 @@ namespace SkyDiveTicketing.Core.Entities
             Paid = false;
             Locked = false;
             Cancelled = false;
+            ShoppingCartTickets = new List<ShoppingCartTicket>();
         }
 
         public string TicketNumber { get; set; }
@@ -34,6 +35,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// </summary>
         public double PaidAmount { get; set; }
         public AdminCartable? RelatedAdminCartableRequest { get; private set; }
+        public ICollection<ShoppingCartTicket> ShoppingCartTickets { get; set; }
 
         public void SetRequest(AdminCartable request) => RelatedAdminCartableRequest = request;
         public void SetAsPaid(double amount)

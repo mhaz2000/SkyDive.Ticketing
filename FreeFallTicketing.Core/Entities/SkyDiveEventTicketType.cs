@@ -17,5 +17,7 @@ namespace SkyDiveTicketing.Core.Entities
 
         public string Title { get; set; }
         public int Capacity { get; set; }
+
+        public ICollection<UserTypeTicketType> AllowedUserTypes { get; set; }
     }
 }

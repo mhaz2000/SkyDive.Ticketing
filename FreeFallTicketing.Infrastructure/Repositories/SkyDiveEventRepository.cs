@@ -86,7 +86,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             var events = Context.SkyDiveEvents
                 .Include(c => c.TypesAmount).ThenInclude(c => c.Type)
                 .Include(c => c.Status)
-                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy).AsQueryable();
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy)
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ShoppingCartTickets).AsQueryable();
 
             if(predicate is not null)
                 events = events.Where(predicate).AsQueryable();

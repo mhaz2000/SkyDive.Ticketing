@@ -52,5 +52,7 @@ namespace SkyDiveTicketing.Core.Repositories
             string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, DefaultCity? city);
 
         void AcceptingTermsAndConditions(User user);
+
+        Task<User?> GetUserWithInclude(Expression<Func<User, bool>> filter);
     }
 }

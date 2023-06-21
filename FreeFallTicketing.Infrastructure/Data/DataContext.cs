@@ -30,6 +30,8 @@ namespace SkyDiveTicketing.Infrastructure.Data
         public DbSet<LogBookDocument> LogBookDocuments { get; set; }
         public DbSet<SkyDiveEventItem> SkyDiveEventItems { get; set; }
         public DbSet<AttorneyDocument> AttorneyDocuments { get; set; }
+        public DbSet<ShoppingCartTicket> ShoppingCartTickets { get; set; }
+        public DbSet<UserTypeTicketType> UserTypeTicketTypes { get; set; }
         public DbSet<SkyDiveEventStatus> SkyDiveEventStatuses { get; set; }
         public DbSet<NationalCardDocument> NationalCardDocuments { get; set; }
         public DbSet<SkyDiveEventTicketType> SkyDiveEventTicketTypes { get; set; }
@@ -46,6 +48,40 @@ namespace SkyDiveTicketing.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyGlobalFilter<BaseEntity>(p => !p.IsDeleted);
+
+            #region shopping cart and ticket relationship
+
+            modelBuilder.Entity<ShoppingCartTicket>()
+                .HasKey(bc => new { bc.ShoppingCartId, bc.TicketId });
+
+            modelBuilder.Entity<ShoppingCartTicket>()
+                .HasOne(bc => bc.Ticket)
+                .WithMany(b => b.ShoppingCartTickets)
+                .HasForeignKey(bc => bc.TicketId);
+
+            modelBuilder.Entity<ShoppingCartTicket>()
+                .HasOne(bc => bc.ShoppingCart)
+                .WithMany(c => c.ShoppingCartTickets)
+                .HasForeignKey(bc => bc.ShoppingCartId);
+
+            #endregion
+
+            #region ticket and user type relationship
+
+            modelBuilder.Entity<UserTypeTicketType>()
+                .HasKey(bc => new { bc.TicketTypeId, bc.UserTypeId });
+
+            modelBuilder.Entity<UserTypeTicketType>()
+                .HasOne(bc => bc.TicketType)
+                .WithMany(b => b.AllowedUserTypes)
+                .HasForeignKey(bc => bc.TicketTypeId);
+
+            modelBuilder.Entity<UserTypeTicketType>()
+                .HasOne(bc => bc.UserType)
+                .WithMany(c => c.AllowedTicketTypes)
+                .HasForeignKey(bc => bc.UserTypeId);
+
+            #endregion
 
             modelBuilder.Entity<Passenger>()
                 .HasOne(p => p.MedicalDocumentFile)

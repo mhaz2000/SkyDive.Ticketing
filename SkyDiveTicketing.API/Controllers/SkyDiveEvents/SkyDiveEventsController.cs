@@ -289,11 +289,11 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
         }
 
         [HttpGet("EventDayTickets/{id}")]
-        public IActionResult GetEventDayTickets(Guid id, [FromQuery] PageQuery pageQuery)
+        public async Task<IActionResult> GetEventDayTickets(Guid id, [FromQuery] PageQuery pageQuery)
         {
             try
             {
-                (var tickets, var count) = _skyDiveEventService.GetEventDayTickets(id, pageQuery.PageIndex, pageQuery.PageSize);
+                (var tickets, var count) = await _skyDiveEventService.GetEventDayTickets(id, pageQuery.PageIndex, pageQuery.PageSize, UserId);
                 return OkResult("بلیت های روز", tickets, count);
             }
             catch (ManagedException e)

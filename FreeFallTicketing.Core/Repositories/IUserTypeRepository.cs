@@ -5,8 +5,9 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface IUserTypeRepository : IRepository<UserType>
     {
+        IQueryable<UserType> FindUserType();
         void Update(UserType userType, string title);
         Task Create(string title);
-        void AddTicketType(SkyDiveEventTicketType ticketType, UserType userType);
+        Task AddTicketType(SkyDiveEventTicketType ticketType, UserType userType);
     }
 }

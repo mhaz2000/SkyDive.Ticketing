@@ -245,5 +245,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
             user.TermsAndConditionsAcceptance = true;
         }
+
+        public async Task<User?> GetUserWithInclude(Expression<Func<User, bool>> filter)
+        {
+            return await Context.Users.Include(c => c.UserType)
+                .ThenInclude(c => c.AllowedTicketTypes).ThenInclude(c => c.TicketType).FirstOrDefaultAsync(filter);
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace SkyDiveTicketing.Core.Entities
         {
             Title = title;
             IsDefault = false;
-            AllowedTicketTypes = new List<SkyDiveEventTicketType>();
+            AllowedTicketTypes = new List<UserTypeTicketType>();
         }
 
         /// <summary>
@@ -29,6 +29,6 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// کاربر قابلیت رزرو چه بلیط هایی را داشته باشد.
         /// </summary>
-        public ICollection<SkyDiveEventTicketType> AllowedTicketTypes { get; set; }
+        public ICollection<UserTypeTicketType> AllowedTicketTypes { get; set; }
     }
 }
