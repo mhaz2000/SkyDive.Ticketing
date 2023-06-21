@@ -29,10 +29,20 @@ namespace SkyDiveTicketing.API.Controllers.ShoppingCarts
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserShoppingCart()
+        {
+            try
             {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+                var shoppingCart = await _reservationService.GetUserShoppingCart(UserId);
+
+               return OkResult("سبد خرید کاربر", shoppingCart);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }

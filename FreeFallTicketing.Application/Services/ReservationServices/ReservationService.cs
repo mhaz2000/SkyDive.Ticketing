@@ -1,5 +1,6 @@
 ﻿using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.Reservation;
+using SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs;
 using SkyDiveTicketing.Application.DTOs.TicketDTOs;
 using SkyDiveTicketing.Application.Helpers;
 using SkyDiveTicketing.Core.Entities;
@@ -232,6 +233,39 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             return PdfHelper.TicketPdf(ticket.Ticket.ReservedBy.FullName, ticket.FlightLoadItem.FlightLoadType.Title, ticket.Ticket.TicketNumber,
                 ticket.SkyDiveEvent.Location, $"{pc.GetYear(ticket.FlightLoad.Date)}/{pc.GetMonth(ticket.FlightLoad.Date)}/{pc.GetDayOfMonth(ticket.FlightLoad.Date)}",
                 ticket.FlightLoad.Number.ToString("000"), ticket.Ticket.ReservedBy.NationalCode ?? string.Empty);
+        }
+
+        public async Task<ShoppingCartDTO> GetUserShoppingCart(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new ManagedException("کاربر یافت نشد.");
+
+            var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetUserShoppingCart(user);
+            if (shoppingCart is null)
+                throw new ManagedException("سبد خرید شما خالی است.");
+
+            var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.GetDetails(c => c.SkyDiveEvent.IsActive);
+
+            var data =  shoppingCart.Items.Select(item => new
+            {
+                Item = item,
+                SkyDiveEvent = skyDiveEvents.FirstOrDefault(c=> c.FlightLoadItem == item.FlightLoadItem),
+            });
+
+
+            var shoppingCartDto = new ShoppingCartDTO(shoppingCart.Id, shoppingCart.CreatedAt, shoppingCart.UpdatedAt)
+            {
+                Items = data.Select(s => new ShoppingCartItemDTO(s.SkyDiveEvent.FlightLoad.Number, s.Item.Qty, s.Item.FlightLoadItem.FlightLoadType.Title,
+                s.SkyDiveEvent.SkyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type == s.Item.FlightLoadItem.FlightLoadType)?.Amount ?? 0,
+                s.SkyDiveEvent.SkyDiveEvent.Title, s.SkyDiveEvent.SkyDiveEvent.SubjecToVAT)).ToList()
+            };
+
+            shoppingCartDto.TotalAmount = shoppingCartDto.Items.Sum(s => s.Amount * s.Qty);
+
+            //shoppingCartDto.TaxAmount= ??
+
+            return shoppingCartDto;
         }
     }
 }

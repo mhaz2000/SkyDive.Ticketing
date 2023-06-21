@@ -16,7 +16,8 @@ namespace SkyDiveTicketing.Application.Helpers
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw new ManagedException("در ارسال پیامک خطایی رخ داده است.");
+                throw e;
+                //throw new ManagedException("در ارسال پیامک خطایی رخ داده است.");
             }
         }
     }

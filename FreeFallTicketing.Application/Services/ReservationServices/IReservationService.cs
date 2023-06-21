@@ -1,4 +1,5 @@
 ﻿using SkyDiveTicketing.Application.Commands.Reservation;
+using SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs;
 using SkyDiveTicketing.Application.DTOs.TicketDTOs;
 
 namespace SkyDiveTicketing.Application.Services.ReservationServices
@@ -13,5 +14,6 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
         Task CancelTicketRequest(Guid id, Guid userId);
         Task CancelTicketResponse(Guid id, bool response);
         MemoryStream PrintTicket(Guid id);
+        Task<ShoppingCartDTO> GetUserShoppingCart(Guid userId);
     }
 }
