@@ -5,7 +5,9 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface IShoppingCartRepository : IRepository<ShoppingCart>
     {
-        Task AddToShoppingCart(User user, IEnumerable<Ticket> tickets);
+        Task AddToShoppingCart(User user, IDictionary<FlightLoadItem, int> flightLoadItems);
+
+        Task<ShoppingCart?> GetUserShoppingCart(User user);
 
         Task ClearShoppingCartAsync(User user);
     }

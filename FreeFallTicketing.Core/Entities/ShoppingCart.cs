@@ -12,10 +12,28 @@ namespace SkyDiveTicketing.Core.Entities
         public ShoppingCart(User user) : base()
         {
             User = user;
-            ShoppingCartTickets = new List<ShoppingCartTicket>();
+            Items= new List<ShoppingCartItem>();
         }
 
-        public ICollection<ShoppingCartTicket> ShoppingCartTickets { get; set; }
+        public ICollection<ShoppingCartItem> Items { get; set; }
         public User User { get; set; }
     }
+
+    public class ShoppingCartItem : BaseEntity
+    {
+        public ShoppingCartItem()
+        {
+
+        }
+
+        public ShoppingCartItem(FlightLoadItem flightLoadItem, int qty)
+        {
+            FlightLoadItem = flightLoadItem;
+            Qty = qty;
+        }
+
+        public FlightLoadItem FlightLoadItem { get; set; }
+        public int Qty { get; set; }
+    }
+
 }

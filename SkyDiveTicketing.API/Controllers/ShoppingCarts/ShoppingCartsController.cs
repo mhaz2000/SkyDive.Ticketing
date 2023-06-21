@@ -22,7 +22,8 @@ namespace SkyDiveTicketing.API.Controllers.ShoppingCarts
             try
             {
                 (bool res, string message) = await _reservationService.CheckTickets(UserId);
-                return OkResult(res ? "مشکلی در سبد خرید وجود ندارد." : "لطفا سبد خرید خود ار اصلاح نمایید.", message);
+
+                return res ? OkResult("مشکلی در سبد خرید وجود ندارد.") : BadRequest(message);
             }
             catch (ManagedException e)
             {

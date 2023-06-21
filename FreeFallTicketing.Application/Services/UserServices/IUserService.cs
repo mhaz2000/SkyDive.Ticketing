@@ -9,7 +9,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
     {
         Task<Guid> Register(CreateUserCommand command);
 
-        Task<string> OtpRequest(OtpUserCommand command);
+        Task<string> OtpRequest(OtpUserCommand command, string apiKey, string templateKey);
 
         Task Update(AdminUserCommand command, Guid userId);
 

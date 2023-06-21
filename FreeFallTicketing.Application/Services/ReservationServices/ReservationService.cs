@@ -20,33 +20,28 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
         public async Task<(bool, string)> CheckTickets(Guid userId)
         {
-            Expression<Func<ShoppingCart, object>>[] includeExpressions = {
-                c=> c.User,
-                c=> c.ShoppingCartTickets,
-            };
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new ManagedException("کاربر یافت نشد.");
 
-            var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, includeExpressions);
-            if (shoppingCart is null || !shoppingCart.ShoppingCartTickets.Any())
+            var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetUserShoppingCart(user);
+            if (shoppingCart is null || !shoppingCart.Items.Any())
                 throw new ManagedException("سبد خرید شما خالی است.");
 
-            var unLockedTickets = shoppingCart.ShoppingCartTickets.Where(c => !c.Ticket.Locked).Select(c => c.Ticket);
-            if (unLockedTickets.Any())
+            var shoppingCartItems = shoppingCart.Items;
+            if (shoppingCartItems.Any())
             {
                 List<string> errors = new List<string>();
 
-                Dictionary<FlightLoadItem, List<Ticket>> ticketItems = new Dictionary<FlightLoadItem, List<Ticket>>();
-                foreach (var ticket in unLockedTickets)
+                foreach (var shoppingCartItem in shoppingCartItems)
                 {
-                    var flightLoadItem = await _unitOfWork.FlightLoadRepository.GetFlightItemByTicket(ticket);
-                    if (ticketItems.ContainsKey(flightLoadItem))
-                        ticketItems[flightLoadItem].Add(ticket);
-                }
+                    var flightLoad = await _unitOfWork.FlightLoadRepository.GetFlightLoadByItem(shoppingCartItem.FlightLoadItem);
+                    if (flightLoad is null)
+                        throw new ManagedException("پرواز مورد نظر یافت نشد.");
 
-                foreach (var item in ticketItems)
-                {
-                    var flightLoad = await _unitOfWork.FlightLoadRepository.GetFirstWithIncludeAsync(c => c.FlightLoadItems.Contains(item.Key), c => c.FlightLoadItems);
-                    if (item.Key.SeatNumber - (item.Key.Tickets.Where(c => !c.Locked && !c.Cancelled).Count() + item.Value.Count()) < 0)
-                        errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {item.Key.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
+                    var availableTickets = shoppingCartItem.FlightLoadItem.Tickets.Where(c => (!c.Locked || c.LockedBy.Id == user.Id) && !c.ReservedByAdmin && c.ReservedBy is null);
+                    if(availableTickets.Count() < shoppingCartItem.Qty)
+                        errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {shoppingCartItem.FlightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
                 }
 
                 if (errors.Any())
@@ -85,7 +80,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             Expression<Func<ShoppingCart, object>>[] includeExpressions = {
                 c=> c.User,
-                c=> c.ShoppingCartTickets,
+                c=> c.Items,
             };
 
             var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, includeExpressions);
@@ -96,14 +91,14 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             var ticketModels = _unitOfWork.SkyDiveEventRepository.GetDetails();
 
-            foreach (var shoppingCartTicket in shoppingCart.ShoppingCartTickets)
+            foreach (var shoppingCartTicket in shoppingCart.Items)
             {
-                var ticketModel = ticketModels.FirstOrDefault(x => x.Ticket == shoppingCartTicket.Ticket);
-                _unitOfWork.TicketRepository.SetAsPaid(shoppingCartTicket.Ticket,
-                    ticketModel.SkyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == ticketModel.FlightLoadItem.FlightLoadType.Id).Amount);
+                //var ticketModel = ticketModels.FirstOrDefault(x => x.Ticket == shoppingCartTicket.Ticket);
+                //_unitOfWork.TicketRepository.SetAsPaid(shoppingCartTicket.Ticket,
+                //    ticketModel.SkyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == ticketModel.FlightLoadItem.FlightLoadType.Id).Amount);
 
-                await _unitOfWork.TransactionRepositroy.AddTransaction(shoppingCartTicket.Ticket.TicketNumber,
-                    ticketModel.SkyDiveEvent.Location + "کد" + ticketModel.SkyDiveEvent.Code.ToString("000"), "", 0, TransactionType.Confirmed, user);
+                //await _unitOfWork.TransactionRepositroy.AddTransaction(shoppingCartTicket.Ticket.TicketNumber,
+                //    ticketModel.SkyDiveEvent.Location + "کد" + ticketModel.SkyDiveEvent.Code.ToString("000"), "", 0, TransactionType.Confirmed, user);
             }
 
             await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
@@ -111,9 +106,10 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             return true;
 
         }
+
         public async Task UnlockTickets()
         {
-            var tickets = _unitOfWork.TicketRepository.AsEnumerable()
+            var tickets = _unitOfWork.TicketRepository.Include(c=>c.LockedBy).AsEnumerable()
                 .Where(x => x.ReserveTime is not null && Math.Abs((DateTime.Now - x.ReserveTime.Value).TotalMinutes) >= 15);
 
             foreach (var ticket in tickets)
@@ -146,7 +142,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 throw new ManagedException("کاربری یافت نشد.");
 
             List<string> errors = new List<string>();
-            List<Ticket> tickets = new List<Ticket>();
+            Dictionary<FlightLoadItem, int> flightLoadItems = new Dictionary<FlightLoadItem, int>();
 
             _unitOfWork.TicketRepository.ClearUserTicket(user);
 
@@ -181,7 +177,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 var flightLoad = skyDiveEventItem.FlightLoads.FirstOrDefault(c => c.Id == item.FlightLoadId);
                 var flightLoadItem = flightLoad.FlightLoadItems.FirstOrDefault(c => c.FlightLoadType.Id == item.TicketTypeId);
 
-                var availableTickets = flightLoadItem.Tickets.Where(c => !c.Locked && !c.Cancelled && !c.ReservedByAdmin && c.ReservedBy is null).Take(item.Qty).ToList();
+                var availableTickets = flightLoadItem.Tickets.Where(c => !c.Locked && !c.Cancelled && !c.ReservedByAdmin).Take(item.Qty).ToList();
                 if (availableTickets is null || !availableTickets.Any())
                     errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {flightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
                 else
@@ -189,7 +185,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     foreach (var ticket in availableTickets)
                         _unitOfWork.TicketRepository.ReserveTicket(ticket, user);
 
-                    tickets.AddRange(availableTickets);
+                    flightLoadItems.Add(flightLoadItem, item.Qty);
                 }
             }
 
@@ -197,7 +193,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 throw new ManagedException(string.Join("\n", errors));
 
             await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
-            await _unitOfWork.ShoppingCartRepository.AddToShoppingCart(user, tickets);
+            await _unitOfWork.ShoppingCartRepository.AddToShoppingCart(user, flightLoadItems);
             await _unitOfWork.CommitAsync();
 
         }

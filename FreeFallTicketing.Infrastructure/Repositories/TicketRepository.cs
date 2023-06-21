@@ -39,9 +39,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public void ReserveTicket(Ticket ticket, User user)
         {
-            ticket.SetAsLock();
+            ticket.SetAsLock(user);
             ticket.ReserveTime = DateTime.Now;
-            ticket.ReservedBy = user;
         }
 
         public void SetAsCancelled(Ticket ticket)
@@ -57,8 +56,6 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public void Unlock(Ticket ticket)
         {
             ticket.ReserveTime = null;
-            ticket.ReservedBy = null;
-            ticket.ReservedById = null;
             ticket.SetAsUnLock();
         }
     }

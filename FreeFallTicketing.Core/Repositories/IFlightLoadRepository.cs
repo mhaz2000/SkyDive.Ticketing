@@ -10,5 +10,7 @@ namespace SkyDiveTicketing.Core.Repositories
         Task<FlightLoad?> GetExpandedById(Guid id);
 
         Task UpdateFlightTicket(FlightLoadItem flightItem, Ticket ticket, SkyDiveEventTicketType ticketType, bool reservable);
+
+        Task<FlightLoad?> GetFlightLoadByItem(FlightLoadItem flightLoadItem);
     }
 }

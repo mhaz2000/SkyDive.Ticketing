@@ -146,12 +146,12 @@ Registry.Register(builder.Services);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
+//    //app.UseSwagger();
+//    //app.UseSwaggerUI();
+//}
     app.UseHangfireDashboard();
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
-}
 
 app.UseCors(c =>
 {
@@ -169,8 +169,8 @@ app.MapControllers();
 
 app.MigrateDatabase<Program>();
 
-//RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
-//RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
-//RecurringJob.AddOrUpdate<IJumpRecordJob>("ExpiredJumpRecord", c => c.CheckIfExpired(), Cron.Daily);
+RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
+RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);
+RecurringJob.AddOrUpdate<IJumpRecordJob>("ExpiredJumpRecord", c => c.CheckIfExpired(), Cron.Daily);
 
 app.Run();

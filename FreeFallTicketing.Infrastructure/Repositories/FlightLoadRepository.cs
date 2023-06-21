@@ -63,5 +63,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             flightLoad.Capacity += ticketType.Capacity;
         }
+
+        public Task<FlightLoad?> GetFlightLoadByItem(FlightLoadItem flightLoadItem)
+        {
+            return Context.FlightLoads.Include(c=> c.FlightLoadItems).FirstOrDefaultAsync(c=>c.FlightLoadItems.Contains(flightLoadItem));
+        }
     }
 }

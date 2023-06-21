@@ -17,7 +17,6 @@ namespace SkyDiveTicketing.Core.Entities
             Paid = false;
             Locked = false;
             Cancelled = false;
-            ShoppingCartTickets = new List<ShoppingCartTicket>();
         }
 
         public string TicketNumber { get; set; }
@@ -27,6 +26,7 @@ namespace SkyDiveTicketing.Core.Entities
         public bool ReservedByAdmin { get; set; }
         public bool Paid { get; private set; }
         public bool Locked { get; private set; }
+        public User? LockedBy { get; private set; }
         public bool Cancelled { get; private set; }
         public DateTime? ReserveTime { get; set; }
 
@@ -35,7 +35,6 @@ namespace SkyDiveTicketing.Core.Entities
         /// </summary>
         public double PaidAmount { get; set; }
         public AdminCartable? RelatedAdminCartableRequest { get; private set; }
-        public ICollection<ShoppingCartTicket> ShoppingCartTickets { get; set; }
 
         public void SetRequest(AdminCartable request) => RelatedAdminCartableRequest = request;
         public void SetAsPaid(double amount)
@@ -43,8 +42,16 @@ namespace SkyDiveTicketing.Core.Entities
             Paid = true;
             PaidAmount = amount;
         }
-        public void SetAsUnLock() => Locked = false;
-        public void SetAsLock() => Locked = true;
+        public void SetAsUnLock()
+        {
+            Locked = false;
+            LockedBy = null;
+        }
+        public void SetAsLock(User user)
+        {
+            LockedBy = user;
+            Locked = true;
+        }
         public void SetAsCancelled() => Cancelled = true;
 
     }

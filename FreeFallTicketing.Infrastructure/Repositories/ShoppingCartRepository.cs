@@ -12,56 +12,58 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task AddToShoppingCart(User user, IEnumerable<Ticket> tickets)
+        public async Task AddToShoppingCart(User user, IDictionary<FlightLoadItem, int> flightLoadItems)
         {
-            var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c => c.ShoppingCartTickets).Where(c => c.User == user).FirstOrDefaultAsync();
+            var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c => c.Items).Where(c => c.User == user).FirstOrDefaultAsync();
             if (shoppingCart is null)
             {
                 var entity = new ShoppingCart(user);
 
-                foreach (var ticket in tickets)
+                foreach (var flightLoadItem in flightLoadItems)
                 {
-                    var shoppingCartTicket = new ShoppingCartTicket()
-                    {
-                        ShoppingCart = entity,
-                        ShoppingCartId = entity.Id,
-                        Ticket = ticket,
-                        TicketId = ticket.Id
-                    };
+                    var shoppingCartItem = new ShoppingCartItem(flightLoadItem.Key, flightLoadItem.Value);
 
-                    ticket.ShoppingCartTickets.Add(shoppingCartTicket);
+                    Context.ShoppingCartItems.Add(shoppingCartItem);
 
-                    Context.ShoppingCartTickets.Add(shoppingCartTicket);
+                    entity.Items.Add(shoppingCartItem);
                 }
+
                 await Context.ShoppingCarts.AddAsync(entity);
             }
             else
             {
-                foreach (var ticket in tickets)
-                {
-                    var shoppingCartTicket = new ShoppingCartTicket()
-                    {
-                        ShoppingCart = shoppingCart,
-                        ShoppingCartId = shoppingCart.Id,
-                        Ticket = ticket,
-                        TicketId = ticket.Id
-                    };
 
-                    Context.ShoppingCartTickets.Add(shoppingCartTicket);
+                foreach (var flightLoadItem in flightLoadItems)
+                {
+                    var shoppingCartItem = new ShoppingCartItem(flightLoadItem.Key, flightLoadItem.Value);
+
+                    shoppingCart.Items.Add(shoppingCartItem);
+
+                    Context.ShoppingCartItems.Add(shoppingCartItem);
                 }
             }
         }
 
         public async Task ClearShoppingCartAsync(User user)
         {
-            var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c => c.ShoppingCartTickets)
+            var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c => c.Items)
                 .Where(c => c.User == user).FirstOrDefaultAsync();
 
             if (shoppingCart is not null)
             {
-                Context.ShoppingCartTickets.RemoveRange(shoppingCart.ShoppingCartTickets);
-                shoppingCart.ShoppingCartTickets.Clear();
+                Context.ShoppingCartItems.RemoveRange(shoppingCart.Items);
+                shoppingCart.Items.Clear();
             }
+        }
+
+        public async Task<ShoppingCart?> GetUserShoppingCart(User user)
+        {
+            return await Context.ShoppingCarts
+                .Include(c => c.User)
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.FlightLoadType)
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy)
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.Tickets).ThenInclude(c => c.LockedBy)
+                .FirstOrDefaultAsync(c => c.User == user);
         }
     }
 }

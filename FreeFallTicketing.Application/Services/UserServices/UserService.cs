@@ -196,7 +196,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 throw new ManagedException("کد وارد شده اشتباه است.");
         }
 
-        public async Task<string> OtpRequest(OtpUserCommand command)
+        public async Task<string> OtpRequest(OtpUserCommand command, string apiKey, string templateKey)
         {
             var user = await _unitOfWork.UserRepository
                 .FirstOrDefaultAsync(c => (c.PhoneNumber == command.Username || c.Email == command.Username || c.UserName == command.Username)
@@ -214,24 +214,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             var otpCode = random.NextInt64(100000, 999999).ToString();
 
             //send via otp
-
-            try
-            {
-                var sender = "1000596446";
-                var receptor = user.PhoneNumber;
-                var api = new Kavenegar.KavenegarApi("3855427A2B677749795636547468526D4479474249466E786E33476658454537593677652F51592F4D476F3D");
-                api.VerifyLookup(receptor, otpCode, "verfiy");
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
-
-            //
-
+            SMSHelpler.SendOtp(user.PhoneNumber, otpCode, apiKey, templateKey);
 
             _unitOfWork.UserRepository.SetOtpCode(user, otpCode);
             await _unitOfWork.CommitAsync();

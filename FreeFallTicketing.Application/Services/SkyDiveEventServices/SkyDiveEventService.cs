@@ -228,7 +228,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (ticket is null)
                 throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
-            if (ticket.ReservedBy is not null && !ticket.ReservedByAdmin)
+            if (ticket.ReservedBy is not null && !ticket.Locked && !ticket.ReservedByAdmin)
                 throw new ManagedException("امکان ویرایش بلیت های رزور شده وجود ندارد.");
 
             var flightItem = await _unitOfWork.FlightLoadRepository.GetFlightItemByTicket(ticket);
@@ -289,7 +289,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
         {
             return skyDiveEventItem.FlightLoads.Sum(flightLoad =>
             {
-                var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(c => c.ReservedBy is null).Count());
+                var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(c => c.ReservedBy is null && !c.Locked).Count());
                 return flightLoad.Capacity - ticketsNumber;
             });
         }

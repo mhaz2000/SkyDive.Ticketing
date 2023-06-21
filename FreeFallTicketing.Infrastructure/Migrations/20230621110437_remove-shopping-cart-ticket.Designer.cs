@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyDiveTicketing.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkyDiveTicketing.Infrastructure.Data;
 namespace SkyDiveTicketing.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230621110437_remove-shopping-cart-ticket")]
+    partial class removeshoppingcartticket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -861,9 +864,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                     b.Property<bool>("Locked")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("LockedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("Paid")
                         .HasColumnType("bit");
 
@@ -895,8 +895,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FlightLoadItemId");
-
-                    b.HasIndex("LockedById");
 
                     b.HasIndex("RelatedAdminCartableRequestId");
 
@@ -1408,10 +1406,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .WithMany("Tickets")
                         .HasForeignKey("FlightLoadItemId");
 
-                    b.HasOne("SkyDiveTicketing.Core.Entities.User", "LockedBy")
-                        .WithMany()
-                        .HasForeignKey("LockedById");
-
                     b.HasOne("SkyDiveTicketing.Core.Entities.AdminCartable", "RelatedAdminCartableRequest")
                         .WithMany()
                         .HasForeignKey("RelatedAdminCartableRequestId");
@@ -1419,8 +1413,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                     b.HasOne("SkyDiveTicketing.Core.Entities.User", "ReservedBy")
                         .WithMany()
                         .HasForeignKey("ReservedById");
-
-                    b.Navigation("LockedBy");
 
                     b.Navigation("RelatedAdminCartableRequest");
 

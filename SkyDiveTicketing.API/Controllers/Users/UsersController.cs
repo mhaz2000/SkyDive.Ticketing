@@ -15,7 +15,9 @@ namespace SkyDiveTicketing.API.Controllers.Users
     [ApiController]
     public class UsersController : ApiControllerBase
     {
-        private IUserService _userService;
+        private readonly IUserService _userService;
+        private readonly string _apiKey;
+        private readonly string _templateKey;
         private readonly JwtIssuerOptionsModel _jwtIssuerOptions;
 
         public UsersController(IUserService userService)
@@ -27,6 +29,8 @@ namespace SkyDiveTicketing.API.Controllers.Users
 
             _userService = userService;
             _jwtIssuerOptions = config.Get<AppSettingsModel>().JwtIssuerOptions;
+            _apiKey = config.Get<AppSettingsModel>().KavenegarApiKey;
+            _templateKey = config.Get<AppSettingsModel>().VerificationTemplateKey;
         }
 
         [HttpPost("Register")]
@@ -57,7 +61,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 command.Validate();
 
-                var phone = await _userService.OtpRequest(command);
+                var phone = await _userService.OtpRequest(command, _apiKey, _templateKey);
                 return OkResult("ارسال پیامک با موفقیت انجام شد.", phone);
             }
             catch (ManagedException e)
