@@ -12,7 +12,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task AddToShoppingCart(User user, IDictionary<FlightLoadItem, int> flightLoadItems, SkyDiveEvent skyDiveEvent)
+        public async Task AddToShoppingCart(User user, Dictionary<FlightLoadItem, User> flightLoadItems, SkyDiveEvent? skyDiveEvent)
         {
             var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c => c.Items).Where(c => c.User == user).FirstOrDefaultAsync();
             if (shoppingCart is null)
@@ -60,7 +60,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
             return await Context.ShoppingCarts
                 .Include(c => c.User)
-                .Include(c => c.SkyDiveEvent).ThenInclude(c=>c.TypesAmount)
+                .Include(c => c.SkyDiveEvent).ThenInclude(c => c.TypesAmount)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.FlightLoadType)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.Tickets).ThenInclude(c => c.LockedBy)
@@ -74,7 +74,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 .Include(c => c.Items)
                 .FirstOrDefaultAsync(c => c.User == user);
 
-            if(shoppingCart is not null)
+            if (shoppingCart is not null)
             {
                 Context.ShoppingCartItems.RemoveRange(shoppingCart.Items);
                 Context.ShoppingCarts.Remove(shoppingCart);

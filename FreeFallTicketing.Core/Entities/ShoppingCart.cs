@@ -28,14 +28,13 @@ namespace SkyDiveTicketing.Core.Entities
 
         }
 
-        public ShoppingCartItem(FlightLoadItem flightLoadItem, int qty)
+        public ShoppingCartItem(FlightLoadItem flightLoadItem, User reservedFor)
         {
             FlightLoadItem = flightLoadItem;
-            Qty = qty;
         }
 
         public FlightLoadItem FlightLoadItem { get; set; }
-        public int Qty { get; set; }
+        public User ReservedFor { get; set; }
     }
 
 }
