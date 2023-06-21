@@ -95,9 +95,9 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             return events;
         }
 
-        public IEnumerable<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null)
+        public IList<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null)
         {
-            return FindEvents()
+            var data = FindEvents()
                    .SelectMany(skyDiveEvent => skyDiveEvent.Items, (skyDiveEvent, skyDiveEventItem) => new { skyDiveEvent, skyDiveEventItem })
                    .SelectMany(c => c.skyDiveEventItem.FlightLoads, (skyDiveEventItem, flightLoad) => new { skyDiveEventItem.skyDiveEvent, skyDiveEventItem.skyDiveEventItem, flightLoad })
                    .SelectMany(c => c.flightLoad.FlightLoadItems, (flightLoad, flightLoadItems) => new { flightLoad.skyDiveEvent, flightLoad.skyDiveEventItem, flightLoad.flightLoad, flightLoadItems })
@@ -108,7 +108,27 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                        FlightLoad = flightLoadItems.flightLoad,
                        FlightLoadItem = flightLoadItems.flightLoadItems,
                        Ticket = ticket
-                   }).Where(predicate);
+                   });
+
+            if(predicate is not null)
+                data = data.Where(predicate);
+
+            return data.ToList();
+        }
+
+        public async Task<IEnumerable<TicketDetailModel>> GetExpandedSkyDiveEvent(Guid id)
+        {
+            var skyDiveEvent = await FindEvents().FirstOrDefaultAsync(e => e.Id == id);
+
+            return skyDiveEvent.Items.SelectMany(c => c.FlightLoads, (skyDiveEventItem, flightLoad) => new { skyDiveEventItem, flightLoad })
+                   .SelectMany(c => c.flightLoad.FlightLoadItems, (flightLoad, flightLoadItems) => new { flightLoad.flightLoad, flightLoad.skyDiveEventItem, flightLoadItems })
+                   .Select(c => new TicketDetailModel
+                   {
+                       SkyDiveEvent = skyDiveEvent,
+                       SkyDiveEventItem = c.skyDiveEventItem,
+                       FlightLoad = c.flightLoad,
+                       FlightLoadItem = c.flightLoadItems,
+                   });
         }
 
         public void PublishEvent(SkyDiveEvent skyDiveEvent)

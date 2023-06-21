@@ -29,14 +29,6 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             return ticket;
         }
 
-        public void ClearUserTicket(User user)
-        {
-            var userTickets = Context.Tickets.Include(c => c.ReservedBy).Where(x => x.ReservedBy == user);
-
-            foreach (var ticket in userTickets)
-                ticket.ReservedBy = null;
-        }
-
         public void ReserveTicket(Ticket ticket, User user)
         {
             ticket.SetAsLock(user);

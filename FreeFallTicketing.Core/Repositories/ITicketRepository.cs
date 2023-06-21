@@ -5,7 +5,6 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface ITicketRepository : IRepository<Ticket>
     {
-        void ClearUserTicket(User user);
         void ReserveTicket(Ticket ticket, User user);
         void SetAsCancelled(Ticket ticket);
         void SetAsPaid(Ticket ticket, double amount);

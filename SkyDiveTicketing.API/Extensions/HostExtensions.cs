@@ -85,7 +85,7 @@ namespace SkyDiveTicketing.API.Extensions
                     JumpDuration = 6,
                     TermsAndConditionsUrl = string.Empty,
                     UserStatusInfo = new List<UserStatusInfo>(),
-                    VAT = 0.9f
+                    VAT = 0.09f
                 });
 
                 dataContext.SaveChanges();

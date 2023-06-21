@@ -23,18 +23,16 @@ namespace SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs
     public class ShoppingCartItemDTO
     {
 
-        public ShoppingCartItemDTO(int flightNumber, int qty, string type, double amount, string eventName, bool subjectToVAT)
+        public ShoppingCartItemDTO(int flightNumber, int qty, string type, double amount, bool subjectToVAT)
         {
             FlightNumber = flightNumber;
             Qty = qty;
             Type = type;
             Amount = amount;
-            EventName = eventName;
             SubjectToVAT = subjectToVAT;
         }
 
         public bool SubjectToVAT { get; set; }
-        public string EventName { get; set; }
         public int FlightNumber { get; set; }
         public int Qty { get; set; }
         public string Type { get; set; }

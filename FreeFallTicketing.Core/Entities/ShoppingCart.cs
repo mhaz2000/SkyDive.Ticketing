@@ -9,14 +9,16 @@ namespace SkyDiveTicketing.Core.Entities
 
         }
 
-        public ShoppingCart(User user) : base()
+        public ShoppingCart(User user, SkyDiveEvent skyDiveEvent) : base()
         {
             User = user;
-            Items= new List<ShoppingCartItem>();
+            Items = new List<ShoppingCartItem>();
+            SkyDiveEvent = skyDiveEvent;
         }
 
         public ICollection<ShoppingCartItem> Items { get; set; }
         public User User { get; set; }
+        public SkyDiveEvent? SkyDiveEvent { get; set; }
     }
 
     public class ShoppingCartItem : BaseEntity
