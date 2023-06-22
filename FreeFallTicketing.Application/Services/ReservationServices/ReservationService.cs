@@ -3,6 +3,7 @@ using SkyDiveTicketing.Application.Commands.Reservation;
 using SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs;
 using SkyDiveTicketing.Application.DTOs.TicketDTOs;
 using SkyDiveTicketing.Application.Helpers;
+using SkyDiveTicketing.Application.TempModels;
 using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
 using System.Globalization;
@@ -34,7 +35,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             {
                 List<string> errors = new List<string>();
 
-                foreach (var shoppingCartItem in shoppingCartItems.GroupBy(c=> c.FlightLoadItem))
+                foreach (var shoppingCartItem in shoppingCartItems.GroupBy(c => c.FlightLoadItem))
                 {
                     var flightLoad = await _unitOfWork.FlightLoadRepository.GetFlightLoadByItem(shoppingCartItem.Key);
                     if (flightLoad is null)
@@ -138,13 +139,14 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
         public async Task Update(ReserveCommand command, Guid userId)
         {
-            User? otherUser = null;
             var user = await _unitOfWork.UserRepository.GetUserWithInclude(c => c.Id == userId);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
             List<string> errors = new List<string>();
-            Dictionary<FlightLoadItem, User> flightLoadItems = new Dictionary<FlightLoadItem, User>();
+            List<Tuple<FlightLoadItem,User>> flightLoadItems = new List<Tuple<FlightLoadItem, User>>();
+
+            UnlockShoppingCartItems(user);
 
             if (!command.Items.Any())
                 await _unitOfWork.ShoppingCartRepository.RemoveUserShoppingCart(user);
@@ -159,6 +161,8 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
                 foreach (var item in command.Items)
                 {
+                    User? otherUser = null;
+
                     var ticketType = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetByIdAsync(item.TicketTypeId);
                     if (ticketType is null)
                         throw new ManagedException("نوع بلیت مورد نظر وجود ندارد.");
@@ -204,7 +208,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
                     duplicationCheck.Add((otherUser?.Code ?? user.Code).ToString() + flightLoad.Number.ToString());
 
-                    var availableTicket = flightLoadItem.Tickets.Where(c => !c.Locked && !c.Cancelled && !c.ReservedByAdmin).FirstOrDefault();
+                    var availableTicket = flightLoadItem.Tickets.Where(c => !c.Locked && !c.Cancelled && !c.ReservedByAdmin && !c.Paid).FirstOrDefault();
 
                     if (availableTicket is null)
                         errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {flightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
@@ -212,7 +216,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     {
                         _unitOfWork.TicketRepository.ReserveTicket(availableTicket, user);
 
-                        flightLoadItems.Add(flightLoadItem, otherUser ?? user);
+                        flightLoadItems.Add(new Tuple<FlightLoadItem, User>(flightLoadItem, otherUser ?? user));
                     }
                 }
 
@@ -226,10 +230,21 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     throw new ManagedException("شما سبد خرید تسویه نشده برای رویداد دیگری دارید، لطفا اقدام به حذف آیتم های سبد خرید یا تسویه آن ها نمایید.");
 
                 await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
-                await _unitOfWork.ShoppingCartRepository.AddToShoppingCart(user, flightLoadItems, skyDiveEvent);
+                await _unitOfWork.ShoppingCartRepository
+                    .AddToShoppingCart(user, flightLoadItems, skyDiveEvent);
             }
 
             await _unitOfWork.CommitAsync();
+        }
+
+        private void UnlockShoppingCartItems(User user)
+        {
+            var tickets = _unitOfWork.TicketRepository.Include(c => c.LockedBy).Where(c => c.LockedBy == user && !c.Paid);
+
+            foreach (var ticket in tickets)
+            {
+                _unitOfWork.TicketRepository.Unlock(ticket);
+            }
         }
 
         public async Task CancelTicketResponse(Guid id, bool response)
@@ -284,14 +299,14 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             var shoppingCartDto = new ShoppingCartDTO(shoppingCart.Id, shoppingCart.CreatedAt, shoppingCart.UpdatedAt)
             {
-                Items = shoppingCart.Items.GroupBy(c=>c.FlightLoadItem).Select(shoppingCartItem =>
-                    new ShoppingCartItemDTO(data?.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.Key)?.FlightLoad.Number ?? 0, shoppingCartItem.Count(),
-                    shoppingCartItem.Key.FlightLoadType.Title,
-                    shoppingCart.SkyDiveEvent?.TypesAmount?.FirstOrDefault(c => c.Type == shoppingCartItem.Key.FlightLoadType)?.Amount ?? 0,
-                    shoppingCart.SkyDiveEvent.SubjecToVAT)).ToList()
+                Items = shoppingCart.Items.Select(shoppingCartItem =>
+                    new ShoppingCartItemDTO(data?.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)?.FlightLoad.Number ?? 0,
+                    shoppingCartItem.ReservedFor.Code, shoppingCartItem.FlightLoadItem.FlightLoadType.Title,
+                    shoppingCart.SkyDiveEvent?.TypesAmount?.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType)?.Amount ?? 0,
+                    shoppingCart.SkyDiveEvent.SubjecToVAT, shoppingCartItem.FlightLoadItem.Id)).ToList()
             };
 
-            shoppingCartDto.TotalAmount = shoppingCartDto.Items.Sum(s => s.Amount * s.Qty);
+            shoppingCartDto.TotalAmount = shoppingCartDto.Items.Sum(s => s.Amount * s.UserCode);
 
             shoppingCartDto.TaxAmount = shoppingCart.SkyDiveEvent.SubjecToVAT ? Math.Round(settings.VAT * shoppingCartDto.TotalAmount) : 0;
 

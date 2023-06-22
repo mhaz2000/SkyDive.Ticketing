@@ -12,7 +12,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task AddToShoppingCart(User user, Dictionary<FlightLoadItem, User> flightLoadItems, SkyDiveEvent? skyDiveEvent)
+        public async Task AddToShoppingCart(User user, List<Tuple<FlightLoadItem, User>> flightLoadItems, SkyDiveEvent? skyDiveEvent)
         {
             var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c => c.Items).Where(c => c.User == user).FirstOrDefaultAsync();
             if (shoppingCart is null)
@@ -21,7 +21,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
                 foreach (var flightLoadItem in flightLoadItems)
                 {
-                    var shoppingCartItem = new ShoppingCartItem(flightLoadItem.Key, flightLoadItem.Value);
+                    var shoppingCartItem = new ShoppingCartItem(flightLoadItem.Item1, flightLoadItem.Item2);
 
                     Context.ShoppingCartItems.Add(shoppingCartItem);
 
@@ -35,7 +35,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
                 foreach (var flightLoadItem in flightLoadItems)
                 {
-                    var shoppingCartItem = new ShoppingCartItem(flightLoadItem.Key, flightLoadItem.Value);
+                    var shoppingCartItem = new ShoppingCartItem(flightLoadItem.Item1, flightLoadItem.Item2);
 
                     shoppingCart.Items.Add(shoppingCartItem);
 
@@ -61,6 +61,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             return await Context.ShoppingCarts
                 .Include(c => c.User)
                 .Include(c => c.SkyDiveEvent).ThenInclude(c => c.TypesAmount)
+                .Include(c => c.Items).ThenInclude(c => c.ReservedFor)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.FlightLoadType)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoadItem).ThenInclude(c => c.Tickets).ThenInclude(c => c.LockedBy)
