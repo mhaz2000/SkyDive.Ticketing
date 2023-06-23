@@ -10,7 +10,7 @@ namespace SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs
 
         public SkyDiveEventDTO(Guid id, DateTime createdAt, DateTime updatedAt, string title, DateTime startDate,
             DateTime endDate, Guid image, bool isActive, int capacity, string code, string location, bool subjectToVAT, bool voidable,
-            string termsAndConditions, string statusTitle, bool reservable, IEnumerable<SkyDiveEventDayDTO> days)
+            string termsAndConditions, string statusTitle, bool reservable, Guid statusId, IEnumerable<SkyDiveEventDayDTO> days)
             : base(id, createdAt, updatedAt)
         {
             Title = title;
@@ -27,6 +27,7 @@ namespace SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs
             Voidable = voidable;
             Reservable = reservable;
             Days = days;
+            StatusId = statusId;
         }
 
         public string Code { get; set; }
@@ -41,6 +42,7 @@ namespace SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs
         public bool Voidable { get; set; }
         public string? TermsAndConditions { get; set; }
         public string StatusTitle { get; set; }
+        public Guid StatusId { get; set; }
         public bool Reservable { get; set; }
 
         public string Duration =>

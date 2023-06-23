@@ -4,14 +4,16 @@ namespace SkyDiveTicketing.Application.DTOs.SettingsDTOs
 {
     public class SettingsDTO : BaseDTO<Guid>
     {
-        public SettingsDTO(Guid id, DateTime createdAt, DateTime updatedAt, IEnumerable<UserStatusInfoDTO> userStatusInfo, string url)
+        public SettingsDTO(Guid id, DateTime createdAt, DateTime updatedAt, IEnumerable<UserStatusInfoDTO> userStatusInfo, string url, int jumpDuration)
             : base(id, createdAt, updatedAt)
         {
             UserStatusInfo = userStatusInfo;
             TermsAndConditionsUrl = url;
+            JumpDuration = jumpDuration;
         }
 
         public string TermsAndConditionsUrl { get; set; }
+        public int JumpDuration { get; set; }
 
         public IEnumerable<UserStatusInfoDTO> UserStatusInfo { get; set; }
 

@@ -9,6 +9,6 @@ namespace SkyDiveTicketing.Application.Services.AdminCartableServices
 {
     public interface IAdminCartableService
     {
-        IEnumerable<AdminCartableMessageDTO> GetAdminCartableMessages();
+        IEnumerable<AdminCartableMessageDTO> GetAdminCartableMessages(Core.Entities.RequestType? requestType);
     }
 }

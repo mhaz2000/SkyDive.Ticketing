@@ -171,11 +171,11 @@ namespace SkyDiveTicketing.API.Controllers.Users
         }
 
         [HttpGet("AdminCartableMessages")]
-        public IActionResult GetAdminCartableMessages([FromQuery] PageQuery pageQuery)
+        public IActionResult GetAdminCartableMessages([FromQuery] PageQuery pageQuery, RequestType? requestType)
         {
             try
             {
-                var messages = _adminCartableService.GetAdminCartableMessages();
+                var messages = _adminCartableService.GetAdminCartableMessages(requestType);
                 return OkResult("کارتابل رسیدگی ادمین", messages.ToPagingAndSorting(pageQuery), messages.Count());
             }
             catch (ManagedException e)
