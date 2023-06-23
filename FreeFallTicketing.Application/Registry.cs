@@ -12,6 +12,7 @@ using SkyDiveTicketing.Application.Services.JumpRecordServices;
 using SkyDiveTicketing.Application.Services.WalletServices;
 using SkyDiveTicketing.Application.Services.UserMessageServices;
 using SkyDiveTicketing.Application.Services.CityServices;
+using SkyDiveTicketing.Application.Services.AdminCartableServices;
 
 namespace SkyDiveTicketing.Application
 {
@@ -31,6 +32,7 @@ namespace SkyDiveTicketing.Application
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IUserMessageService, UserMessageService>();
             services.AddScoped<ISkyDiveEventService, SkyDiveEventService>();
+            services.AddScoped<IAdminCartableService, AdminCartableService>();
             services.AddScoped<ISkyDiveEventStatusService, SkyDiveEventStatusService>();
             services.AddScoped<ISkyDiveEventTicketTypeService, SkyDiveEventTicketTypeService>();
             services.AddScoped<IFlightLoadCancellationTypeService, FlightLoadCancellationTypeService>();

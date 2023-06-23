@@ -5,11 +5,13 @@ using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.API.Extensions;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.UserCommands;
+using SkyDiveTicketing.Application.Services.AdminCartableServices;
 using SkyDiveTicketing.Application.Services.PassengerServices;
 using SkyDiveTicketing.Application.Services.UserServices;
 using SkyDiveTicketing.Application.Services.UserTypeServices;
 using SkyDiveTicketing.Core.Entities;
 using System.Reflection.Metadata;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SkyDiveTicketing.API.Controllers.Users
 {
@@ -19,14 +21,17 @@ namespace SkyDiveTicketing.API.Controllers.Users
     public class AdminController : ApiControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IAdminCartableService _adminCartableService;
         private readonly IPassengerService _passengerService;
         private readonly IUserTypeService _userTypeService;
 
-        public AdminController(IUserService userService, IPassengerService passengerService, IUserTypeService userTypeService)
+        public AdminController(IUserService userService, IPassengerService passengerService, IUserTypeService userTypeService,
+            IAdminCartableService adminCartableService)
         {
             _userService = userService;
             _passengerService = passengerService;
             _userTypeService = userTypeService;
+            _adminCartableService = adminCartableService;
         }
 
         [HttpPost("InactivateUser")]
@@ -160,6 +165,20 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 return BadRequest(e.Message);
             }
             catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("AdminCartableMessages")]
+        public IActionResult GetAdminCartableMessages([FromQuery] PageQuery pageQuery)
+        {
+            try
+            {
+                var messages = _adminCartableService.GetAdminCartableMessages();
+                return OkResult("کارتابل رسیدگی ادمین", messages.ToPagingAndSorting(pageQuery), messages.Count());
+            }
+            catch (ManagedException e)
             {
                 return BadRequest(e.Message);
             }

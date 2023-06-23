@@ -31,7 +31,7 @@ namespace SkyDiveTicketing.Core.Entities
         public ShoppingCartItem(FlightLoadItem flightLoadItem, User reservedFor)
         {
             FlightLoadItem = flightLoadItem;
-            ReservedFor= reservedFor;
+            ReservedFor = reservedFor;
         }
 
         public FlightLoadItem FlightLoadItem { get; set; }

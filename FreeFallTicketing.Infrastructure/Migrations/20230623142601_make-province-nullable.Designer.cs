@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyDiveTicketing.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkyDiveTicketing.Infrastructure.Data;
 namespace SkyDiveTicketing.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230623142601_make-province-nullable")]
+    partial class makeprovincenullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -185,7 +188,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("ApplicantId");
 
-                    b.ToTable("AdminCartables", (string)null);
+                    b.ToTable("AdminCartables");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.AttorneyDocument", b =>
@@ -214,7 +217,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AttorneyDocuments", (string)null);
+                    b.ToTable("AttorneyDocuments");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.DefaultCity", b =>
@@ -236,7 +239,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cities", (string)null);
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.FileModel", b =>
@@ -260,7 +263,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Files", (string)null);
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.FlightLoad", b =>
@@ -297,7 +300,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("SkyDiveEventItemId");
 
-                    b.ToTable("FlightLoads", (string)null);
+                    b.ToTable("FlightLoads");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.FlightLoadItem", b =>
@@ -330,7 +333,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("FlightLoadTypeId");
 
-                    b.ToTable("FlightLoadItems", (string)null);
+                    b.ToTable("FlightLoadItems");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.JumpRecord", b =>
@@ -383,7 +386,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("JumpRecords", (string)null);
+                    b.ToTable("JumpRecords");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.LogBookDocument", b =>
@@ -412,7 +415,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LogBookDocuments", (string)null);
+                    b.ToTable("LogBookDocuments");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.MedicalDocument", b =>
@@ -441,7 +444,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MedicalDocuments", (string)null);
+                    b.ToTable("MedicalDocuments");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Message", b =>
@@ -473,7 +476,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.NationalCardDocument", b =>
@@ -502,7 +505,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NationalCardDocuments", (string)null);
+                    b.ToTable("NationalCardDocuments");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Passenger", b =>
@@ -574,7 +577,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[NationalCardDocumentFileId] IS NOT NULL");
 
-                    b.ToTable("Passengers", (string)null);
+                    b.ToTable("Passengers");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Settings", b =>
@@ -603,7 +606,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Settings", (string)null);
+                    b.ToTable("Settings");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.ShoppingCart", b =>
@@ -633,7 +636,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ShoppingCarts", (string)null);
+                    b.ToTable("ShoppingCarts");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.ShoppingCartItem", b =>
@@ -668,7 +671,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("ShoppingCartId");
 
-                    b.ToTable("ShoppingCartItems", (string)null);
+                    b.ToTable("ShoppingCartItems");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEvent", b =>
@@ -725,7 +728,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("SkyDiveEvents", (string)null);
+                    b.ToTable("SkyDiveEvents");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEventItem", b =>
@@ -756,7 +759,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("SkyDiveEventId");
 
-                    b.ToTable("SkyDiveEventItems", (string)null);
+                    b.ToTable("SkyDiveEventItems");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEventStatus", b =>
@@ -783,7 +786,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SkyDiveEventStatuses", (string)null);
+                    b.ToTable("SkyDiveEventStatuses");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEventTicketType", b =>
@@ -810,7 +813,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SkyDiveEventTicketTypes", (string)null);
+                    b.ToTable("SkyDiveEventTicketTypes");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.SkyDiveEventTicketTypeAmount", b =>
@@ -843,7 +846,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("SkyDiveEventTicketTypeAmounts", (string)null);
+                    b.ToTable("SkyDiveEventTicketTypeAmounts");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Ticket", b =>
@@ -924,7 +927,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("ReservedById");
 
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Transaction", b =>
@@ -973,7 +976,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("PayerId");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.User", b =>
@@ -1121,7 +1124,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("PassengerId");
 
-                    b.ToTable("UserCustomField", (string)null);
+                    b.ToTable("UserCustomField");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.UserStatusInfo", b =>
@@ -1153,7 +1156,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("SettingsId");
 
-                    b.ToTable("UserStatusInfo", (string)null);
+                    b.ToTable("UserStatusInfo");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.UserType", b =>
@@ -1180,7 +1183,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserTypes", (string)null);
+                    b.ToTable("UserTypes");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.UserTypeTicketType", b =>
@@ -1195,7 +1198,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("UserTypeId");
 
-                    b.ToTable("UserTypeTicketTypes", (string)null);
+                    b.ToTable("UserTypeTicketTypes");
                 });
 
             modelBuilder.Entity("SkyDiveTicketing.Core.Entities.Wallet", b =>
@@ -1223,7 +1226,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Wallets", (string)null);
+                    b.ToTable("Wallets");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

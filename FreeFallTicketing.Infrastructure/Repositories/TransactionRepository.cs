@@ -11,10 +11,13 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task AddTransaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, User payer)
+        public async Task<int> AddTransaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, User payer,
+            int? invoiceNumber = null)
         {
-            var invoiceNumber = Context.Transactions.OrderByDescending(s => s.InvoiceNumber).FirstOrDefault()?.InvoiceNumber ?? 0;
-            await Context.Transactions.AddAsync(new Transaction(ticketNumber, eventName, paymetInformation, amount, type, ++invoiceNumber, payer));
+            int number = invoiceNumber ?? Context.Transactions.OrderByDescending(s => s.InvoiceNumber).FirstOrDefault()?.InvoiceNumber ?? 0;
+            await Context.Transactions.AddAsync(new Transaction(ticketNumber, eventName, paymetInformation, amount, type, ++number, payer));
+
+            return number;
         }
     }
 }

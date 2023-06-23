@@ -41,7 +41,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
             return new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
                 skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Items?.Sum(c => c.FlightLoads?.Sum(t => t.Capacity) ?? 0) ?? 0, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
-                skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title,
+                skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title, skyDiveEvent.Status.Reservable,
                 skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id)));
         }
 
@@ -62,7 +62,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             return events.OrderByDescending(c => c.StartDate)
                 .Select(skyDiveEvent => new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
                 skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Capacity, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
-                skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title,
+                skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title, skyDiveEvent.Status.Reservable,
                 skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id))));
         }
 
@@ -273,7 +273,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 new TicketFlightDTO(flightLoad.Number, flightLoad.FlightLoadItems.Select(item => 
                     new TicketDetailDTO(item.FlightLoadType.Title, skyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == item.FlightLoadType.Id)?.Amount ?? 0,
                         item.Tickets.Where(c => c.ReservedBy is null && !c.Locked && !c.ReservedByAdmin).Count(),
-                        user.UserType?.AllowedTicketTypes?.Any(c=> c.TicketType == item.FlightLoadType) ?? true)) ,
+                        user.UserType?.AllowedTicketTypes?.Any(c=> c.TicketType == item.FlightLoadType) ?? true, item.FlightLoadType.Id)),
                     flightLoad.Id)).OrderBy(c => c.FlightNumber));
 
             dto.Qty = dto.Flights.Sum(flight => flight.Tickets.Sum(ticket => ticket.Qty));

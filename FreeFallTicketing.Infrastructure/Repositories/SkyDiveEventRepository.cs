@@ -51,7 +51,6 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             }
         }
 
-
         public async Task AddTicketTypeAmount(SkyDiveEvent skyDiveEvent, SkyDiveEventTicketType ticketType, double amount)
         {
             var entity = new SkyDiveEventTicketTypeAmount(ticketType, amount);

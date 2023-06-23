@@ -37,15 +37,17 @@ namespace SkyDiveTicketing.Application.DTOs.TicketDTOs
     
     public class TicketDetailDTO
     {
-        public TicketDetailDTO(string ticketType, double amount, int qty, bool allowedToReserve)
+        public TicketDetailDTO(string ticketType, double amount, int qty, bool allowedToReserve, Guid ticketTypeId)
         {
             TicketType = ticketType;
             Amount = amount;
             Qty = qty;
             AllowedToReserve = allowedToReserve;
+            TicketTypeId = ticketTypeId;
         }
 
         public string TicketType { get; set; }
+        public Guid TicketTypeId { get; set; }
         public double Amount { get; set; }
         public int Qty { get; set; }
         public bool AllowedToReserve { get; set; }

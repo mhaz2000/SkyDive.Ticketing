@@ -26,7 +26,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
                 command.Validate();
 
                 await _reservationService.Update(command, UserId);
-                return OkResult("بلیت با موفقیت ویرایش شد.");
+                return OkResult("سبد خرید خرید شما ویرایش شد.");
             }
             catch (ManagedException e)
             {
@@ -44,7 +44,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
         }
 
         [HttpGet("MyTickets")]
-        public async Task<IActionResult> GetMyTickets(PageQuery pageQuery)
+        public async Task<IActionResult> GetMyTickets([FromQuery] PageQuery pageQuery)
         {
             try
             {
@@ -128,11 +128,11 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
         }
 
         [HttpGet("PrintTicket/{id}")]
-        public IActionResult PrintTicket(Guid id)
+        public async Task<IActionResult> PrintTicket(Guid id)
         {
             try
             {
-                var ticketFile = _reservationService.PrintTicket(id);
+                var ticketFile = await _reservationService.PrintTicket(id);
                 return File(ticketFile, "application/octet-stream");
             }
             catch (ManagedException e)

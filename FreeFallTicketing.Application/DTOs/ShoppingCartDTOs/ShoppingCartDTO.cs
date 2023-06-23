@@ -13,7 +13,7 @@ namespace SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs
         {
         }
 
-        public int TicketsCount => Items.Sum(s => s.UserCode);
+        public int TicketsCount => Items.Count();
         public double TaxAmount { get; set; }
         public double TotalAmount { get; set; }
         public List<ShoppingCartItemDTO> Items { get; set; }
@@ -23,22 +23,24 @@ namespace SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs
     public class ShoppingCartItemDTO
     {
 
-        public ShoppingCartItemDTO(int flightNumber, int qty, string type, double amount, bool subjectToVAT, Guid flightLoadItemId)
+        public ShoppingCartItemDTO(int flightNumber, int qty, string type, double amount, bool subjectToVAT, Guid flightLoadId, Guid ticketTypeId)
         {
             FlightNumber = flightNumber;
             UserCode = qty;
             Type = type;
             Amount = amount;
             SubjectToVAT = subjectToVAT;
-            FlightLoadItemId = flightLoadItemId;
+            FlightLoadId = flightLoadId;
+            TicketTypeId = ticketTypeId;
         }
 
         public bool SubjectToVAT { get; set; }
         public int FlightNumber { get; set; }
         public int UserCode { get; set; }
         public string Type { get; set; }
+        public Guid TicketTypeId { get; set; }
         public double Amount { get; set; }
-        public Guid FlightLoadItemId { get; set; }
+        public Guid FlightLoadId { get; set; }
 
     }
 }

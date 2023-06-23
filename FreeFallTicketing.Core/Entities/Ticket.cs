@@ -29,6 +29,13 @@ namespace SkyDiveTicketing.Core.Entities
         public User? LockedBy { get; private set; }
         public bool Cancelled { get; private set; }
         public DateTime? ReserveTime { get; set; }
+        public DateTime? PaidTime { get; set; }
+
+        public Guid SkyDiveEventId { get; set; }
+        public int FlightNumber { get; set; }
+        public string TicketType { get; set; }
+        public DateTime FlightDate { get; set; }
+
 
         /// <summary>
         /// با توجه به اینکه قیمت بلیت های ممکن است تغییر کند.
@@ -37,10 +44,14 @@ namespace SkyDiveTicketing.Core.Entities
         public AdminCartable? RelatedAdminCartableRequest { get; private set; }
 
         public void SetRequest(AdminCartable request) => RelatedAdminCartableRequest = request;
-        public void SetAsPaid(double amount)
+        public void SetAsPaid(double amount, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate)
         {
             Paid = true;
             PaidAmount = amount;
+            SkyDiveEventId = skyDiveEventId;
+            FlightNumber = flightNumber;
+            TicketType = ticketType;
+            FlightDate = flightDate;
         }
         public void SetAsUnLock()
         {

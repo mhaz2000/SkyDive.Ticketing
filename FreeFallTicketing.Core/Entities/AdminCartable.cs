@@ -14,12 +14,14 @@ namespace SkyDiveTicketing.Core.Entities
         {
             Title = title;
             Applicant = applicant;
+            ApplicantId = applicant.Id;
             Done = false;
             RequestType = type;
         }
 
         public string Title { get; set; }
         public User Applicant { get; set; }
+        public Guid ApplicantId { get; set; }
         public bool Done { get; private set; }
         public RequestType RequestType { get; set; }
 
@@ -35,6 +37,12 @@ namespace SkyDiveTicketing.Core.Entities
         [Description("درخواست لغو بلیت")]
         TicketCancellation,
         [Description("درخواست استرداد وجه")]
-        Refund
+        Refund,
+        [Description("شارژ کیف پول")]
+        WalletCharging,
+        [Description("منقضی شدن مدارک")]
+        DocumentsExpiration,
+        [Description("بروز رسانی مدارک")]
+        UpdatingDocuments,
     }
 }
