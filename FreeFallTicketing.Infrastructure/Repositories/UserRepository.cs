@@ -248,7 +248,9 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public async Task<User?> GetUserWithInclude(Expression<Func<User, bool>> filter)
         {
-            return await Context.Users.Include(c => c.UserType)
+            return await Context.Users
+                .Include(c => c.Passenger).ThenInclude(c => c.City)
+                .Include(c => c.UserType)
                 .ThenInclude(c => c.AllowedTicketTypes).ThenInclude(c => c.TicketType).FirstOrDefaultAsync(filter);
         }
     }

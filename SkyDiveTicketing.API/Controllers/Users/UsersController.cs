@@ -321,11 +321,11 @@ namespace SkyDiveTicketing.API.Controllers.Users
         }
 
         [HttpGet("GetUserDocument")]
-        public async Task<IActionResult> GetUserDocument()
+        public async Task<IActionResult> GetUserDocument(Guid? userId)
         {
             try
             {
-                var userDocuments = await _userService.GetUserDocuments(UserId);
+                var userDocuments = await _userService.GetUserDocuments(userId ?? UserId);
                 return OkResult("مدارک کاربر.", userDocuments);
             }
             catch (ManagedException e)

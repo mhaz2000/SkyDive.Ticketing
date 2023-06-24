@@ -31,8 +31,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         Task CheckPersonalInformation(UserCheckPersonalInformationCommand command);
 
-        Task AssignUserType(AssignUserTypeCommand command);
-
         Task<bool> CheckIfUserIsActive(Guid id);
 
         Task<UserInformationDTO> GetUserInformation(Guid userId);
@@ -48,5 +46,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         Task<UserLoginDto> OtpRequestConfirmation(OtpRequestConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
 
         Task AcceptingTermsAndConditions(Guid userId);
+
+        Task<UserDetailDTO> GetUserDetail(Guid id);
     }
 }

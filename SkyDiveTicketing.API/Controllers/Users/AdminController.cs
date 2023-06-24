@@ -93,26 +93,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
-        [HttpPut("AssignUserType")]
-        public async Task<IActionResult> AssignUserType(AssignUserTypeCommand command)
-        {
-            try
-            {
-                command.Validate();
-
-                await _userService.AssignUserType(command);
-                return OkResult("نوع حساب کاربر با موفقیت به کاربر انتصاب داده شد.");
-            }
-            catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (ValidationException e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
         [HttpPut("UpdateUser/{id}")]
         public async Task<IActionResult> UpdateUser(AdminUserCommand command, Guid id)
         {
@@ -142,7 +122,21 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 var max = maxDate?.ToDateTime();
 
                 var users = _userService.GetUsers(search ?? string.Empty, min, max, userStatus);
-                return OkResult("اصلاعات کاربران", users.ToPagingAndSorting(pageQuery), users.Count());
+                return OkResult("اطلاعات کاربران", users.ToPagingAndSorting(pageQuery), users.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("UserDetail/{id}")]
+        public async Task<IActionResult> GetUserDetail(Guid id)
+        {
+            try
+            {
+                var user = await _userService.GetUserDetail(id);
+                return OkResult("اطلاعات کاربر", user);
             }
             catch (ManagedException e)
             {

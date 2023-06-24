@@ -33,6 +33,8 @@ namespace SkyDiveTicketing.Application.Commands.UserCommands
 
         public string Password { get; set; }
 
+        public Guid UserTypeId { get; set; }
+
         public void Validate()
         {
             new AdminUserCommandValidator().Validate(this).RaiseExceptionIfRequired();
