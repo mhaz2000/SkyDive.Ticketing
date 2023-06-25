@@ -206,7 +206,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             user.LoginFailedAttempts = 0;
         }
 
-        public async Task AddUser(string password, string? nationalCode, float? height, float? weight, string? firstName, string? lastName, string? email,
+        public async Task<User> AddUser(string password, string? nationalCode, float? height, float? weight, string? firstName, string? lastName, string? email,
             DateTime? birthDate, string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, DefaultCity? city)
         {
             var defaultType = await Context.UserTypes.FirstOrDefaultAsync(c => c.IsDefault);
@@ -239,6 +239,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             var _passwordHasher = new PasswordHasher<User>();
             user.PasswordHash = _passwordHasher.HashPassword(user, password);
+
+            return user;
         }
 
         public void AcceptingTermsAndConditions(User user)

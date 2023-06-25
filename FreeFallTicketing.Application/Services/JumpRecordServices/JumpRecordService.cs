@@ -1,6 +1,7 @@
 ﻿using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.JumpRecordCommands;
 using SkyDiveTicketing.Application.DTOs.JumpRecordDTOs;
+using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
 
 namespace SkyDiveTicketing.Application.Services.JumpRecordServices
@@ -21,7 +22,7 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
 
             foreach (var record in expiredJumpRecords)
             {
-                _unitOfWork.UserRepository.AddMessage(record.User,
+                await _unitOfWork.UserRepository.AddMessage(record.User,
                     $"{record.User.FirstName} {record.User.LastName} عزیز از آخرین پرش شما {setting.JumpDuration} ماه گذشته است. لطفا اقدامات لازم جهت بارگذاری سوابق پرش را انجام دهید.");
 
                 _unitOfWork.JumpRecordRepository.ExpireJumpRecord(record);
@@ -54,8 +55,18 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
             await _unitOfWork.JumpRecordRepository.AddJumpRecord(command.Date, command.Location, command.Equipments, command.PlaneType, command.Height,
-                new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, command.Time.Hour, command.Time.Minute, command.Time.Second), command.Description, user);
+                command.Time, command.Description, user);
+
             await _unitOfWork.CommitAsync();
+        }
+
+        public async Task<IEnumerable<JumpRecordDTO>> GetAllJumpRecords()
+        {
+            var jumpRecords = await _unitOfWork.JumpRecordRepository.GetListWithIncludeAsync("User");
+
+            return jumpRecords.Select(jumpRecord => new JumpRecordDTO(jumpRecord.Id, jumpRecord.CreatedAt,
+                jumpRecord.UpdatedAt, jumpRecord.Date, jumpRecord.Location, jumpRecord.Equipments, jumpRecord.PlaneType, jumpRecord.Height,
+                jumpRecord.Time, jumpRecord.Description, jumpRecord.Confirmed));
         }
 
         public async Task<IEnumerable<JumpRecordDTO>> GetJumpRecords(Guid userId)
@@ -68,7 +79,7 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
 
             return jumpRecords.Select(jumpRecord => new JumpRecordDTO(jumpRecord.Id, jumpRecord.CreatedAt,
                 jumpRecord.UpdatedAt, jumpRecord.Date, jumpRecord.Location, jumpRecord.Equipments, jumpRecord.PlaneType, jumpRecord.Height,
-                new TimeOnly(jumpRecord.Time.Hour, jumpRecord.Time.Minute, jumpRecord.Time.Second), jumpRecord.Description, jumpRecord.Confirmed));
+                jumpRecord.Time, jumpRecord.Description, jumpRecord.Confirmed));
         }
     }
 }

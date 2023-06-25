@@ -46,11 +46,11 @@ namespace SkyDiveTicketing.API.Controllers.JumpRecords
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetJumpRecords(PageQuery pageQuery)
+        public async Task<IActionResult> GetJumpRecords([FromQuery] PageQuery pageQuery, Guid? userId)
         {
             try
             {
-                var jumpRecords = await _jumpRecordService.GetJumpRecords(UserId);
+                var jumpRecords = await _jumpRecordService.GetJumpRecords(userId ?? UserId);
                 return OkResult("سوابق پرش", jumpRecords.ToPagingAndSorting(pageQuery), jumpRecords.Count());
             }
             catch (ManagedException e)
@@ -64,8 +64,29 @@ namespace SkyDiveTicketing.API.Controllers.JumpRecords
             }
         }
 
+
+        [HttpGet("AllJumpRecords")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetJumpRecords([FromQuery] PageQuery pageQuery)
+        {
+            try
+            {
+                var jumpRecords = await _jumpRecordService.GetAllJumpRecords();
+                return OkResult("سوابق پرش", jumpRecords.ToPagingAndSorting(pageQuery), jumpRecords.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex + "\n----------------------");
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+            }
+        }
+
         [HttpPut("ConfirmJumpRecord/{id}/{isConfirmed}")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ConfirmJumpRecord(Guid id, bool isConfirmed)
         {
             try

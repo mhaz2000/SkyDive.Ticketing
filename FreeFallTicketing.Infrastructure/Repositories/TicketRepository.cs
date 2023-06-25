@@ -40,11 +40,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             ticket.SetAsCancelled();
         }
 
-        public void SetAsPaid(Ticket ticket, double amount, User user, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate)
+        public void SetAsPaid(Ticket ticket, double amount, User user, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate, User paidBy)
         {
             ticket.SetAsPaid(amount, skyDiveEventId, flightNumber, ticketType, flightDate);
             ticket.PaidTime = DateTime.Now;
             ticket.ReservedBy = user;
+            ticket.PaidBy = paidBy;
         }
 
         public void Unlock(Ticket ticket)

@@ -3,7 +3,7 @@
     public class JumpRecordDTO : BaseDTO<Guid>
     {
         public JumpRecordDTO(Guid id, DateTime createdAt, DateTime updatedAt, DateTime date, string location, string equipments, string planeType,
-            float height, TimeOnly time, string description, bool confirmed) : base(id, createdAt, updatedAt)
+            float height, TimeSpan time, string description, bool confirmed) : base(id, createdAt, updatedAt)
         {
             Confirmed = confirmed;
             Date = date;
@@ -20,7 +20,7 @@
         public string? Equipments { get; set; }
         public string? PlaneType { get; set; }
         public float Height { get; set; }
-        public TimeOnly Time { get; set; }
+        public TimeSpan Time { get; set; }
         public string? Description { get; set; }
         public bool Confirmed { get; set; }
     }

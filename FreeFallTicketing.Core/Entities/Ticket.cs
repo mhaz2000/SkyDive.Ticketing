@@ -17,6 +17,8 @@ namespace SkyDiveTicketing.Core.Entities
             Paid = false;
             Locked = false;
             Cancelled = false;
+            ConfirmedByAdmin = false;
+            CancellationRequest = false;
         }
 
         public string TicketNumber { get; set; }
@@ -30,6 +32,9 @@ namespace SkyDiveTicketing.Core.Entities
         public bool Cancelled { get; private set; }
         public DateTime? ReserveTime { get; set; }
         public DateTime? PaidTime { get; set; }
+        public User? PaidBy { get; set; }
+        public bool ConfirmedByAdmin { get; set; }
+        public bool CancellationRequest { get; set; }
 
         public Guid SkyDiveEventId { get; set; }
         public int FlightNumber { get; set; }

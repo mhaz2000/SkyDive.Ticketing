@@ -7,7 +7,7 @@ namespace SkyDiveTicketing.Core.Repositories
     {
         void ReserveTicket(Ticket ticket, User user);
         void SetAsCancelled(Ticket ticket);
-        void SetAsPaid(Ticket ticket, double amount, User user, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate);
+        void SetAsPaid(Ticket ticket, double amount, User user, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate, User paidBy);
         void Unlock(Ticket ticket);
     }
 }

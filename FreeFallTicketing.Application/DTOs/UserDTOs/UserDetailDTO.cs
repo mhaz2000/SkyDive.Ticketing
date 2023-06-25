@@ -6,7 +6,8 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
     {
         public UserDetailDTO(Guid id, DateTime createdAt, DateTime updatedAt, string username, string firstName, string lastName,
             string userTypeDisplay, Guid userTypeId, string nationalCode, DateTime? birthDate, string city, Guid? cityId, string address,
-            int userCode, string email, string phone, float? height, float? weight, UserStatus userStatus, string userStatusDisplay) : base(id, createdAt, updatedAt)
+            int userCode, string email, string phone, float? height, float? weight, UserStatus userStatus, string userStatusDisplay,
+            string emergencyContact, string emergencyPhone) : base(id, createdAt, updatedAt)
         {
             Username = username;
             FirstName = firstName;
@@ -25,6 +26,8 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
             Height = height;
             Weight = weight;
             UserCode = userCode;
+            EmergencyPhone = emergencyPhone;
+            EmergencyContact = emergencyContact;
         }
 
         public string Username { get; set; }
@@ -44,5 +47,7 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
         public float? Weight { get; set; }
         public UserStatus UserStatus { get; set; }
         public string UserStatusDisplay { get; set; }
+        public string EmergencyContact { get; set; }
+        public string EmergencyPhone { get; set; }
     }
 }

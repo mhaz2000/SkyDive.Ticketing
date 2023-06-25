@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyDiveTicketing.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkyDiveTicketing.Infrastructure.Data;
 namespace SkyDiveTicketing.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230624101649_datetime-to-timespan")]
+    partial class datetimetotimespan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -852,13 +855,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("CancellationRequest")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("Cancelled")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("ConfirmedByAdmin")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
@@ -887,9 +884,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
 
                     b.Property<double>("PaidAmount")
                         .HasColumnType("float");
-
-                    b.Property<Guid?>("PaidById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("PaidTime")
                         .HasColumnType("datetime2");
@@ -928,8 +922,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                     b.HasIndex("FlightLoadItemId");
 
                     b.HasIndex("LockedById");
-
-                    b.HasIndex("PaidById");
 
                     b.HasIndex("RelatedAdminCartableRequestId");
 
@@ -1459,10 +1451,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("LockedById");
 
-                    b.HasOne("SkyDiveTicketing.Core.Entities.User", "PaidBy")
-                        .WithMany()
-                        .HasForeignKey("PaidById");
-
                     b.HasOne("SkyDiveTicketing.Core.Entities.AdminCartable", "RelatedAdminCartableRequest")
                         .WithMany()
                         .HasForeignKey("RelatedAdminCartableRequestId");
@@ -1472,8 +1460,6 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .HasForeignKey("ReservedById");
 
                     b.Navigation("LockedBy");
-
-                    b.Navigation("PaidBy");
 
                     b.Navigation("RelatedAdminCartableRequest");
 

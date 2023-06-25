@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyDiveTicketing.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SkyDiveTicketing.Infrastructure.Data;
 namespace SkyDiveTicketing.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230624114732_add-paid-by-in-ticket")]
+    partial class addpaidbyinticket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -852,13 +855,7 @@ namespace SkyDiveTicketing.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("CancellationRequest")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("Cancelled")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("ConfirmedByAdmin")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")

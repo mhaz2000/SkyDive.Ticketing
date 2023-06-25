@@ -62,6 +62,26 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             }
         }
 
+        //[HttpPut("ConfirmTicket/{id}/{confirmation}")]
+        //public async Task<IActionResult> ConfirmTicket(Guid id, bool confirmation)
+        //{
+        //    try
+        //    {
+        //        await _reservationService.ConfirmTicket(id, confirmation);
+        //        return OkResult(confirmation ? "بلیت تایید شد." : "بلیت رد شد.");
+        //    }
+        //    catch (ManagedException e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex + "\n----------------------");
+        //        return BadRequest("متاسفانه خطای سیستمی رخ داده");
+        //    }
+        //}
+
+
         [HttpPut("SetAsPaid")]
         public async Task<IActionResult> SetAsPaid()
         {

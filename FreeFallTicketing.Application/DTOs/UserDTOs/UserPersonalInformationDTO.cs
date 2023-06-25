@@ -3,7 +3,8 @@
     public class UserPersonalInformationDTO : BaseDTO<Guid>
     {
         public UserPersonalInformationDTO(Guid id, DateTime createdAt, DateTime updatedAt, string nationalCode, DateTime? birthDate, string firstName,
-            string lastName, string email, Guid? cityId, string state, string city, string address, float? weight, float? height) : base(id, createdAt, updatedAt)
+            string lastName, string email, Guid? cityId, string state, string city, string address, float? weight, float? height, string emergencyContact,
+            string emergencyPhone) : base(id, createdAt, updatedAt)
         {
             NationalCode = nationalCode;
             BirthDate = birthDate;
@@ -16,6 +17,8 @@
             Address = address;
             Weight = weight;
             Height = height;
+            EmergencyContact = emergencyContact;
+            EmergencyPhone = emergencyPhone;
         }
 
         public string NationalCode { get; set; }
@@ -29,5 +32,7 @@
         public string Address { get; set; }
         public float? Weight { get; set; }
         public float? Height { get; set; }
+        public string EmergencyContact { get; set; }
+        public string EmergencyPhone { get; set; }
     }
 }

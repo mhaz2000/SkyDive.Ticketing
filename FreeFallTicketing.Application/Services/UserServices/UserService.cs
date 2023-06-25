@@ -250,6 +250,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task Update(AdminUserCommand command, Guid userId)
         {
+            var errors = new List<string>();
+
             var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId, c => c.Passenger);
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
@@ -261,6 +263,24 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             var userType = await _unitOfWork.UserTypeRepository.GetByIdAsync(command.UserTypeId);
             if (userType is null)
                 throw new ManagedException("نوع کاربری یافت نشد.");
+
+            var phoneDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower() &&
+                c.Status != UserStatus.Inactive && c.Id != userId);
+            var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username && c.Id != userId);
+            var emailDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower()
+                && c.Status != UserStatus.Inactive &&  c.Id != userId);
+
+            if (phoneDuplicationCheck)
+                errors.Add("شماره موبایل تکراری است.");
+
+            if (usernameDuplicationCheck)
+                errors.Add("نام کاربری تکراری است.");
+
+            if (emailDuplicationCheck)
+                errors.Add("ایمیل تکراری است.");
+
+            if (errors.Any())
+                throw new ManagedException(string.Join("\n", errors));
 
             _unitOfWork.UserRepository.UpdateUser(user, command.Weight, command.Height, city, command.LastName, command.FirstName,
                 command.NationalCode, command.EmergencyPhone, command.Address, command.BirthDate, command.EmergencyContact, command.Email,
@@ -324,7 +344,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 throw new ManagedException("کاربری یافت نشد.");
 
             return new UserPersonalInformationDTO(user.Id, user.CreatedAt, user.UpdatedAt, user.NationalCode, user.BirthDate, user.FirstName, user.LastName,
-                user.Email, user.Passenger?.City?.Id, user.Passenger?.City?.State, user.Passenger?.City?.City, user.Passenger?.Address, user.Passenger?.Weight, user.Passenger?.Height);
+                user.Email, user.Passenger?.City?.Id, user.Passenger?.City?.State, user.Passenger?.City?.City, user.Passenger?.Address, user.Passenger?.Weight,
+                user.Passenger?.Height, user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone);
         }
 
         public async Task<UserDocumentsDTO> GetUserDocuments(Guid userId)
@@ -391,7 +412,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             if (command.MedicalDocument is not null)
             {
-                if (command.MedicalDocument.ExpirationDate is null && command.MedicalDocument.FileId is not null)
+                if (command.MedicalDocument.ExpirationDate is null)
                     throw new ManagedException("تاریخ انقضای مدارک پزشکی الزامی است.");
 
                 _unitOfWork.PassengerRepository.AddMedicalDocument(user.Passenger, command.MedicalDocument.FileId.Value, command.MedicalDocument.ExpirationDate);
@@ -414,7 +435,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             var phoneDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower() && c.Status != UserStatus.Inactive);
             var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username);
-            var emailDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.Email.ToLower() == command.Email.ToLower() && c.Status != UserStatus.Inactive);
+            var emailDuplicationCheck = await _unitOfWork.UserRepository
+                .AnyAsync(c => !string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower() && c.Status != UserStatus.Inactive);
 
             if (phoneDuplicationCheck)
                 errors.Add("شماره موبایل تکراری است.");
@@ -429,11 +451,17 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (city is null && command.CityId is not null)
                 throw new ManagedException("شهر مورد نظر یافت نشد.");
 
+            var userType = await _unitOfWork.UserTypeRepository.GetByIdAsync(command.UserTypeId);
+            if (userType is null)
+                throw new ManagedException("نوع کاربری یافت نشد.");
+
             if (errors.Any())
                 throw new ManagedException(string.Join("\n", errors));
 
-            await _unitOfWork.UserRepository.AddUser(command.Password, command.NationalCode, command.Height, command.Weight, command.FirstName, command.LastName, command.Email,
-                command.BirthDate, command.Phone, command.Username, command.Address, command.EmergencyContact, command.EmergencyPhone, city);
+            var user = await _unitOfWork.UserRepository.AddUser(command.Password, command.NationalCode, command.Height, command.Weight, command.FirstName, command.LastName, command.Email,
+                 command.BirthDate, command.Phone, command.Username, command.Address, command.EmergencyContact, command.EmergencyPhone, city);
+
+            _unitOfWork.UserRepository.AssignUserType(user, userType);
 
             await _unitOfWork.CommitAsync();
         }
@@ -480,13 +508,14 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task<UserDetailDTO> GetUserDetail(Guid id)
         {
-            var user = await _unitOfWork.UserRepository.GetUserWithInclude(c=> c.Id == id);
+            var user = await _unitOfWork.UserRepository.GetUserWithInclude(c => c.Id == id);
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
             return new UserDetailDTO(id, user.CreatedAt, user.UpdatedAt, user.UserName, user.FirstName, user.LastName, user.UserType.Title, user.UserType.Id,
-                user.NationalCode, user.BirthDate, $"{user.Passenger.City?.State} {user.Passenger.City?.City}", user.Passenger.City?.Id, user.Passenger.Address,
-                user.Code, user.Email, user.PhoneNumber, user.Passenger.Height, user.Passenger.Weight, user.Status, user.Status.GetDescription());
+                user.NationalCode, user.BirthDate, $"{user.Passenger?.City?.State} {user.Passenger?.City?.City}", user.Passenger?.City?.Id, user.Passenger?.Address,
+                user.Code, user.Email, user.PhoneNumber, user.Passenger?.Height, user.Passenger?.Weight, user.Status, user.Status.GetDescription(),
+                user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone);
         }
     }
 }

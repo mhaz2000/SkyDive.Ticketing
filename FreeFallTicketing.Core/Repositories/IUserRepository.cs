@@ -48,7 +48,7 @@ namespace SkyDiveTicketing.Core.Repositories
 
         void ResetFailedAttempts(User user);
 
-        Task AddUser(string password, string? nationalCode, float? height, float? weight, string? firstName, string? lastName, string? email, DateTime? birthDate,
+        Task<User> AddUser(string password, string? nationalCode, float? height, float? weight, string? firstName, string? lastName, string? email, DateTime? birthDate,
             string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, DefaultCity? city);
 
         void AcceptingTermsAndConditions(User user);

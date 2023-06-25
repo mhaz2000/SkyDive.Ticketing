@@ -11,7 +11,7 @@ namespace SkyDiveTicketing.Core.Entities
         {
 
         }
-        public JumpRecord(DateTime date, string location, string equipments, string planeType, float height, DateTime time, string description, User user) : base()
+        public JumpRecord(DateTime date, string location, string equipments, string planeType, float height, TimeSpan time, string description, User user) : base()
         {
             Date = date;
             Location = location;
@@ -52,7 +52,8 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// مدت
         /// </summary>
-        public DateTime Time { get; set; }
+        //public DateTime Time { get; set; }
+        public TimeSpan Time { get; set; }
 
         /// <summary>
         /// توضیحات

@@ -62,7 +62,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             List<MyTicketDTO> myTickets = new List<MyTicketDTO>();
 
-            var tickets = _unitOfWork.TicketRepository.Include(c => c.ReservedBy).Where(c => c.ReservedBy == user);
+            var tickets = _unitOfWork.TicketRepository.Include(c => c.ReservedBy).Where(c => c.ReservedBy == user && c.Paid);
             foreach (var ticket in tickets)
             {
                 var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId);
@@ -97,7 +97,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 var flightLoad = await _unitOfWork.FlightLoadRepository.GetFlightLoadByItem(shoppingCartItem.FlightLoadItem);
 
                 _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketAmount, shoppingCartItem.ReservedFor,
-                    shoppingCart.SkyDiveEvent.Id, flightLoad.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date);
+                    shoppingCart.SkyDiveEvent.Id, flightLoad.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
 
                 number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
                     shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "", ticketAmount, TransactionType.Confirmed, user, number);
@@ -127,11 +127,11 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.RelatedAdminCartableRequest);
+            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.RelatedAdminCartableRequest, c=> c.PaidBy);
             if (ticket is null)
                 throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
-            if (!ticket.Voidable)
+            if (!ticket.Voidable || ticket.ReservedBy != user)
                 throw new ManagedException("امکان کنسل کردن بلیت وجود ندارد.");
 
             await _unitOfWork.AdminCartableRepository.AddToCartable("در خواست کنسلی بلیت", user, RequestType.TicketCancellation, ticket);

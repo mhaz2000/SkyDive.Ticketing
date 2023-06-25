@@ -11,7 +11,7 @@ namespace SkyDiveTicketing.Application.Commands.JumpRecordCommands
         public string? Equipments { get; set; }
         public string? PlaneType { get; set; }
         public float Height { get; set; }
-        public TimeOnly Time { get; set; }
+        public TimeSpan Time { get; set; }
         public string? Description { get; set; }
 
         public void Validate() => new JumpRecordCommandValidator().Validate(this).RaiseExceptionIfRequired();
