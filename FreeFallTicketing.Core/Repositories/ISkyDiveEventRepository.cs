@@ -15,6 +15,7 @@ namespace SkyDiveTicketing.Core.Repositories
         Task AddTicketTypeAmount(SkyDiveEvent skyDiveEvent, SkyDiveEventTicketType ticketType, double amount);
         void AddConditionsAndTerms(SkyDiveEvent skyDiveEvent, string conditionsAndTerms);
         void ClearTicketTypesAmount(SkyDiveEvent skyDiveEvent);
+        Task<IEnumerable<SkyDiveEventTicketTypeAmount>?> GetSkyDiveEventTicketTypesAmount(Guid id);
         IList<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null);
         Task<IEnumerable<TicketDetailModel>> GetExpandedSkyDiveEvent(Guid id);
         void PublishEvent(SkyDiveEvent skyDiveEvent);

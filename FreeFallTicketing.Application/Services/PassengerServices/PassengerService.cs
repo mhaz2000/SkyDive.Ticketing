@@ -52,7 +52,7 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
             if (activeCondition)
             {
                 _unitOfWork.UserRepository.ChangeUserStatus(user, UserStatus.Active);
-                await _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.");
+                await _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.", "تایید حساب کاربری");
 
                 //send sms
             }

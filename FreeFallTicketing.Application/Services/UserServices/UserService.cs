@@ -46,7 +46,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             if (registration)
             {
-                await _unitOfWork.UserRepository.AddMessage(user, $"{command.FirstName} {command.LastName} عزیز لطفا جهت تهیه بلیت اطلاعات کاربری خود را تکمیل نمایید.");
+                await _unitOfWork.UserRepository.AddMessage(user, $"{command.FirstName} {command.LastName} عزیز لطفا جهت تهیه بلیت اطلاعات کاربری خود را تکمیل نمایید.", "تکمیل پروفایل کاربری");
                 //send message to user for compleing personal information
             }
             else
@@ -54,7 +54,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 await OtherPersonalInformation(user, command);
                 UploadDocument(user, command);
 
-                await _unitOfWork.UserRepository.AddMessage(user, "اطلاعات حساب کاربری جهت رسیدگی و تایید ارسال شد.");
+                await _unitOfWork.UserRepository.AddMessage(user, "اطلاعات حساب کاربری جهت رسیدگی و تایید ارسال شد.", "در خواست تایید پروفایل کاربری");
                 await _unitOfWork.AdminCartableRepository.AddToCartable($"اطلاعات حساب کاربری {user.FirstName} {user.LastName} ثبت شد، لطفا نسبت به تایید یا رد آن ها اقدام فرمایید.",
                     user, RequestType.UserInformationConfirmation);
 
@@ -311,7 +311,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             if (command.IsConfirmed)
             {
-                await _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.");
+                await _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.", "تایید حساب کاربری");
                 //sending sms
             }
 

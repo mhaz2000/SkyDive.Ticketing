@@ -31,7 +31,7 @@ namespace SkyDiveTicketing.Application.Commands.UserCommands
 
         public string? Phone { get; set; }
 
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         public Guid UserTypeId { get; set; }
 

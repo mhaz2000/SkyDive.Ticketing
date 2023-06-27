@@ -122,6 +122,22 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpGet("TicketTypeAmounts/{id}")]
+        public async Task<IActionResult> GetTicketTypeAmounts(Guid id)
+        {
+            try
+            {
+                var typesAmount = await _skyDiveEventService.GetEventTicketTypeAmounts(id);
+                return OkResult("نرخ انواع بلیت ها.", typesAmount, typesAmount.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+
+        [Authorize(Roles = "Admin")]
         [HttpPut("ConditionsAndTerms/{id}")]
         public async Task<IActionResult> AddConditionsAndTerms(Guid id, [FromBody] AddEventConditionsAndTermsCommand command)
         {

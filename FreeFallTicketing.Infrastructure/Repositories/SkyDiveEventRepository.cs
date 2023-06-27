@@ -152,6 +152,13 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             skyDiveEvent.EndDate = endDate;
         }
 
+        public async Task<IEnumerable<SkyDiveEventTicketTypeAmount>?> GetSkyDiveEventTicketTypesAmount(Guid id)
+        {
+            var skyDiveEvent = await Context.SkyDiveEvents.Include(c=>c.TypesAmount).ThenInclude(c=>c.Type).FirstOrDefaultAsync(c=> c.Id == id);
+
+            return skyDiveEvent?.TypesAmount;
+        }
+
         private async Task<IList<Ticket>> GenerateTickets(int ticketQty, int flightNumber, SkyDiveEvent skyDiveEvent, int counter)
         {
             List<Ticket> tickets = new List<Ticket>();

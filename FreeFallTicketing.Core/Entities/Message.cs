@@ -8,14 +8,16 @@ namespace SkyDiveTicketing.Core.Entities
         {
 
         }
-        public Message(string text) : base()
+        public Message(string text, string title) : base()
         {
             Text = text;
-            Visited= false;
+            Visited = false;
+            Title = title;
         }
 
         public string Text { get; set; }
         public bool Visited { get; set; }
+        public string Title { get; set; }
 
         public User User { get; set; }
         public Guid UserId { get; set; }

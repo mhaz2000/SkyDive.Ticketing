@@ -35,9 +35,18 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             ticket.ReserveTime = DateTime.Now;
         }
 
-        public void SetAsCancelled(Ticket ticket)
+        public async Task SetAsCancelled(Ticket ticket)
         {
-            ticket.SetAsCancelled();
+            var cancelledTicket = new CancelledTicket(ticket.TicketNumber, ticket.ReservedBy, ticket.ReserveTime, ticket.PaidTime, ticket.PaidBy, ticket.SkyDiveEventId,
+                ticket.FlightNumber, ticket.TicketType, ticket.FlightDate, ticket.PaidAmount);
+
+            await Context.CancelledTickets.AddAsync(cancelledTicket);
+
+            ticket.CancellationRequest = false;
+            ticket.SetAsUnLock();
+            ticket.ConfirmedByAdmin = false;
+            ticket.SetAsUnPaid();
+            ticket.RelatedAdminCartableRequest = null;
         }
 
         public void SetAsPaid(Ticket ticket, double amount, User user, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate, User paidBy)

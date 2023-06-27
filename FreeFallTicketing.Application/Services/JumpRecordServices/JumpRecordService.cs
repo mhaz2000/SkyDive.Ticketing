@@ -23,7 +23,7 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
             foreach (var record in expiredJumpRecords)
             {
                 await _unitOfWork.UserRepository.AddMessage(record.User,
-                    $"{record.User.FirstName} {record.User.LastName} عزیز از آخرین پرش شما {setting.JumpDuration} ماه گذشته است. لطفا اقدامات لازم جهت بارگذاری سوابق پرش را انجام دهید.");
+                    $"{record.User.FirstName} {record.User.LastName} عزیز از آخرین پرش شما {setting.JumpDuration} ماه گذشته است. لطفا اقدامات لازم جهت بارگذاری سوابق پرش را انجام دهید.", "سر رسید تاریخ انقضای پرش");
 
                 _unitOfWork.JumpRecordRepository.ExpireJumpRecord(record);
             }
@@ -40,10 +40,10 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
             if (isConfirmed)
             {
                 _unitOfWork.JumpRecordRepository.ConfirmJumpRecord(jumpRecord);
-                _unitOfWork.UserRepository.AddMessage(jumpRecord.User, "سابقه پرش توسط ادمین تایید شد.");
+                await _unitOfWork.UserRepository.AddMessage(jumpRecord.User, "سابقه پرش توسط ادمین تایید شد.","تایید سابقه پرش");
             }
             else
-                _unitOfWork.UserRepository.AddMessage(jumpRecord.User, "سابقه پرش توسط ادمین رد شد.");
+                await _unitOfWork.UserRepository.AddMessage(jumpRecord.User, "سابقه پرش توسط ادمین رد شد.", "رد سابقه پرش");
 
             await _unitOfWork.CommitAsync();
         }

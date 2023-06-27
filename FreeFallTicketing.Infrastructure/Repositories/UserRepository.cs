@@ -15,9 +15,9 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task AddMessage(User user, string message)
+        public async Task AddMessage(User user, string message, string title)
         {
-            var entity = new Message(message);
+            var entity = new Message(message, title);
             await Context.Messages.AddAsync(entity);
             user.AddMessage(entity);
         }

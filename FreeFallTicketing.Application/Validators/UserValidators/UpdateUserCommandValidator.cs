@@ -17,11 +17,11 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
             var passwordReg = new Regex(@"^(?=.*[0-9])(?=.*[A-Za-z]).{6,}$"); 
             var usernameReg = new Regex(@"^(?=.{5,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$");
 
-            RuleFor(c => c.Password).Must(pass => passwordReg.IsMatch(pass)).When(c=> string.IsNullOrEmpty(c.Password))
+            RuleFor(c => c.Password).Must(pass => passwordReg.IsMatch(pass)).When(c=> !string.IsNullOrEmpty(c.Password))
                 .WithMessage("رمز باید حداقل 6 کاراکتر و شامل اعداد و حروف باشد!");
 
             RuleFor(c => c.Username).Must(username => usernameReg.IsMatch(username))
-                .When(c=> string.IsNullOrEmpty(c.Username)).WithMessage("نام کاربری اشتباه است!");
+                .When(c=> !string.IsNullOrEmpty(c.Username)).WithMessage("نام کاربری اشتباه است!");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SkyDiveTicketing.Core.Entities.Base;
+using System.Net.Sockets;
 
 namespace SkyDiveTicketing.Core.Entities
 {
@@ -16,7 +17,6 @@ namespace SkyDiveTicketing.Core.Entities
             ReservedByAdmin = reservedByAdmin;
             Paid = false;
             Locked = false;
-            Cancelled = false;
             ConfirmedByAdmin = false;
             CancellationRequest = false;
         }
@@ -29,24 +29,23 @@ namespace SkyDiveTicketing.Core.Entities
         public bool Paid { get; private set; }
         public bool Locked { get; private set; }
         public User? LockedBy { get; private set; }
-        public bool Cancelled { get; private set; }
         public DateTime? ReserveTime { get; set; }
         public DateTime? PaidTime { get; set; }
         public User? PaidBy { get; set; }
         public bool ConfirmedByAdmin { get; set; }
         public bool CancellationRequest { get; set; }
 
-        public Guid SkyDiveEventId { get; set; }
-        public int FlightNumber { get; set; }
-        public string TicketType { get; set; }
-        public DateTime FlightDate { get; set; }
+        public Guid? SkyDiveEventId { get; set; }
+        public int? FlightNumber { get; set; }
+        public string? TicketType { get; set; }
+        public DateTime? FlightDate { get; set; }
 
 
         /// <summary>
         /// با توجه به اینکه قیمت بلیت های ممکن است تغییر کند.
         /// </summary>
         public double PaidAmount { get; set; }
-        public AdminCartable? RelatedAdminCartableRequest { get; private set; }
+        public AdminCartable? RelatedAdminCartableRequest { get; set; }
 
         public void SetRequest(AdminCartable request) => RelatedAdminCartableRequest = request;
         public void SetAsPaid(double amount, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate)
@@ -58,6 +57,17 @@ namespace SkyDiveTicketing.Core.Entities
             TicketType = ticketType;
             FlightDate = flightDate;
         }
+
+        public void SetAsUnPaid()
+        {
+            Paid = false;
+            PaidAmount = 0;
+            SkyDiveEventId = null;
+            FlightNumber = null;
+            TicketType = null;
+            FlightDate = null;
+            PaidTime = null;
+        }
         public void SetAsUnLock()
         {
             Locked = false;
@@ -68,7 +78,36 @@ namespace SkyDiveTicketing.Core.Entities
             LockedBy = user;
             Locked = true;
         }
-        public void SetAsCancelled() => Cancelled = true;
+    }
 
+    public class CancelledTicket : BaseEntity
+    {
+        public CancelledTicket() : base() { }
+
+        public CancelledTicket(string ticketNumber, User? reservedBy, DateTime? reserveTime, DateTime? paidTime, User? paidBy, Guid? skyDiveEventId,
+            int? flightNumber, string? ticketType, DateTime? flightDate, double paidAmount)
+        {
+            TicketNumber = ticketNumber;
+            ReservedBy = reservedBy;
+            ReserveTime = reserveTime;
+            PaidTime = paidTime;
+            PaidBy = paidBy;
+            SkyDiveEventId = skyDiveEventId;
+            FlightNumber = flightNumber;
+            TicketType = ticketType;
+            FlightDate = flightDate;
+            PaidAmount = paidAmount;
+        }
+
+        public string TicketNumber { get; set; }
+        public User? ReservedBy { get; set; }
+        public DateTime? ReserveTime { get; set; }
+        public DateTime? PaidTime { get; set; }
+        public User? PaidBy { get; set; }
+        public Guid? SkyDiveEventId { get; set; }
+        public int? FlightNumber { get; set; }
+        public string? TicketType { get; set; }
+        public DateTime? FlightDate { get; set; }
+        public double? PaidAmount { get; set; }
     }
 }

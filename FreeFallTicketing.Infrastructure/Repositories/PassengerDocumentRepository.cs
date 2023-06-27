@@ -27,7 +27,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 if (user is not null)
                 {
                     user.Status = UserStatus.Pending;
-                    user.AddMessage(new Message($"{user.FirstName} {user.LastName} عزیز مدارک پزشکی شما منقضی شده است. لطفا اقدامات لازم جهت بارگذاری مدارک پزشکی جدید را انجام دهید."));
+                    user.AddMessage(new Message($"{user.FirstName} {user.LastName} عزیز مدارک پزشکی شما منقضی شده است. لطفا اقدامات لازم جهت بارگذاری مدارک پزشکی جدید را انجام دهید.", "سر رسید تاریخ انقضای مدرک"));
                 }
             }
         }
@@ -53,7 +53,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 if (user is not null)
                 {
                     user.Status = UserStatus.Pending;
-                    user.AddMessage(new Message($"{user.FirstName} {user.LastName} عزیز وکالتنامه محضری شما منقضی شده است. لطفا اقدامات لازم جهت تمدید وکالتنامه را انجام دهید."));
+                    user.AddMessage(new Message($"{user.FirstName} {user.LastName} عزیز وکالتنامه محضری شما منقضی شده است. لطفا اقدامات لازم جهت تمدید وکالتنامه را انجام دهید.", "سر رسید تاریخ انقضای مدرک"));
                 }
             }
         }

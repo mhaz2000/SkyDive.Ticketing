@@ -301,5 +301,14 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 return flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(ticket => ticket.ReservedBy?.Id == user.Id).Count());
             });
         }
+
+        public async Task<IEnumerable<TicketTypeAmountDTO>> GetEventTicketTypeAmounts(Guid id)
+        {
+            var typesAmount = await _unitOfWork.SkyDiveEventRepository.GetSkyDiveEventTicketTypesAmount(id);
+            if (typesAmount is null)
+                throw new ManagedException("رویداد مورد نظر یافت نشد.");
+
+            return typesAmount.Select(s => new TicketTypeAmountDTO(s.Amount,s.Type.Id, s.Type.Title));
+        }
     }
 }

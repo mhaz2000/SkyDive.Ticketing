@@ -19,7 +19,7 @@ namespace SkyDiveTicketing.Application.Services.UserMessageServices
             if (message is null)
                 throw new ManagedException("پیام مورد نظر یافت نشد.");
 
-            return new UserMessageDTO(message.Id, message.CreatedAt, message.UpdatedAt, message.Text, message.Visited);
+            return new UserMessageDTO(message.Id, message.CreatedAt, message.UpdatedAt, message.Text, message.Visited, message.Title);
         }
 
         public async Task<IEnumerable<UserMessageDTO>> GetUserMessages(Guid? userId)
@@ -28,7 +28,7 @@ namespace SkyDiveTicketing.Application.Services.UserMessageServices
                 await _unitOfWork.MessageRepository.GetAllAsync() :
                 await _unitOfWork.MessageRepository.FindAsync(c => c.UserId == userId);
 
-            return messages.Select(message => new UserMessageDTO(message.Id, message.CreatedAt, message.UpdatedAt, message.Text, message.Visited));
+            return messages.Select(message => new UserMessageDTO(message.Id, message.CreatedAt, message.UpdatedAt, message.Text, message.Visited, message.Title));
         }
 
         public async Task MessageHasBeenSeen(Guid id)

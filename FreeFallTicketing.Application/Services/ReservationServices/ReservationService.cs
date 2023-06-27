@@ -65,10 +65,10 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             var tickets = _unitOfWork.TicketRepository.Include(c => c.ReservedBy).Where(c => c.ReservedBy == user && c.Paid);
             foreach (var ticket in tickets)
             {
-                var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId);
+                var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId.Value);
 
-                myTickets.Add(new MyTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, ticket.FlightDate, ticket.FlightNumber.ToString("000"),
-                    skyDiveEvent.Location, ticket.TicketType, skyDiveEvent.TermsAndConditions, skyDiveEvent.Voidable));
+                myTickets.Add(new MyTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, ticket.FlightDate.Value,
+                    ticket.FlightNumber.Value.ToString("000"), skyDiveEvent.Location, ticket.TicketType, skyDiveEvent.TermsAndConditions, skyDiveEvent.Voidable));
             }
 
             return myTickets;
@@ -127,7 +127,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.RelatedAdminCartableRequest, c=> c.PaidBy);
+            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.RelatedAdminCartableRequest, c => c.PaidBy);
             if (ticket is null)
                 throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
@@ -215,7 +215,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
                     duplicationCheck.Add((otherUser?.Code ?? user.Code).ToString() + flightLoad.Number.ToString());
 
-                    var availableTicket = flightLoadItem.Tickets.Where(c => !c.Locked && !c.Cancelled && !c.ReservedByAdmin && !c.Paid).FirstOrDefault();
+                    var availableTicket = flightLoadItem.Tickets.Where(c => !c.Locked && !c.ReservedByAdmin && !c.Paid).FirstOrDefault();
 
                     if (availableTicket is null)
                         errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {flightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
@@ -264,15 +264,15 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             if (response)
             {
-                _unitOfWork.TicketRepository.SetAsCancelled(ticket);
-                _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین تایید شد.");
+                await _unitOfWork.TicketRepository.SetAsCancelled(ticket);
+                await _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین تایید شد.", "تایید لغو بلیت");
 
                 var wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludeAsync(c => c.User == request.Applicant, c => c.User);
                 if (wallet is not null)
                     _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, ticket.PaidAmount);
             }
             else
-                _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین رد شد.");
+                await _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین رد شد.", "رد لغو بلیت");
 
             await _unitOfWork.CommitAsync();
         }
@@ -285,11 +285,11 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             if (ticket is null)
                 throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
-            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId);
+            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId.Value);
 
             return PdfHelper.TicketPdf(ticket.ReservedBy.FullName, ticket.TicketType, ticket.TicketNumber,
-                skyDiveEvent.Location, $"{pc.GetYear(ticket.FlightDate)}/{pc.GetMonth(ticket.FlightDate)}/{pc.GetDayOfMonth(ticket.FlightDate)}",
-                ticket.FlightNumber.ToString("000"), ticket.ReservedBy.NationalCode ?? string.Empty);
+                skyDiveEvent.Location, $"{pc.GetYear(ticket.FlightDate.Value)}/{pc.GetMonth(ticket.FlightDate.Value)}/{pc.GetDayOfMonth(ticket.FlightDate.Value)}",
+                ticket.FlightNumber.Value.ToString("000"), ticket.ReservedBy.NationalCode ?? string.Empty);
         }
 
         public async Task<ShoppingCartDTO> GetUserShoppingCart(Guid userId)

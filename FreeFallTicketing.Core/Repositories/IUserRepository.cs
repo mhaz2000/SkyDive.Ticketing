@@ -38,7 +38,7 @@ namespace SkyDiveTicketing.Core.Repositories
 
         void LoginFailed(User user);
 
-        Task AddMessage(User user, string message);
+        Task AddMessage(User user, string message, string title);
 
         void AssignUserType(User user, UserType userType);
 
