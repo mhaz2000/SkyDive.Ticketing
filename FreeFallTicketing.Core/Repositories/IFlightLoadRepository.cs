@@ -12,5 +12,7 @@ namespace SkyDiveTicketing.Core.Repositories
         Task UpdateFlightTicket(FlightLoadItem flightItem, Ticket ticket, SkyDiveEventTicketType ticketType, bool reservable);
 
         Task<FlightLoad?> GetFlightLoadByItem(FlightLoadItem flightLoadItem);
+
+        void RemoveFlights(IEnumerable<FlightLoad> flights, SkyDiveEventItem skyDiveEventDay);
     }
 }

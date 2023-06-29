@@ -136,6 +136,21 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("RemoveFlights/{id}")]
+        public async Task<IActionResult> RemoveFlights(Guid id)
+        {
+            try
+            {
+                await _skyDiveEventService.RemoveFlights(id);
+                return OkResult("پرواز ها با موفقیت حذف شدند.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
 
         [Authorize(Roles = "Admin")]
         [HttpPut("ConditionsAndTerms/{id}")]

@@ -113,7 +113,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public async Task<bool> HasFlightLoad(Guid id)
         {
             var skyDiveEvent = await Context.SkyDiveEvents.Include(c => c.Items).ThenInclude(c => c.FlightLoads).FirstOrDefaultAsync(c => c.Id == id);
-            if (skyDiveEvent is null) 
+            if (skyDiveEvent is null)
                 return false;
 
             return skyDiveEvent.Items.Any(c => c.FlightLoads.Any());
@@ -176,6 +176,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             }
 
             return tickets;
+        }
+
+        public async Task<IEnumerable<FlightLoad>?> GetSkyDiveEventDayFlights(Guid id)
+        {
+            return (await Context.SkyDiveEventItems.Include(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets)
+                .FirstOrDefaultAsync(c=>c.Id == id))?.FlightLoads;
         }
     }
 }

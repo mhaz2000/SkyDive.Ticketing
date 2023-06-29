@@ -68,5 +68,21 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
             return Context.FlightLoads.Include(c=> c.FlightLoadItems).FirstOrDefaultAsync(c=>c.FlightLoadItems.Contains(flightLoadItem));
         }
+
+        public void RemoveFlights(IEnumerable<FlightLoad> flights, SkyDiveEventItem skyDiveEventDay)
+        {
+            skyDiveEventDay.FlightLoads.Clear();
+
+            foreach (var flight in flights)
+            {
+                foreach (var item in flight.FlightLoadItems)
+                {
+                    Context.Tickets.RemoveRange(item.Tickets);
+                    Context.FlightLoadItems.Remove(item);
+                }
+
+                Context.FlightLoads.Remove(flight);
+            }
+        }
     }
 }
