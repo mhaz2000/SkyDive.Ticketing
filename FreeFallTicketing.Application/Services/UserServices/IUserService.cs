@@ -21,7 +21,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         Task CompeleteUserSecurityInformation(UserSecurityInformationCompletionCommand command);
 
-        Task ResetPassword(UserResetPasswordCommand command, Guid userId);
+        Task ResetPassword(UserResetPasswordCommand command, Guid userId, bool adminPrivileged = false);
 
         Task<UserLoginDto> LoginUser(LoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions);
 

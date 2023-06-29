@@ -113,6 +113,26 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
+        [HttpPut("UpdateUserPassword/{id}")]
+        public async Task<IActionResult> UpdateUserPassword(Guid id, UserResetPasswordCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _userService.ResetPassword(command, id, true);
+                return OkResult("اطلاعات کاربر ویرایش شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet("GetUsers")]
         public IActionResult GetUsers([FromQuery] PageQuery pageQuery, string? minDate, string? maxDate, UserStatus? userStatus, string? search = "")
         {

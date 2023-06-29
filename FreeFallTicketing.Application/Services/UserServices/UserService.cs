@@ -238,9 +238,9 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             return userId;
         }
 
-        public async Task ResetPassword(UserResetPasswordCommand command, Guid userId)
+        public async Task ResetPassword(UserResetPasswordCommand command, Guid userId, bool adminPrivileged = false)
         {
-            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Id == userId && c.Status != UserStatus.Inactive);
+            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Id == userId && (c.Status != UserStatus.Inactive || adminPrivileged));
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
