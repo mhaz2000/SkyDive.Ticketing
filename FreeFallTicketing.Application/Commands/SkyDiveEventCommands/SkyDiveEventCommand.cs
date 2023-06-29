@@ -11,7 +11,7 @@ namespace SkyDiveTicketing.Application.Commands.SkyDiveEventCommands
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool Voidable { get; set; }
-        public Guid Image { get; set; }
+        public Guid? Image { get; set; }
         public Guid StatusId { get; set; }
         public bool SubjecToVAT { get; set; }
 

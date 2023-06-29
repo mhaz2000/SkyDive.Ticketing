@@ -105,7 +105,10 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (status is null)
                 throw new ManagedException("وضعیت رویداد معتبر نیست.");
 
-            _unitOfWork.SkyDiveEventRepository.Update(command.Title, command.Location, command.Voidable, command.SubjecToVAT,
+            if (await _unitOfWork.SkyDiveEventRepository.HasFlightLoad(id))
+                throw new ManagedException("برای این رویداد پرواز ثبت شده است.");
+
+            await _unitOfWork.SkyDiveEventRepository.Update(command.Title, command.Location, command.Voidable, command.SubjecToVAT,
                 command.Image, command.StartDate, command.EndDate, status, skyDiveEvent);
 
             await _unitOfWork.CommitAsync();
@@ -269,11 +272,11 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
             var skyDiveEventDay = skyDiveEvent.Items.First(c => c.Id == id);
 
-            var dto = new ReservingTicketDTO(skyDiveEventDay.Date, skyDiveEventDay.FlightLoads.Select(flightLoad => 
-                new TicketFlightDTO(flightLoad.Number, flightLoad.FlightLoadItems.Select(item => 
+            var dto = new ReservingTicketDTO(skyDiveEventDay.Date, skyDiveEventDay.FlightLoads.Select(flightLoad =>
+                new TicketFlightDTO(flightLoad.Number, flightLoad.FlightLoadItems.Select(item =>
                     new TicketDetailDTO(item.FlightLoadType.Title, skyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type.Id == item.FlightLoadType.Id)?.Amount ?? 0,
                         item.Tickets.Where(c => c.ReservedBy is null && !c.Locked && !c.ReservedByAdmin).Count(),
-                        user.UserType?.AllowedTicketTypes?.Any(c=> c.TicketType == item.FlightLoadType) ?? true, item.FlightLoadType.Id)),
+                        user.UserType?.AllowedTicketTypes?.Any(c => c.TicketType == item.FlightLoadType) ?? true, item.FlightLoadType.Id)),
                     flightLoad.Id)).OrderBy(c => c.FlightNumber));
 
             dto.Qty = dto.Flights.Sum(flight => flight.Tickets.Sum(ticket => ticket.Qty));
@@ -308,7 +311,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (typesAmount is null)
                 throw new ManagedException("رویداد مورد نظر یافت نشد.");
 
-            return typesAmount.Select(s => new TicketTypeAmountDTO(s.Amount,s.Type.Id, s.Type.Title));
+            return typesAmount.Select(s => new TicketTypeAmountDTO(s.Amount, s.Type.Id, s.Type.Title));
         }
     }
 }

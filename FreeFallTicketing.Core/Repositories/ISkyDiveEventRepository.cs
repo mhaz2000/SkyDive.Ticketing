@@ -8,16 +8,17 @@ namespace SkyDiveTicketing.Core.Repositories
     public interface ISkyDiveEventRepository : IRepository<SkyDiveEvent>
     {
         IQueryable<SkyDiveEvent> FindEvents(Expression<Func<SkyDiveEvent, bool>>? predicate = null);
-        Task Create(string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status);
+        Task Create(string title, string location, bool voidable, bool subjecToVAT, Guid? image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status);
         void ToggleActivation(SkyDiveEvent skyDiveEvent);
-        void Update(string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status, SkyDiveEvent skyDiveEvent);
+        Task Update(string title, string location, bool voidable, bool subjecToVAT, Guid? image,
+            DateTime startDate, DateTime endDate, SkyDiveEventStatus status, SkyDiveEvent skyDiveEvent);
         Task AddFlightsAsync(SkyDiveEvent skyDiveEvent, SkyDiveEventItem skyDiveEventDay, IDictionary<SkyDiveEventTicketType, int> typesQty, int flightNumber, int voidableNumber, int capacity);
         Task AddTicketTypeAmount(SkyDiveEvent skyDiveEvent, SkyDiveEventTicketType ticketType, double amount);
         void AddConditionsAndTerms(SkyDiveEvent skyDiveEvent, string conditionsAndTerms);
         void ClearTicketTypesAmount(SkyDiveEvent skyDiveEvent);
         Task<IEnumerable<SkyDiveEventTicketTypeAmount>?> GetSkyDiveEventTicketTypesAmount(Guid id);
-        IList<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null);
         Task<IEnumerable<TicketDetailModel>> GetExpandedSkyDiveEvent(Guid id);
         void PublishEvent(SkyDiveEvent skyDiveEvent);
+        Task<bool> HasFlightLoad(Guid id);
     }
 }

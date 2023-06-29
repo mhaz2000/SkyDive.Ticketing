@@ -8,7 +8,7 @@ namespace SkyDiveTicketing.Core.Entities
         {
 
         }
-        public SkyDiveEvent(int code, string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate,
+        public SkyDiveEvent(int code, string title, string location, bool voidable, bool subjecToVAT, Guid? image, DateTime startDate, DateTime endDate,
             SkyDiveEventStatus status) : base()
         {
             Code = code;
@@ -44,7 +44,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// تصاویر رویداد
         /// </summary>
-        public Guid Image { get; set; }
+        public Guid? Image { get; set; }
 
         /// <summary>
         /// تاریخ شروع رویداد

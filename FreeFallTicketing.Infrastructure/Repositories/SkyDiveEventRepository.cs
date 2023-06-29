@@ -37,7 +37,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 {
                     var entity = new FlightLoadItem(item.Key, item.Value);
                     var tickets = await GenerateTickets(item.Value, lastNumber, skyDiveEvent, ticketCounter);
-                    ticketCounter+= tickets.Count;
+                    ticketCounter += tickets.Count;
                     entity.Tickets = tickets;
 
                     await Context.FlightLoadItems.AddAsync(entity);
@@ -64,7 +64,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             skyDiveEvent.TypesAmount.Clear();
         }
 
-        public async Task Create(string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status)
+        public async Task Create(string title, string location, bool voidable, bool subjecToVAT, Guid? image,
+            DateTime startDate, DateTime endDate, SkyDiveEventStatus status)
         {
             var lastCode = Context.SkyDiveEvents.OrderByDescending(x => x.Code).FirstOrDefault()?.Code ?? 0;
             var skyDiveEvent = new SkyDiveEvent(++lastCode, title, location, voidable, subjecToVAT, image, startDate, endDate, status);
@@ -88,31 +89,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).AsQueryable();
 
-            if(predicate is not null)
+            if (predicate is not null)
                 events = events.Where(predicate).AsQueryable();
 
             return events;
-        }
-
-        public IList<TicketDetailModel> GetDetails(Expression<Func<TicketDetailModel, bool>>? predicate = null)
-        {
-            var data = FindEvents()
-                   .SelectMany(skyDiveEvent => skyDiveEvent.Items, (skyDiveEvent, skyDiveEventItem) => new { skyDiveEvent, skyDiveEventItem })
-                   .SelectMany(c => c.skyDiveEventItem.FlightLoads, (skyDiveEventItem, flightLoad) => new { skyDiveEventItem.skyDiveEvent, skyDiveEventItem.skyDiveEventItem, flightLoad })
-                   .SelectMany(c => c.flightLoad.FlightLoadItems, (flightLoad, flightLoadItems) => new { flightLoad.skyDiveEvent, flightLoad.skyDiveEventItem, flightLoad.flightLoad, flightLoadItems })
-                   .SelectMany(c => c.flightLoadItems.Tickets, (flightLoadItems, ticket) => new TicketDetailModel
-                   {
-                       SkyDiveEvent = flightLoadItems.skyDiveEvent,
-                       SkyDiveEventItem = flightLoadItems.skyDiveEventItem,
-                       FlightLoad = flightLoadItems.flightLoad,
-                       FlightLoadItem = flightLoadItems.flightLoadItems,
-                       Ticket = ticket
-                   });
-
-            if(predicate is not null)
-                data = data.Where(predicate);
-
-            return data.ToList();
         }
 
         public async Task<IEnumerable<TicketDetailModel>> GetExpandedSkyDiveEvent(Guid id)
@@ -130,6 +110,15 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                    });
         }
 
+        public async Task<bool> HasFlightLoad(Guid id)
+        {
+            var skyDiveEvent = await Context.SkyDiveEvents.Include(c => c.Items).ThenInclude(c => c.FlightLoads).FirstOrDefaultAsync(c => c.Id == id);
+            if (skyDiveEvent is null) 
+                return false;
+
+            return skyDiveEvent.Items.Any(c => c.FlightLoads.Any());
+        }
+
         public void PublishEvent(SkyDiveEvent skyDiveEvent)
         {
             skyDiveEvent.ToggleActivation();
@@ -140,8 +129,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             skyDiveEvent.ToggleActivation();
         }
 
-        public void Update(string title, string location, bool voidable, bool subjecToVAT, Guid image, DateTime startDate, DateTime endDate, SkyDiveEventStatus status, SkyDiveEvent skyDiveEvent)
+        public async Task Update(string title, string location, bool voidable, bool subjecToVAT, Guid? image, DateTime startDate,
+            DateTime endDate, SkyDiveEventStatus status, SkyDiveEvent skyDiveEvent)
         {
+            Context.SkyDiveEventItems.RemoveRange(skyDiveEvent.Items);
+
             skyDiveEvent.Status = status;
             skyDiveEvent.Title = title;
             skyDiveEvent.Location = location;
@@ -150,11 +142,19 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             skyDiveEvent.Image = image;
             skyDiveEvent.StartDate = startDate;
             skyDiveEvent.EndDate = endDate;
+
+            for (int i = 0; i < (endDate - startDate).TotalDays + 1; i++)
+            {
+                var entity = new SkyDiveEventItem(startDate.AddDays(i));
+                await Context.SkyDiveEventItems.AddAsync(entity);
+
+                skyDiveEvent.Items.Add(entity);
+            }
         }
 
         public async Task<IEnumerable<SkyDiveEventTicketTypeAmount>?> GetSkyDiveEventTicketTypesAmount(Guid id)
         {
-            var skyDiveEvent = await Context.SkyDiveEvents.Include(c=>c.TypesAmount).ThenInclude(c=>c.Type).FirstOrDefaultAsync(c=> c.Id == id);
+            var skyDiveEvent = await Context.SkyDiveEvents.Include(c => c.TypesAmount).ThenInclude(c => c.Type).FirstOrDefaultAsync(c => c.Id == id);
 
             return skyDiveEvent?.TypesAmount;
         }
