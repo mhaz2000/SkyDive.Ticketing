@@ -22,7 +22,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
         {
             try
             {
-                var messages = await _userMessageService.GetUserMessages(userId);
+                var messages = await _userMessageService.GetUserMessages(userId ?? UserId);
                 return OkResult("لیست پیام های کاربر", messages, messages.Count());
             }
             catch (ManagedException e)
@@ -31,7 +31,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -50,7 +50,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -69,7 +69,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
