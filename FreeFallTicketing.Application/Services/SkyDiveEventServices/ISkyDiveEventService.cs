@@ -25,5 +25,6 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
         Task<(ReservingTicketDTO reservingTicketDTO, int count)> GetEventDayTickets(Guid id, int index, int size, Guid userId);
         Task<IEnumerable<TicketTypeAmountDTO>> GetEventTicketTypeAmounts(Guid id);
         Task RemoveFlights(Guid id);
+        Task RemoveTicket(Guid id);
     }
 }

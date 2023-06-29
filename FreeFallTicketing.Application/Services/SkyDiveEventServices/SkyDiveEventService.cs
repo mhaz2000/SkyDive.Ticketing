@@ -222,7 +222,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 new FlightLoadItemTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, item.FlightLoadType.Title,
                 !ticket.ReservedByAdmin, ticket.ReservedBy is null ?
                 (ticket.ReservedByAdmin ? "رزرو شده (admin)" : "رزرو نشده") :
-                $"رزرو شده ({ticket.ReservedBy.FullName + " " + ticket.ReservedBy.Code})")).OrderBy(c => c.TicketNumber);
+                $"رزرو شده ({ticket.ReservedBy.FullName + " " + ticket.ReservedBy.Code})", item.FlightLoadType.Id)).OrderBy(c => c.TicketNumber);
         }
 
         public async Task UpdateTicket(UpdateTicketCommand command)
@@ -332,6 +332,23 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 throw new ManagedException("بلیتی در پرواز ها رزرو شده است.");
 
             _unitOfWork.FlightLoadRepository.RemoveFlights(flights, skyDiveEventDay);
+            await _unitOfWork.CommitAsync();
+        }
+
+        public async Task RemoveTicket(Guid id)
+        {
+            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.ReservedBy);
+            if (ticket is null)
+                throw new ManagedException("بلیت مورد نظر یافت نشد.");
+
+            if (ticket.Paid || ticket.Locked)
+                throw new ManagedException("امکان حذف بلیت های رزرو شده وجود ندارد.");
+
+            var flightLoadItem = await _unitOfWork.FlightLoadRepository.GetFlightItemByTicket(ticket);
+            if(flightLoadItem is null)
+                throw new ManagedException("پرواز مرتبط با بلیت یافت نشد.");
+
+            await _unitOfWork.FlightLoadRepository.RemoveTicket(flightLoadItem, ticket);
             await _unitOfWork.CommitAsync();
         }
     }

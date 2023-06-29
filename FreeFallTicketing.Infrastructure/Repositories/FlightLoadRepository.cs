@@ -39,6 +39,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             flightLoad.Capacity -= flightItem.FlightLoadType.Capacity;
 
+            if (!flightItem.Tickets.Any())
+            {
+                flightLoad.FlightLoadItems.Remove(flightItem);
+                Context.FlightLoadItems.Remove(flightItem);
+            }
+
             Context.Tickets.Remove(ticket);
 
             var newTicket = new Ticket(ticket.TicketNumber, ticket.Voidable, null, !reservable);
@@ -83,6 +89,24 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
                 Context.FlightLoads.Remove(flight);
             }
+        }
+
+        public async Task RemoveTicket(FlightLoadItem flightLoadItem, Ticket ticket)
+        {
+            var flight = await Context.FlightLoads.Include(c => c.FlightLoadItems).FirstOrDefaultAsync(c => c.FlightLoadItems.Contains(flightLoadItem));
+
+            flight.Capacity -= flightLoadItem.FlightLoadType.Capacity;
+
+            flightLoadItem.SeatNumber--;
+            flightLoadItem.Tickets.Remove(ticket);
+
+            if (!flightLoadItem.Tickets.Any())
+            {
+                flight.FlightLoadItems.Remove(flightLoadItem);
+                Context.FlightLoadItems.Remove(flightLoadItem);
+            }
+
+            Context.Tickets.Remove(ticket);
         }
     }
 }

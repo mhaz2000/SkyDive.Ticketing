@@ -243,6 +243,26 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             }
         }
 
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("RemoveTicket/{id}")]
+        public async Task<IActionResult> RemoveTicket(Guid id)
+        {
+            try
+            {
+                await _skyDiveEventService.RemoveTicket(id);
+                return OkResult("بلیت مورد نظر حذف گردید..");
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpPut("PublishEvent/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PublishEvent(Guid id)
