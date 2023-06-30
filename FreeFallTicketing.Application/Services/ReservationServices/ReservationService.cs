@@ -316,6 +316,8 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     , shoppingCartItem.FlightLoadItem.FlightLoadType.Id)).ToList()
             };
 
+            shoppingCartDto.SkyDiveEventId = shoppingCart.SkyDiveEvent.Id;
+
             shoppingCartDto.TotalAmount = shoppingCartDto.Items.Sum(s => s.Amount);
 
             shoppingCartDto.TaxAmount = shoppingCart.SkyDiveEvent.SubjecToVAT ? Math.Round(settings.VAT * shoppingCartDto.TotalAmount) : 0;

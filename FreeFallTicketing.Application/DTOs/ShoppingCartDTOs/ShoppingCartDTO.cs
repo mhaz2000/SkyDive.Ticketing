@@ -13,6 +13,7 @@ namespace SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs
         {
         }
 
+        public Guid SkyDiveEventId { get; set; }
         public int TicketsCount => Items.Count();
         public double TaxAmount { get; set; }
         public double TotalAmount { get; set; }
