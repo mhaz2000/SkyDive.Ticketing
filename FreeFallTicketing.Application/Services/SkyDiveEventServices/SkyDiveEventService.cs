@@ -255,7 +255,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (skyDiveEvent.Items.All(c => c.FlightLoads.Any()))
                 _unitOfWork.SkyDiveEventRepository.PublishEvent(skyDiveEvent);
             else
-                throw new ManagedException("اطلاعات رویداد ناقص است. برای تمامی روز های رویداد پرواز ایجاد نمایید..");
+                throw new ManagedException("اطلاعات رویداد ناقص است. برای تمامی روز های رویداد پرواز ایجاد نمایید.");
 
             await _unitOfWork.CommitAsync();
         }
