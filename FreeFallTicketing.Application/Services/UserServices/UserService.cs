@@ -266,8 +266,10 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             var phoneDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower() &&
                 c.Status != UserStatus.Inactive && c.Id != userId);
+
             var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username && c.Id != userId);
-            var emailDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower()
+
+            var emailDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => !string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower()
                 && c.Status != UserStatus.Inactive &&  c.Id != userId);
 
             if (phoneDuplicationCheck)

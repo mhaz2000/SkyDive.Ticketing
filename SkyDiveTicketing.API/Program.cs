@@ -112,6 +112,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IPassengerDocumentJob, PassengerDocumentJob>();
 builder.Services.AddScoped<ITicketJob, TicketJob>();
 builder.Services.AddScoped<ILogUnitOfWork, LogUnitOfWork>();
+builder.Services.AddScoped<IJumpRecordJob, JumpRecordJob>();
 builder.Services.AddScoped<ExceptionLogger>();
 
 
