@@ -2,7 +2,8 @@
 {
     public class MyTicketDTO : BaseDTO<Guid>
     {
-        public MyTicketDTO(Guid id, DateTime createdAt, DateTime updatedAt, string ticketNumber, DateTime date, string flightNumber, string eventLocation, string ticketType, string termsAndConditionUrl, bool voidable)
+        public MyTicketDTO(Guid id, DateTime createdAt, DateTime updatedAt, string ticketNumber, DateTime date, string flightNumber,
+            string eventLocation, string ticketType, string termsAndConditionUrl, bool voidable, Guid skyDiveEventId)
             : base(id, createdAt, updatedAt)
         {
             TicketNumber = ticketNumber;
@@ -12,6 +13,7 @@
             TicketType = ticketType;
             TermsAndConditionUrl = termsAndConditionUrl;
             Voidable = voidable;
+            SkyDiveEventId = skyDiveEventId;
         }
 
         public string TicketNumber { get; set; }
@@ -21,5 +23,6 @@
         public string TicketType { get; set; }
         public string TermsAndConditionUrl { get; set; }
         public bool Voidable { get; set; }
+        public Guid SkyDiveEventId { get; set; }
     }
 }

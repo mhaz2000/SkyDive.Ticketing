@@ -68,7 +68,8 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId.Value);
 
                 myTickets.Add(new MyTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, ticket.FlightDate.Value,
-                    ticket.FlightNumber.Value.ToString("000"), skyDiveEvent.Location, ticket.TicketType, skyDiveEvent.TermsAndConditions, skyDiveEvent.Voidable));
+                    ticket.FlightNumber.Value.ToString("000"), skyDiveEvent.Location, ticket.TicketType, skyDiveEvent.TermsAndConditions,
+                    skyDiveEvent.Voidable, skyDiveEvent.Id));
             }
 
             return myTickets;
