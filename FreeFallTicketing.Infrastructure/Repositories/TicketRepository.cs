@@ -29,6 +29,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             return ticket;
         }
 
+        public void ClearCancellationRequest(Ticket ticket)
+        {
+            ticket.CancellationRequest = false;
+            ticket.RelatedAdminCartableRequest = null;
+        }
+
         public void ReserveTicket(Ticket ticket, User user)
         {
             ticket.SetAsLock(user);

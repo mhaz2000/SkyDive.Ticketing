@@ -257,24 +257,32 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
         public async Task CancelTicketResponse(Guid id, bool response)
         {
-            var request = await _unitOfWork.AdminCartableRepository.GetByIdAsync(id);
+            var request = await _unitOfWork.AdminCartableRepository.GetFirstWithIncludeAsync(c=> c.Id == id, c=> c.Applicant);
             if (request is null)
                 throw new ManagedException("درخواست مورد نظر یافت نشد.");
 
             var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.RelatedAdminCartableRequest == request, c => c.RelatedAdminCartableRequest);
+            if (ticket is null)
+                throw new ManagedException("برای این بلیت درخواست کنسلی ثبت نشده است.");
 
             if (response)
             {
+                var paidAmount = ticket.PaidAmount;
+
                 await _unitOfWork.TicketRepository.SetAsCancelled(ticket);
                 await _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین تایید شد.", "تایید لغو بلیت");
 
                 var wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludeAsync(c => c.User == request.Applicant, c => c.User);
                 if (wallet is not null)
-                    _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, ticket.PaidAmount);
+                    _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, paidAmount);
             }
             else
+            {
+                _unitOfWork.TicketRepository.ClearCancellationRequest(ticket);
                 await _unitOfWork.UserRepository.AddMessage(request.Applicant, $"در خواست لغو بلیت با شماره {ticket.TicketNumber} توسط ادمین رد شد.", "رد لغو بلیت");
+            }
 
+            _unitOfWork.AdminCartableRepository.SetAsDone(request);
             await _unitOfWork.CommitAsync();
         }
 

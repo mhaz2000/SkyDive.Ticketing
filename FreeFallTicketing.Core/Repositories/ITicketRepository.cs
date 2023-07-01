@@ -5,6 +5,7 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface ITicketRepository : IRepository<Ticket>
     {
+        void ClearCancellationRequest(Ticket ticket);
         void ReserveTicket(Ticket ticket, User user);
         Task SetAsCancelled(Ticket ticket);
         void SetAsPaid(Ticket ticket, double amount, User user, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate, User paidBy);

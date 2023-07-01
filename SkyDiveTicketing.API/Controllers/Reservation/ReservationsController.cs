@@ -4,6 +4,7 @@ using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.Reservation;
 using SkyDiveTicketing.Application.Services.ReservationServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SkyDiveTicketing.API.Controllers.Reservation
 {
@@ -38,7 +39,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -57,7 +58,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -96,7 +97,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -119,12 +120,13 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
         [HttpPut("CancellingTicketResponse/{id}/{response}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CancellingTicketResponse(Guid id, bool response)
         {
             try
@@ -142,7 +144,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
@@ -161,7 +163,7 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
+                Console.WriteLine(ex + "\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }

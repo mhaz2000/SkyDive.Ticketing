@@ -47,7 +47,11 @@ namespace SkyDiveTicketing.Core.Entities
         public double PaidAmount { get; set; }
         public AdminCartable? RelatedAdminCartableRequest { get; set; }
 
-        public void SetRequest(AdminCartable request) => RelatedAdminCartableRequest = request;
+        public void SetRequest(AdminCartable request)
+        {
+            RelatedAdminCartableRequest = request;
+            CancellationRequest= true;
+        }
         public void SetAsPaid(double amount, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate)
         {
             Paid = true;
@@ -67,6 +71,8 @@ namespace SkyDiveTicketing.Core.Entities
             TicketType = null;
             FlightDate = null;
             PaidTime = null;
+            ReservedBy = null;
+            PaidBy = null;
         }
         public void SetAsUnLock()
         {
