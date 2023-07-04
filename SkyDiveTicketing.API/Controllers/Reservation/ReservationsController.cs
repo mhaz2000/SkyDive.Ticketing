@@ -37,11 +37,6 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpGet("MyTickets")]
@@ -55,11 +50,6 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -142,11 +132,6 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpGet("PrintTicket/{id}")]
@@ -160,11 +145,6 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }

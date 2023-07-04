@@ -1,4 +1,5 @@
-﻿using SkyDiveTicketing.Application.DTOs.WalletDTOs;
+﻿using SkyDiveTicketing.Application.Commands.WalletCommands;
+using SkyDiveTicketing.Application.DTOs.WalletDTOs;
 
 namespace SkyDiveTicketing.Application.Services.WalletServices
 {
@@ -7,5 +8,7 @@ namespace SkyDiveTicketing.Application.Services.WalletServices
         Task<WalletDTO> GetUserWallet(Guid userId);
 
         Task ChargeWallet(Guid userId);
+
+        Task ChargeUserWalletByAdmin(ChargeUserWalletCommand command);
     }
 }

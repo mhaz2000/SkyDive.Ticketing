@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Base;
+using SkyDiveTicketing.Application.Commands.WalletCommands;
 using SkyDiveTicketing.Application.Services.WalletServices;
 
 namespace SkyDiveTicketing.API.Controllers.Wallets
@@ -28,11 +31,28 @@ namespace SkyDiveTicketing.API.Controllers.Wallets
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut]
+        public async Task<IActionResult> ChargeUserWallet(ChargeUserWalletCommand command)
+        {
+            try
             {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+                command.Validate();
+
+                await _walletService.ChargeUserWalletByAdmin(command);
+                return OkResult("کیف پول کاربر با موفقیت شارژ شد.");
             }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
     }
 }
