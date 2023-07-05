@@ -17,7 +17,8 @@ namespace SkyDiveTicketing.Application.Commands.UserCommands
         public string? EmergencyPhone { get; set; }
         public float? Height { get; set; }
         public float? Weight { get; set; }
-        public Guid? CityId { get; set; }
+        public string? State { get; set; }
+        public string? City { get; set; }
 
         /// <summary>
         /// فایل سند پزشکی

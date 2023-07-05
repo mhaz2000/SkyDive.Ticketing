@@ -9,9 +9,11 @@ namespace SkyDiveTicketing.Core.Entities
 
         }
 
-        public Passenger(string nationalCode, DefaultCity? city, string address, float? height, float? weight, string emergencyContact, string emergencyPhone) : base()
+        public Passenger(string nationalCode, string? state, string? city, string address, float? height, float? weight, string emergencyContact, string emergencyPhone)
+            : base()
         {
             City = city;
+            State = state;
             Height = height;
             Weight = weight;
             Address = address;
@@ -34,7 +36,9 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// شهر
         /// </summary>
-        public DefaultCity? City { get; set; }
+        public string? City { get; set; }
+
+        public string? State { get; set; }
 
         /// <summary>
         /// آدرس

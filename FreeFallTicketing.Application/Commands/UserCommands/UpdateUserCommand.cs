@@ -15,7 +15,9 @@ namespace SkyDiveTicketing.Application.Commands.UserCommands
 
         public string? NationalCode { get; set; }
 
-        public Guid? CityId { get; set; }
+        public string? City { get; set; }
+
+        public string? State { get; set; }
 
         public string? Address { get; set; }
 

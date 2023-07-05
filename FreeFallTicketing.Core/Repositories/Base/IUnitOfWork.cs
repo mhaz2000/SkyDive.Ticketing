@@ -4,7 +4,6 @@
     {
         IRoleRepository RoleRepository { get; }
         IUserRepository UserRepository { get; }
-        ICityRepository CityRepository { get; }
         IWalletRepository WalletRepository { get; }
         ITicketRepository TicketRepository { get; }
         IFileModelRepository FileRepository { get; }

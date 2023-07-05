@@ -40,7 +40,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 user.Status = UserStatus.AwaitingCompletion;
         }
 
-        public void CompeleteOtherUserPersonalInfo(string email, DefaultCity? city, string address, string emergencyContact, string emergencyPhone, float? height, float? weight, User user)
+        public void CompeleteOtherUserPersonalInfo(string email, string? state, string? city, string address, string emergencyContact, string emergencyPhone, float? height,
+            float? weight, User user)
         {
             if (user.Passenger is not null)
             {
@@ -54,7 +55,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             }
             else
             {
-                var entity = new Passenger(user.NationalCode, city, address, height, weight, emergencyContact, emergencyPhone);
+                var entity = new Passenger(user.NationalCode, state, city, address, height, weight, emergencyContact, emergencyPhone);
                 Context.Passengers.Add(entity);
                 user.Passenger = entity;
             }
@@ -171,7 +172,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             user.OtpRequestTime = DateTime.Now;
         }
 
-        public void UpdateUser(User user, float? weight, float? height, DefaultCity? city, string? lastName, string? firstName, string? nationalCode, string? emergencyPhone,
+        public void UpdateUser(User user, float? weight, float? height, string state, string city, string? lastName, string? firstName, string? nationalCode, string? emergencyPhone,
             string? address, DateTime? birthDate, string? emergencyContact, string email, string phone, string username)
         {
             user.Passenger.Weight = weight;
@@ -207,7 +208,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         }
 
         public async Task<User> AddUser(string password, string? nationalCode, float? height, float? weight, string? firstName, string? lastName, string? email,
-            DateTime? birthDate, string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, DefaultCity? city)
+            DateTime? birthDate, string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, string? state, string? city)
         {
             var defaultType = await Context.UserTypes.FirstOrDefaultAsync(c => c.IsDefault);
             var user = new User()
@@ -226,7 +227,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 UserName = username
             };
 
-            var passenger = new Passenger(nationalCode, city, address, height, weight, emergencyContact, emergencyPhone);
+            var passenger = new Passenger(nationalCode, state, city, address, height, weight, emergencyContact, emergencyPhone);
             await Context.Passengers.AddAsync(passenger);
 
             user.Passenger = passenger;
@@ -253,7 +254,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             return await Context.Users
                 .Include(c => c.Passenger).ThenInclude(c => c.City)
                 .Include(c => c.UserType)
-                .ThenInclude(c => c.AllowedTicketTypes).ThenInclude(c => c.TicketType).FirstOrDefaultAsync(filter);
+                .ThenInclude(c => c!.AllowedTicketTypes).ThenInclude(c => c.TicketType).FirstOrDefaultAsync(filter);
         }
     }
 }

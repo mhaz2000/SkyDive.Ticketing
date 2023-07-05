@@ -15,7 +15,6 @@ namespace SkyDiveTicketing.Infrastructure.Data
         public DbSet<FileModel> Files { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Settings> Settings { get; set; }
-        public DbSet<DefaultCity> Cities { get; set; }
         public DbSet<UserType> UserTypes { get; set; }
         public DbSet<Passenger> Passengers { get; set; }
         public DbSet<FlightLoad> FlightLoads { get; set; }

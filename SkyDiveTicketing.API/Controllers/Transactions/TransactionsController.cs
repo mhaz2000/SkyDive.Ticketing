@@ -16,7 +16,7 @@ namespace SkyDiveTicketing.API.Controllers.Transactions
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(PageQuery pageQuery)
+        public async Task<IActionResult> Get([FromQuery] PageQuery pageQuery)
         {
             try
             {

@@ -11,7 +11,6 @@ using SkyDiveTicketing.Application.Services.TransactionServices;
 using SkyDiveTicketing.Application.Services.JumpRecordServices;
 using SkyDiveTicketing.Application.Services.WalletServices;
 using SkyDiveTicketing.Application.Services.UserMessageServices;
-using SkyDiveTicketing.Application.Services.CityServices;
 using SkyDiveTicketing.Application.Services.AdminCartableServices;
 
 namespace SkyDiveTicketing.Application
@@ -21,7 +20,6 @@ namespace SkyDiveTicketing.Application
         public static void Register(IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ICityService, CityService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<IUserTypeService, UserTypeService>();

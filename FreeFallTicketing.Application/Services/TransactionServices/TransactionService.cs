@@ -30,12 +30,13 @@ namespace SkyDiveTicketing.Application.Services.TransactionServices
         {
             PersianCalendar pc = new PersianCalendar();
 
-            var transaction = await _unitOfWork.TransactionRepositroy.GetByIdAsync(id);
+            var transaction = await _unitOfWork.TransactionRepositroy.GetFirstWithIncludeAsync(c=> c.Id == id, c=> c.Payer);
             if (transaction is null)
                 throw new ManagedException("تراکنش مورد نظر یافت نشد.");
 
-            return PdfHelper.InvoicePdf($"{pc.GetYear(transaction.CreatedAt)}/{pc.GetMonth(transaction.CreatedAt)}/{pc.GetDayOfMonth(transaction.CreatedAt)}", transaction.InvoiceNumber,
-                transaction.Payer.FullName, transaction.Payer.NationalCode ?? "", transaction.Payer.PhoneNumber, transaction.Amount, transaction.TicketNumber, transaction.VAT, transaction.TotalAmount);
+            return PdfHelper.InvoicePdf($"{pc.GetYear(transaction.CreatedAt)}/{pc.GetMonth(transaction.CreatedAt).ToString("00")}/{pc.GetDayOfMonth(transaction.CreatedAt).ToString("00")}",
+                transaction.InvoiceNumber, transaction.Payer.FullName, transaction.Payer.NationalCode ?? "", transaction.Payer.PhoneNumber, transaction.Amount,
+                transaction.TicketNumber, transaction.VAT, transaction.TotalAmount);
         }
     }
 }

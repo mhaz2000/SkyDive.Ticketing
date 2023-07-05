@@ -35,7 +35,6 @@ namespace SkyDiveTicketing.API.Extensions
 
                     CreateRolesSeed(dataContext);
                     CreateAdminSeed(dataContext, _userManager);
-                    SeedCities(dataContext);
                     CreateUserType(dataContext);
                     CreateSkyDiveEventTicketType(dataContext);
                     CreateSkyDiveEventStatuses(dataContext);
@@ -88,19 +87,6 @@ namespace SkyDiveTicketing.API.Extensions
                     VAT = 0.09f
                 });
 
-                dataContext.SaveChanges();
-            }
-        }
-
-        private static void SeedCities(DataContext dataContext)
-        {
-            if (!dataContext.Cities.Any())
-            {
-                var filePath = Directory.GetCurrentDirectory() + @"\JsonFiles\cities.json";
-                using FileStream stream = File.OpenRead(filePath);
-                var cities = JsonSerializer.Deserialize<ICollection<DefaultCity>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
-
-                dataContext.Cities.AddRange(cities);
                 dataContext.SaveChanges();
             }
         }

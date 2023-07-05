@@ -84,36 +84,38 @@
                         font-weight: 600;
                       ""
                     >
-                      <div style=""border: 6px solid black; padding: 0 50px; text-align: center; width: 500px;"">
+                      <div style=""border: 6px solid black; padding: 0 50px; text-align: center; width: 650px;"">
                         <h2>صورت حساب فروش</h2>
-                        <div style=""display: flex; justify-content: space-between; width: 100%;"">
-                          <p style=""width: 25%;"">تاریخ: {date}</p>
-                          <p>فروشنده: شرکت پرواز های تفریحی</p>
+                        <div style=""width: 100%;position: relative;"">
+                          <p style=""position: absolute; right: 0;"">فروشنده: شرکت پرواز های تفریحی</p>
+                          <p style=""position: absolute; left: 0;width: 35%;"">تاریخ: {date}</p>
                         </div>
-                        <div style=""display: flex; justify-content: space-between;"">
-                          <p style=""width: 25%;"">شماره: {invoiceNumber}</p>
-                          <p>خریدار: {buyer}</p>
+                        <br>
+                        <div style=""width: 100%;position: relative;"">
+                          <p style=""position: absolute; right: 0;"">شماره: {invoiceNumber}</p>
+                          <p style=""position: absolute; left: 0;width: 35%;"">خریدار: {buyer}</p>
                         </div>
+                        <br>
                         <p style=""text-align: end;"">کد ملی: {nationalCode}</p>
                         <p style=""text-align: end;"">شماره موبایل: {phone}</p>
                         <table style=""width: 100%;"">
                           <tr>
-                            <th style=""width: 30%;"">مبلغ ریال</th>
-                            <th style=""width: 70%;"">شرح</th>
+                            <th style=""width: 35%;"">مبلغ ریال</th>
+                            <th style=""width: 65%;"">شرح</th>
                           </tr>
                           <tr>
                             <td>{ticketAmount:n0}</td>
                             <td>خرید بلیت شماره: {ticketNumber}</td>
                           </tr>
                         </table>
-                        <div style=""display: flex; margin-bottom: 10px;"">
-                          <table style=""width: 30%; margin-top: 4px;"">
+                        <div style=""position: relative; margin-bottom: 10px;"">
+                          <table style=""width: 35%; margin-top: 4px;"">
                             <tr><td>{vat:n0}</td></tr>
                             <tr><td>{amount:n0}</td></tr>
                           </table>
                           <div style=""margin-left: 10px;"">
-                            <p>ارزش افزوده</p>
-                            <p>قابل پرداخت</p>
+                            <p style=""position: absolute; top: 0; left: 38%;"">ارزش افزوده</p>
+                            <p style=""position: absolute; top: 27px; left: 38%;"">قابل پرداخت</p>
                           </div>
                         </div>
                     </div>

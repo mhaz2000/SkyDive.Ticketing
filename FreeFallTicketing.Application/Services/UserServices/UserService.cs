@@ -226,13 +226,17 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task<Guid> Register(CreateUserCommand command)
         {
-            var duplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower()
-                && c.Status != UserStatus.Active);
+            string fixNumber = string.Empty;
+            if(command.Phone!.Contains("+98"))
+                fixNumber= command.Phone.Replace("+98","0");
+
+            var duplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber == fixNumber
+                && c.PhoneNumberConfirmed);
 
             if (duplicationCheck)
                 throw new ManagedException("این شماره قبلا ثبت شده است.");
 
-            var userId = await _unitOfWork.UserRepository.CreateAsync(command.Phone);
+            var userId = await _unitOfWork.UserRepository.CreateAsync(fixNumber);
             await _unitOfWork.CommitAsync();
 
             return userId;
@@ -255,10 +259,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId, c => c.Passenger);
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
-
-            var city = command.CityId is not null ? await _unitOfWork.CityRepository.GetByIdAsync(command.CityId.Value) : null;
-            if (city is null && command.CityId is not null)
-                throw new ManagedException("شهر مورد نظر یافت نشد.");
 
             var userType = await _unitOfWork.UserTypeRepository.GetByIdAsync(command.UserTypeId);
             if (userType is null)
@@ -284,7 +284,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (errors.Any())
                 throw new ManagedException(string.Join("\n", errors));
 
-            _unitOfWork.UserRepository.UpdateUser(user, command.Weight, command.Height, city, command.LastName, command.FirstName,
+            _unitOfWork.UserRepository.UpdateUser(user, command.Weight, command.Height, command.State, command.City, command.LastName, command.FirstName,
                 command.NationalCode, command.EmergencyPhone, command.Address, command.BirthDate, command.EmergencyContact, command.Email,
                 command.Phone, command.Username);
 
@@ -346,7 +346,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 throw new ManagedException("کاربری یافت نشد.");
 
             return new UserPersonalInformationDTO(user.Id, user.CreatedAt, user.UpdatedAt, user.NationalCode, user.BirthDate, user.FirstName, user.LastName,
-                user.Email, user.Passenger?.City?.Id, user.Passenger?.City?.State, user.Passenger?.City?.City, user.Passenger?.Address, user.Passenger?.Weight,
+                user.Email, user.Passenger?.City, user.Passenger?.State, user.Passenger?.Address, user.Passenger?.Weight,
                 user.Passenger?.Height, user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone);
         }
 
@@ -423,12 +423,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         private async Task OtherPersonalInformation(User user, UserPersonalInformationCompletionCommand command)
         {
-            var city = command.CityId is not null ? await _unitOfWork.CityRepository.GetByIdAsync(command.CityId.Value) : null;
-            if (city is null && command.CityId is not null)
-                throw new ManagedException("شهر مورد نظر یافت نشد.");
-
-            _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, city, command.Address ?? string.Empty, command.EmergencyContact ?? string.Empty,
-                command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
+            _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, command.State, command.City, command.Address ?? string.Empty,
+                command.EmergencyContact ?? string.Empty, command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
         }
 
         public async Task CreateUser(AdminUserCommand command)
@@ -449,10 +445,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (emailDuplicationCheck)
                 errors.Add("ایمیل تکراری است.");
 
-            var city = command.CityId is not null ? await _unitOfWork.CityRepository.GetByIdAsync(command.CityId.Value) : null;
-            if (city is null && command.CityId is not null)
-                throw new ManagedException("شهر مورد نظر یافت نشد.");
-
             var userType = await _unitOfWork.UserTypeRepository.GetByIdAsync(command.UserTypeId);
             if (userType is null)
                 throw new ManagedException("نوع کاربری یافت نشد.");
@@ -460,8 +452,9 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (errors.Any())
                 throw new ManagedException(string.Join("\n", errors));
 
-            var user = await _unitOfWork.UserRepository.AddUser(command.Password, command.NationalCode, command.Height, command.Weight, command.FirstName, command.LastName, command.Email,
-                 command.BirthDate, command.Phone, command.Username, command.Address, command.EmergencyContact, command.EmergencyPhone, city);
+            var user = await _unitOfWork.UserRepository.AddUser(command.Password, command.NationalCode, command.Height, command.Weight, command.FirstName, command.LastName,
+                command.Email, command.BirthDate, command.Phone, command.Username, command.Address, command.EmergencyContact, command.EmergencyPhone,
+                command.State, command.City);
 
             _unitOfWork.UserRepository.AssignUserType(user, userType);
 
@@ -515,7 +508,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
             return new UserDetailDTO(id, user.CreatedAt, user.UpdatedAt, user.UserName, user.FirstName, user.LastName, user.UserType.Title, user.UserType.Id,
-                user.NationalCode, user.BirthDate, $"{user.Passenger?.City?.State} {user.Passenger?.City?.City}", user.Passenger?.City?.Id, user.Passenger?.Address,
+                user.NationalCode, user.BirthDate, $"{user.Passenger?.State} {user.Passenger?.City}", user.Passenger?.Address,
                 user.Code, user.Email, user.PhoneNumber, user.Passenger?.Height, user.Passenger?.Weight, user.Status, user.Status.GetDescription(),
                 user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone);
         }

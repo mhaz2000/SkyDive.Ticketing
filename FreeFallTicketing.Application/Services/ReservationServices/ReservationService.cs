@@ -94,11 +94,11 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 if (ticket is null)
                     throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
-                var ticketAmount = shoppingCart.SkyDiveEvent.TypesAmount.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType).Amount;
+                var ticketAmount = shoppingCart.SkyDiveEvent!.TypesAmount.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType)!.Amount;
                 var flightLoad = await _unitOfWork.FlightLoadRepository.GetFlightLoadByItem(shoppingCartItem.FlightLoadItem);
 
                 _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketAmount, shoppingCartItem.ReservedFor,
-                    shoppingCart.SkyDiveEvent.Id, flightLoad.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
+                    shoppingCart.SkyDiveEvent.Id, flightLoad!.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
 
                 number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
                     shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "", ticketAmount, TransactionType.Confirmed, user, number);
@@ -113,7 +113,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
         public async Task UnlockTickets()
         {
-            var tickets = _unitOfWork.TicketRepository.Include(c => c.LockedBy).AsEnumerable()
+            var tickets = _unitOfWork.TicketRepository.Include(c => c.LockedBy!).AsEnumerable()
                 .Where(x => x.ReserveTime is not null && Math.Abs((DateTime.Now - x.ReserveTime.Value).TotalMinutes) >= 15);
 
             foreach (var ticket in tickets)
@@ -234,7 +234,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 if (errors.Any())
                     throw new ManagedException(string.Join("\n", errors));
 
-                if (_unitOfWork.ShoppingCartRepository.Include(c => c.SkyDiveEvent).Any(c => c.SkyDiveEvent != skyDiveEvent && c.Items.Any()))
+                if (_unitOfWork.ShoppingCartRepository.Include(c => c.SkyDiveEvent, c => c.Items).Any(c => c.SkyDiveEvent != skyDiveEvent && c.Items.Any()))
                     throw new ManagedException("شما سبد خرید تسویه نشده برای رویداد دیگری دارید، لطفا اقدام به حذف آیتم های سبد خرید یا تسویه آن ها نمایید.");
 
                 await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
@@ -257,7 +257,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
         public async Task CancelTicketResponse(Guid id, bool response)
         {
-            var request = await _unitOfWork.AdminCartableRepository.GetFirstWithIncludeAsync(c=> c.Id == id, c=> c.Applicant);
+            var request = await _unitOfWork.AdminCartableRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.Applicant);
             if (request is null)
                 throw new ManagedException("درخواست مورد نظر یافت نشد.");
 
