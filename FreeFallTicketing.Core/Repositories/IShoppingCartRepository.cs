@@ -5,7 +5,7 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface IShoppingCartRepository : IRepository<ShoppingCart>
     {
-        Task AddToShoppingCart(User user, List<Tuple<FlightLoadItem, User>> flightLoadItems, SkyDiveEvent? skyDiveEvent);
+        Task AddToShoppingCart(User user, List<Tuple<FlightLoadItem, User>> flightLoadItems, SkyDiveEvent skyDiveEvent);
 
         Task<ShoppingCart?> GetUserShoppingCart(User user);
 

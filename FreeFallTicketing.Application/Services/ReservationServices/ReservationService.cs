@@ -239,7 +239,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
                 await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
                 await _unitOfWork.ShoppingCartRepository
-                    .AddToShoppingCart(user, flightLoadItems, skyDiveEvent);
+                    .AddToShoppingCart(user, flightLoadItems, skyDiveEvent!);
             }
 
             await _unitOfWork.CommitAsync();

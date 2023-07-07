@@ -12,7 +12,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task AddToShoppingCart(User user, List<Tuple<FlightLoadItem, User>> flightLoadItems, SkyDiveEvent? skyDiveEvent)
+        public async Task AddToShoppingCart(User user, List<Tuple<FlightLoadItem, User>> flightLoadItems, SkyDiveEvent skyDiveEvent)
         {
             var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c => c.Items).Where(c => c.User == user).FirstOrDefaultAsync();
             if (shoppingCart is null)
@@ -38,6 +38,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                     var shoppingCartItem = new ShoppingCartItem(flightLoadItem.Item1, flightLoadItem.Item2);
 
                     shoppingCart.Items.Add(shoppingCartItem);
+                    shoppingCart.SkyDiveEvent = skyDiveEvent;
 
                     Context.ShoppingCartItems.Add(shoppingCartItem);
                 }
@@ -52,6 +53,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             if (shoppingCart is not null)
             {
                 Context.ShoppingCartItems.RemoveRange(shoppingCart.Items);
+                shoppingCart.SkyDiveEvent = null;
                 shoppingCart.Items.Clear();
             }
         }

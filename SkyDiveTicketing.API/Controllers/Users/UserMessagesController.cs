@@ -18,21 +18,22 @@ namespace SkyDiveTicketing.API.Controllers.Users
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(Guid? userId)
+        public async Task<IActionResult> Get(Guid? userId, [FromQuery] PageQuery pageQuery)
         {
             try
             {
                 var messages = await _userMessageService.GetUserMessages(userId ?? UserId);
-                return OkResult("لیست پیام های کاربر", messages, messages.Count());
+                return Ok(new
+                {
+                    Message = "لیست پیام های کاربر",
+                    Content = messages.ToPagingAndSorting(pageQuery),
+                    Total = messages.Count(),
+                    NotVisited = messages.Where(c=> !c.Visited).Count()
+                });
             }
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -48,11 +49,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpPut("{id}")]
@@ -66,11 +62,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }
