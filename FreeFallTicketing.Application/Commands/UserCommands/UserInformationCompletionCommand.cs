@@ -17,7 +17,7 @@ namespace SkyDiveTicketing.Application.Commands.UserCommands
         public string? EmergencyPhone { get; set; }
         public float? Height { get; set; }
         public float? Weight { get; set; }
-        public string? State { get; set; }
+        public string? CityAndState { get; set; }
         public string? City { get; set; }
 
         /// <summary>

@@ -123,6 +123,9 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 command.Validate();
 
+                if (command.Id is null)
+                    command.Id = UserId;
+
                 await _userService.CompeleteUserSecurityInformation(command);
                 return OkResult("اطلاعات کاربری شما با موفقیت به ثبت رسید.");
             }

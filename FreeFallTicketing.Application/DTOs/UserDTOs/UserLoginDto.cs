@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SkyDiveTicketing.Application.DTOs.UserDTOs
+﻿namespace SkyDiveTicketing.Application.DTOs.UserDTOs
 {
     public class UserLoginDto
     {
@@ -13,5 +7,7 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
         public string RefreshToken { get; internal set; }
         public int ExpiresIn { get; internal set; }
         public bool IsAdmin { get; set; }
+        public bool SecurityInformationCompleted { get; set; }
+        public bool PersonalInformationCompleted { get; set; }
     }
 }

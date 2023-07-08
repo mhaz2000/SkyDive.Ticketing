@@ -15,6 +15,7 @@ namespace SkyDiveTicketing.Core.Entities
             PersonalInformationIsCompeleted = false;
             LoginFailedAttempts = 0;
             TermsAndConditionsAcceptance = false;
+            SecurityInformationIsCompeleted = false;
         }
 
         /// <summary>
@@ -81,6 +82,12 @@ namespace SkyDiveTicketing.Core.Entities
         /// آیا اطلاعات شخصی وارد شده است.
         /// </summary>
         public bool PersonalInformationIsCompeleted { get; set; }
+
+        /// <summary>
+        /// آیا اطلاعات کاربری وارد شده است.
+        /// </summary>
+        public bool SecurityInformationIsCompeleted { get; set; }
+
 
         /// <summary>
         /// قوانین و شرایط تایید شده است؟

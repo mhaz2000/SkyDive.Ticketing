@@ -40,12 +40,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 user.Status = UserStatus.AwaitingCompletion;
         }
 
-        public void CompeleteOtherUserPersonalInfo(string email, string? state, string? city, string address, string emergencyContact, string emergencyPhone, float? height,
+        public void CompeleteOtherUserPersonalInfo(string email, string? cityAndState, string address, string emergencyContact, string emergencyPhone, float? height,
             float? weight, User user)
         {
             if (user.Passenger is not null)
             {
-                user.Passenger.City = city;
+                user.Passenger.CityAndState = cityAndState;
                 user.Passenger.Address = address;
                 user.Passenger.Height = height;
                 user.Passenger.Weight = weight;
@@ -55,7 +55,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             }
             else
             {
-                var entity = new Passenger(user.NationalCode, state, city, address, height, weight, emergencyContact, emergencyPhone);
+                var entity = new Passenger(user.NationalCode, cityAndState, address, height, weight, emergencyContact, emergencyPhone);
                 Context.Passengers.Add(entity);
                 user.Passenger = entity;
             }
@@ -82,6 +82,8 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             user.UserName = username;
             user.PasswordHash = _passwordHasher.HashPassword(user, password);
+
+            user.SecurityInformationIsCompeleted = true;
         }
 
         public async Task<Guid> CreateAsync(string phone)
@@ -172,12 +174,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             user.OtpRequestTime = DateTime.Now;
         }
 
-        public void UpdateUser(User user, float? weight, float? height, string state, string city, string? lastName, string? firstName, string? nationalCode, string? emergencyPhone,
-            string? address, DateTime? birthDate, string? emergencyContact, string email, string phone, string username)
+        public void UpdateUser(User user, float? weight, float? height, string cityAndState, string? lastName, string? firstName, string? nationalCode,
+            string? emergencyPhone, string? address, DateTime? birthDate, string? emergencyContact, string email, string phone, string username)
         {
             user.Passenger.Weight = weight;
             user.Passenger.Height = height;
-            user.Passenger.City = city;
+            user.Passenger.CityAndState = cityAndState;
             user.LastName = lastName;
             user.FirstName = firstName;
             user.NationalCode = nationalCode;
@@ -208,7 +210,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         }
 
         public async Task<User> AddUser(string password, string? nationalCode, float? height, float? weight, string? firstName, string? lastName, string? email,
-            DateTime? birthDate, string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, string? state, string? city)
+            DateTime? birthDate, string? phone, string? username, string? address, string? emergencyContact, string? emergencyPhone, string? cityAndState)
         {
             var defaultType = await Context.UserTypes.FirstOrDefaultAsync(c => c.IsDefault);
             var user = new User()
@@ -227,7 +229,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 UserName = username
             };
 
-            var passenger = new Passenger(nationalCode, state, city, address, height, weight, emergencyContact, emergencyPhone);
+            var passenger = new Passenger(nationalCode, cityAndState, address, height, weight, emergencyContact, emergencyPhone);
             await Context.Passengers.AddAsync(passenger);
 
             user.Passenger = passenger;
@@ -252,7 +254,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public async Task<User?> GetUserWithInclude(Expression<Func<User, bool>> filter)
         {
             return await Context.Users
-                .Include(c => c.Passenger).ThenInclude(c => c.City)
+                .Include(c => c.Passenger)
                 .Include(c => c.UserType)
                 .ThenInclude(c => c!.AllowedTicketTypes).ThenInclude(c => c.TicketType).FirstOrDefaultAsync(filter);
         }

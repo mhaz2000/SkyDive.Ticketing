@@ -39,14 +39,10 @@ namespace SkyDiveTicketing.API.Controllers.Settings
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
-            }
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Get()
         {
             try
@@ -57,11 +53,6 @@ namespace SkyDiveTicketing.API.Controllers.Settings
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }

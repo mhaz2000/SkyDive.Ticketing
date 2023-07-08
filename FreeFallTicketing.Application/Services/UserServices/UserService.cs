@@ -28,21 +28,19 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public async Task CompeleteUserPersonalInformation(UserPersonalInformationCompletionCommand command, bool registration)
         {
             Expression<Func<User, object>>[] includeExpressions = {
-                c => c.Passenger.AttorneyDocumentFile,
-                c => c.Passenger.NationalCardDocumentFile,
-                c => c.Passenger.LogBookDocumentFile,
-                c => c.Passenger.MedicalDocumentFile,
-                c => c.Messages
+                c => c.Passenger!.AttorneyDocumentFile!,
+                c => c.Passenger!.NationalCardDocumentFile!,
+                c => c.Passenger!.LogBookDocumentFile!,
+                c => c.Passenger!.MedicalDocumentFile!,
+                c => c.Messages!
             };
 
             var user = _unitOfWork.UserRepository.Include(includeExpressions).FirstOrDefault(c => c.Id == command.Id && c.Status != UserStatus.Inactive);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            if (!user.PhoneNumberConfirmed)
-                throw new ManagedException("تلفن همراه شما تایید نشده است.");
-
-            _unitOfWork.UserRepository.CompeleteUserPersonalInfo(command.FirstName ?? string.Empty, command.LastName ?? string.Empty, command.NationalCode ?? string.Empty, command.BirthDate, user);
+            _unitOfWork.UserRepository.CompeleteUserPersonalInfo(command.FirstName ?? string.Empty, command.LastName ?? string.Empty, command.NationalCode ?? string.Empty,
+                command.BirthDate, user);
 
             if (registration)
             {
@@ -69,9 +67,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Id == command.Id && c.Status != UserStatus.Inactive);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
-
-            if (!user.PhoneNumberConfirmed)
-                throw new ManagedException("تلفن همراه شما تایید نشده است.");
 
             var checkUsernameDuplication = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username);
             if (checkUsernameDuplication)
@@ -101,8 +96,13 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task<UserLoginDto> LoginUser(LoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
         {
+            string username = command.Username!;
+            if ((command.Username.StartsWith("09") || command.Username.StartsWith("+98") || command.Username.StartsWith("0098")) && !command.Username.Contains("@"))
+                username = FixingPhoneNumber(username);
+
             var user = await _unitOfWork.UserRepository
-                .FirstOrDefaultAsync(c => c.UserName == command.Username || c.PhoneNumber == command.Username || c.Email == command.Username && c.Status != UserStatus.Inactive);
+                .FirstOrDefaultAsync(c => (c.UserName == username || c.PhoneNumber == username || c.Email == username) &&
+                c.Status != UserStatus.Inactive);
 
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
@@ -131,13 +131,17 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 TokenType = token.TokenType,
                 ExpiresIn = token.expires_in,
                 AuthToken = token.AuthToken,
-                RefreshToken = token.RefreshToken
+                RefreshToken = token.RefreshToken,
+                PersonalInformationCompleted = user.PersonalInformationIsCompeleted,
+                SecurityInformationCompleted = user.SecurityInformationIsCompeleted,
             };
         }
 
         public async Task<UserLoginDto> OtpRegisterConfirmation(OtpUserConfirmationCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
         {
-            var user = _unitOfWork.UserRepository.FirstOrDefault(c => c.PhoneNumber == command.Phone && c.Status != UserStatus.Inactive);
+            string fixNumber = FixingPhoneNumber(command.Phone!);
+
+            var user = _unitOfWork.UserRepository.FirstOrDefault(c => c.PhoneNumber == fixNumber && c.Status != UserStatus.Inactive);
             if (user is null)
                 throw new ManagedException("کاربری با این شماره موبایل یافت نشد.");
 
@@ -160,14 +164,20 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 TokenType = token.TokenType,
                 ExpiresIn = token.expires_in,
                 AuthToken = token.AuthToken,
-                RefreshToken = token.RefreshToken
+                RefreshToken = token.RefreshToken,
+                PersonalInformationCompleted = user.PersonalInformationIsCompeleted,
+                SecurityInformationCompleted = user.SecurityInformationIsCompeleted,
             };
         }
 
         public async Task<UserLoginDto> OtpLoginUser(OtpLoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
         {
+            string username = command.Username;
+            if ((command.Username.StartsWith("09") || command.Username.StartsWith("+98") || command.Username.StartsWith("0098")) && !command.Username.Contains("@"))
+                username = FixingPhoneNumber(username);
+
             var user = _unitOfWork.UserRepository
-                .FirstOrDefault(c => (c.PhoneNumber == command.Username || c.UserName == command.Username || c.Email == command.Username)
+                .FirstOrDefault(c => (c.PhoneNumber == username || c.UserName == username || c.Email == username)
                 && c.Status != UserStatus.Inactive);
 
             if (user is null)
@@ -188,7 +198,9 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                     TokenType = token.TokenType,
                     ExpiresIn = token.expires_in,
                     AuthToken = token.AuthToken,
-                    RefreshToken = token.RefreshToken
+                    RefreshToken = token.RefreshToken,
+                    PersonalInformationCompleted = user.PersonalInformationIsCompeleted,
+                    SecurityInformationCompleted = user.SecurityInformationIsCompeleted,
                 };
 
             }
@@ -198,8 +210,12 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task<string> OtpRequest(OtpUserCommand command, string apiKey, string templateKey)
         {
+            string username = command.Username;
+            if ((command.Username.StartsWith("09") || command.Username.StartsWith("+98") || command.Username.StartsWith("0098")) && !command.Username.Contains("@"))
+                username = FixingPhoneNumber(username);
+
             var user = await _unitOfWork.UserRepository
-                .FirstOrDefaultAsync(c => (c.PhoneNumber == command.Username || c.Email == command.Username || c.UserName == command.Username)
+                .FirstOrDefaultAsync(c => (c.PhoneNumber == username || c.Email == username || c.UserName == username)
                 && c.Status != UserStatus.Inactive);
 
             if (user is null)
@@ -226,9 +242,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task<Guid> Register(CreateUserCommand command)
         {
-            string fixNumber = string.Empty;
-            if(command.Phone!.Contains("+98"))
-                fixNumber= command.Phone.Replace("+98","0");
+            string fixNumber = FixingPhoneNumber(command.Phone!);
 
             var duplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber == fixNumber
                 && c.PhoneNumberConfirmed);
@@ -270,7 +284,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username && c.Id != userId);
 
             var emailDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => !string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower()
-                && c.Status != UserStatus.Inactive &&  c.Id != userId);
+                && c.Status != UserStatus.Inactive && c.Id != userId);
 
             if (phoneDuplicationCheck)
                 errors.Add("شماره موبایل تکراری است.");
@@ -284,7 +298,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (errors.Any())
                 throw new ManagedException(string.Join("\n", errors));
 
-            _unitOfWork.UserRepository.UpdateUser(user, command.Weight, command.Height, command.State, command.City, command.LastName, command.FirstName,
+            _unitOfWork.UserRepository.UpdateUser(user, command.Weight, command.Height, command.CityAndState, command.LastName, command.FirstName,
                 command.NationalCode, command.EmergencyPhone, command.Address, command.BirthDate, command.EmergencyContact, command.Email,
                 command.Phone, command.Username);
 
@@ -341,12 +355,12 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task<UserPersonalInformationDTO> GetPersonalInformation(Guid userId)
         {
-            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId && c.Status != UserStatus.Inactive, c => c.Passenger.City);
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId && c.Status != UserStatus.Inactive, c=> c.Passenger);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
             return new UserPersonalInformationDTO(user.Id, user.CreatedAt, user.UpdatedAt, user.NationalCode, user.BirthDate, user.FirstName, user.LastName,
-                user.Email, user.Passenger?.City, user.Passenger?.State, user.Passenger?.Address, user.Passenger?.Weight,
+                user.Email, user.Passenger?.CityAndState, user.Passenger?.Address, user.Passenger?.Weight,
                 user.Passenger?.Height, user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone);
         }
 
@@ -423,7 +437,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         private async Task OtherPersonalInformation(User user, UserPersonalInformationCompletionCommand command)
         {
-            _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, command.State, command.City, command.Address ?? string.Empty,
+            _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, command.CityAndState, command.Address ?? string.Empty,
                 command.EmergencyContact ?? string.Empty, command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
         }
 
@@ -454,7 +468,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             var user = await _unitOfWork.UserRepository.AddUser(command.Password, command.NationalCode, command.Height, command.Weight, command.FirstName, command.LastName,
                 command.Email, command.BirthDate, command.Phone, command.Username, command.Address, command.EmergencyContact, command.EmergencyPhone,
-                command.State, command.City);
+                command.CityAndState);
 
             _unitOfWork.UserRepository.AssignUserType(user, userType);
 
@@ -481,7 +495,9 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                     TokenType = token.TokenType,
                     ExpiresIn = token.expires_in,
                     AuthToken = token.AuthToken,
-                    RefreshToken = token.RefreshToken
+                    RefreshToken = token.RefreshToken,
+                    PersonalInformationCompleted = user.PersonalInformationIsCompeleted,
+                    SecurityInformationCompleted = user.SecurityInformationIsCompeleted,
                 };
 
             }
@@ -507,10 +523,23 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
-            return new UserDetailDTO(id, user.CreatedAt, user.UpdatedAt, user.UserName, user.FirstName, user.LastName, user.UserType.Title, user.UserType.Id,
-                user.NationalCode, user.BirthDate, $"{user.Passenger?.State} {user.Passenger?.City}", user.Passenger?.Address,
+            return new UserDetailDTO(id, user.CreatedAt, user.UpdatedAt, user.UserName, user.FirstName!, user.LastName, user.UserType!.Title, user.UserType.Id,
+                user.NationalCode!, user.BirthDate, user.Passenger?.CityAndState!, user.Passenger?.Address!,
                 user.Code, user.Email, user.PhoneNumber, user.Passenger?.Height, user.Passenger?.Weight, user.Status, user.Status.GetDescription(),
                 user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone);
+        }
+
+        private string FixingPhoneNumber(string phoneNumber)
+        {
+            string fixNumber = phoneNumber;
+
+            if (phoneNumber.Contains("+98"))
+                fixNumber = phoneNumber.Replace("+98", "0");
+
+            if (phoneNumber.StartsWith("0098"))
+                fixNumber = "0" + phoneNumber.Substring(4);
+
+            return fixNumber;
         }
     }
 }

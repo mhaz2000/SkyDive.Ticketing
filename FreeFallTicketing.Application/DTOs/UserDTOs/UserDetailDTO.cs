@@ -5,7 +5,7 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
     public class UserDetailDTO : BaseDTO<Guid>
     {
         public UserDetailDTO(Guid id, DateTime createdAt, DateTime updatedAt, string username, string firstName, string lastName,
-            string userTypeDisplay, Guid userTypeId, string nationalCode, DateTime? birthDate, string city, string address,
+            string userTypeDisplay, Guid userTypeId, string nationalCode, DateTime? birthDate, string cityAndState, string address,
             int userCode, string email, string phone, float? height, float? weight, UserStatus userStatus, string userStatusDisplay,
             string emergencyContact, string emergencyPhone) : base(id, createdAt, updatedAt)
         {
@@ -16,7 +16,7 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
             UserTypeId = userTypeId;
             NationalCode = nationalCode;
             BirthDate = birthDate;
-            City = city;
+            CityAndState = cityAndState;
             Address = address;
             Email = email;
             Phone = phone;
@@ -36,7 +36,7 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
         public Guid UserTypeId { get; set; }
         public string NationalCode { get; set; }
         public DateTime? BirthDate { get; set; }
-        public string City { get; set; }
+        public string CityAndState { get; set; }
         public string Address { get; set; }
         public int UserCode { get; set; }
         public string Email { get; set; }

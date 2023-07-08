@@ -22,7 +22,7 @@ namespace SkyDiveTicketing.Core.Repositories
 
         void CompeleteUserPersonalInfo(string firstName, string lastName, string nationalCode, DateTime birthDate, User user);
 
-        void CompeleteOtherUserPersonalInfo(string email, string state, string city, string address, string emergencyContact, string emergencyPhone, float? height,
+        void CompeleteOtherUserPersonalInfo(string email, string cityAndState, string address, string emergencyContact, string emergencyPhone, float? height,
             float? weight, User user);
 
         void CompeleteUserSecurityInfo(string username, string password, User user);
@@ -43,14 +43,14 @@ namespace SkyDiveTicketing.Core.Repositories
 
         void AssignUserType(User user, UserType userType);
 
-        void UpdateUser(User user, float? weight, float? height, string state, string city, string lastName, string firstName,
+        void UpdateUser(User user, float? weight, float? height, string cityAndState, string lastName, string firstName,
             string nationalCode, string emergencyPhone, string address, DateTime? birthDate, string emergencyContact,
             string email, string phone, string username);
 
         void ResetFailedAttempts(User user);
 
         Task<User> AddUser(string password, string nationalCode, float? height, float? weight, string firstName, string lastName, string email, DateTime? birthDate,
-            string phone, string username, string address, string emergencyContact, string emergencyPhone, string state, string city);
+            string phone, string username, string address, string emergencyContact, string emergencyPhone, string cityAndState);
 
         void AcceptingTermsAndConditions(User user);
 

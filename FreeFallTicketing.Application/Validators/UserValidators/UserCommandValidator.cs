@@ -7,7 +7,6 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
     {
         public UserCommandValidator()
         {
-            RuleFor(x=> x.Id).NotNull().WithMessage("شناسه کاربر نمی‌تواند خالی باشد.");
         }
     }
 }

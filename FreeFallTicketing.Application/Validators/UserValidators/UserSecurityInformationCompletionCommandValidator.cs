@@ -12,7 +12,6 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
             var passwordReg = new Regex(@"^(?=.*[0-9])(?=.*[A-Za-z]).{6,}$");
             var usernameReg = new Regex(@"^(?=.{5,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$");
 
-            RuleFor(c => c.Id).NotNull().WithMessage("شناسه کاربر نمی‌تواند خالی باشد.");
             RuleFor(c => c.Username).NotEmpty().NotNull().WithMessage("نام کاربری نمی‌تواند خالی باشد.");
             RuleFor(c => c.Password).NotEmpty().NotNull().WithMessage("کلمه عبور نمی‌تواند خالی باشد.");
 
