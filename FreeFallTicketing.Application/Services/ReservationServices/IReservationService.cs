@@ -9,7 +9,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
         Task Update(ReserveCommand command, Guid userId);
         Task UnlockTickets();
         Task<(bool, string)> CheckTickets(Guid userId);
-        Task<IEnumerable<MyTicketDTO>> GetUserTickets(Guid userId);
+        Task<IEnumerable<MyTicketDTO>> GetUserTickets(Guid userId, TicketStatus? status = null);
         Task<bool> SetAsPaid(Guid userId);
         Task CancelTicketRequest(Guid id, Guid userId);
         Task CancelTicketResponse(Guid id, bool response);

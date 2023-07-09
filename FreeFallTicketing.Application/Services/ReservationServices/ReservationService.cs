@@ -54,7 +54,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             return (true, string.Empty);
         }
 
-        public async Task<IEnumerable<MyTicketDTO>> GetUserTickets(Guid userId)
+        public async Task<IEnumerable<MyTicketDTO>> GetUserTickets(Guid userId, TicketStatus? status = null)
         {
             var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
             if (user is null)
@@ -62,15 +62,28 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             List<MyTicketDTO> myTickets = new List<MyTicketDTO>();
 
-            var tickets = _unitOfWork.TicketRepository.Include(c => c.ReservedBy).Where(c => c.ReservedBy == user && c.Paid);
+            var tickets = _unitOfWork.TicketRepository.Include(c => c.ReservedBy!).Where(c => c.ReservedBy == user && c.Paid);
             foreach (var ticket in tickets)
             {
-                var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId.Value);
+                var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId!.Value);
+
+                myTickets.Add(new MyTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, ticket.FlightDate!.Value,
+                    ticket.FlightNumber!.Value.ToString("000"), skyDiveEvent.Location, ticket.TicketType!, skyDiveEvent.TermsAndConditions!,
+                    skyDiveEvent.Voidable, skyDiveEvent.Id, skyDiveEvent.Code, skyDiveEvent.StartDate>= DateTime.Now ? TicketStatus.Hold : TicketStatus.Reserved));
+            }
+
+            var cancelledTickets = _unitOfWork.TicketRepository.GetCancelledTickets().Where(c => c.ReservedBy == user);
+            foreach (var ticket in cancelledTickets)
+            {
+                var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId!.Value);
 
                 myTickets.Add(new MyTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, ticket.FlightDate.Value,
                     ticket.FlightNumber.Value.ToString("000"), skyDiveEvent.Location, ticket.TicketType, skyDiveEvent.TermsAndConditions,
-                    skyDiveEvent.Voidable, skyDiveEvent.Id));
+                    skyDiveEvent.Voidable, skyDiveEvent.Id, skyDiveEvent.Code, TicketStatus.Cancelled));
             }
+
+            if (status is not null)
+                myTickets = myTickets.Where(c => c.TicketStatus == status).ToList();
 
             return myTickets;
         }
@@ -245,16 +258,6 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             await _unitOfWork.CommitAsync();
         }
 
-        private void UnlockShoppingCartItems(User user)
-        {
-            var tickets = _unitOfWork.TicketRepository.Include(c => c.LockedBy).Where(c => c.LockedBy == user && !c.Paid);
-
-            foreach (var ticket in tickets)
-            {
-                _unitOfWork.TicketRepository.Unlock(ticket);
-            }
-        }
-
         public async Task CancelTicketResponse(Guid id, bool response)
         {
             var request = await _unitOfWork.AdminCartableRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.Applicant);
@@ -332,6 +335,16 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             shoppingCartDto.TaxAmount = shoppingCart.SkyDiveEvent.SubjecToVAT ? Math.Round(settings.VAT * shoppingCartDto.TotalAmount) : 0;
 
             return shoppingCartDto;
+        }
+
+        private void UnlockShoppingCartItems(User user)
+        {
+            var tickets = _unitOfWork.TicketRepository.Include(c => c.LockedBy).Where(c => c.LockedBy == user && !c.Paid);
+
+            foreach (var ticket in tickets)
+            {
+                _unitOfWork.TicketRepository.Unlock(ticket);
+            }
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Services.TransactionServices;
+using System.Data;
 
 namespace SkyDiveTicketing.API.Controllers.Transactions
 {
@@ -21,16 +23,26 @@ namespace SkyDiveTicketing.API.Controllers.Transactions
             try
             {
                 var transactions = await _transactionService.GetTransactions(UserId);
-                return OkResult("اطلاعات تراکنش ها", transactions, transactions.Count());
+                return OkResult("اطلاعات تراکنش ها", transactions.ToPagingAndSorting(pageQuery), transactions.Count());
             }
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
+        }
+
+        [HttpGet("GetUserTransactions/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserTransactions(Guid userId, [FromQuery] PageQuery pageQuery)
+        {
+            try
             {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+                var transactions = await _transactionService.GetTransactions(userId);
+                return OkResult("اطلاعات تراکنش ها", transactions.ToPagingAndSorting(pageQuery), transactions.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
             }
         }
 
@@ -45,11 +57,6 @@ namespace SkyDiveTicketing.API.Controllers.Transactions
             catch (ManagedException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
     }

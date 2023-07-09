@@ -5,6 +5,7 @@ using SkyDiveTicketing.Application.Commands.Reservation;
 using SkyDiveTicketing.Application.Services.ReservationServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using SkyDiveTicketing.Application.DTOs.TicketDTOs;
 
 namespace SkyDiveTicketing.API.Controllers.Reservation
 {
@@ -129,6 +130,21 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
                 return BadRequest(e.Message);
             }
             catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("UserTickets/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetMyTickets(Guid id, [FromQuery] PageQuery pageQuery, TicketStatus? status)
+        {
+            try
+            {
+                var tickets = await _reservationService.GetUserTickets(id, status);
+                return OkResult("بلیت های کاربر.", tickets.ToPagingAndSorting(pageQuery), tickets.Count());
+            }
+            catch (ManagedException e)
             {
                 return BadRequest(e.Message);
             }

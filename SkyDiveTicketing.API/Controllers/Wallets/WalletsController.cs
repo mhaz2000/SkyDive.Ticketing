@@ -33,6 +33,22 @@ namespace SkyDiveTicketing.API.Controllers.Wallets
             }
         }
 
+
+        [HttpGet("UserWallet/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserWallet(Guid userId)
+        {
+            try
+            {
+                var wallet = await _walletService.GetUserWallet(userId);
+                return OkResult("کیف پول کاربر", wallet);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> ChargeUserWallet(ChargeUserWalletCommand command)

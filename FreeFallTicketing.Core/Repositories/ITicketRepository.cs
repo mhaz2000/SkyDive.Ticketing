@@ -10,5 +10,6 @@ namespace SkyDiveTicketing.Core.Repositories
         Task SetAsCancelled(Ticket ticket);
         void SetAsPaid(Ticket ticket, double amount, User user, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate, User paidBy);
         void Unlock(Ticket ticket);
+        IEnumerable<CancelledTicket> GetCancelledTickets();
     }
 }

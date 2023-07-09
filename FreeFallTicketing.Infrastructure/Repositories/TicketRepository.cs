@@ -35,6 +35,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             ticket.RelatedAdminCartableRequest = null;
         }
 
+        public IEnumerable<CancelledTicket> GetCancelledTickets()
+        {
+           return Context.CancelledTickets.Include(c => c.ReservedBy).Include(c => c.PaidBy);
+        }
+
         public void ReserveTicket(Ticket ticket, User user)
         {
             ticket.SetAsLock(user);
@@ -68,5 +73,6 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             ticket.ReserveTime = null;
             ticket.SetAsUnLock();
         }
+
     }
 }
