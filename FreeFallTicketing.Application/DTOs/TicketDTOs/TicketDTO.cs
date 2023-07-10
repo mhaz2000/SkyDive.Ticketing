@@ -1,4 +1,7 @@
-﻿namespace SkyDiveTicketing.Application.DTOs.TicketDTOs
+﻿using SkyDiveTicketing.Application.Helpers;
+using System.ComponentModel;
+
+namespace SkyDiveTicketing.Application.DTOs.TicketDTOs
 {
     public class MyTicketDTO : BaseDTO<Guid>
     {
@@ -28,12 +31,16 @@
         public Guid SkyDiveEventId { get; set; }
         public int SkyDiveEventNumber { get; set; }
         public TicketStatus TicketStatus { get; set; }
+        public string TicketStatusDisplay => TicketStatus.GetDescription();
     }
 
     public enum TicketStatus
     {
-        Hold,
+        [Description("برگزار شده")]
+        Held,
+        [Description("لغو شده")]
         Cancelled,
+        [Description("رزرو شده")]
         Reserved
     }
 }

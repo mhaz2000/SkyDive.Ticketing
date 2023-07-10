@@ -54,7 +54,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             return (true, string.Empty);
         }
 
-        public async Task<IEnumerable<MyTicketDTO>> GetUserTickets(Guid userId, TicketStatus? status = null)
+        public async Task<IEnumerable<MyTicketDTO>> GetUserTickets(Guid userId, string? statuses = null)
         {
             var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
             if (user is null)
@@ -69,7 +69,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
                 myTickets.Add(new MyTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, ticket.FlightDate!.Value,
                     ticket.FlightNumber!.Value.ToString("000"), skyDiveEvent.Location, ticket.TicketType!, skyDiveEvent.TermsAndConditions!,
-                    skyDiveEvent.Voidable, skyDiveEvent.Id, skyDiveEvent.Code, skyDiveEvent.StartDate>= DateTime.Now ? TicketStatus.Hold : TicketStatus.Reserved));
+                    skyDiveEvent.Voidable, skyDiveEvent.Id, skyDiveEvent.Code, skyDiveEvent.StartDate >= DateTime.Now ? TicketStatus.Held : TicketStatus.Reserved));
             }
 
             var cancelledTickets = _unitOfWork.TicketRepository.GetCancelledTickets().Where(c => c.ReservedBy == user);
@@ -82,8 +82,19 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     skyDiveEvent.Voidable, skyDiveEvent.Id, skyDiveEvent.Code, TicketStatus.Cancelled));
             }
 
-            if (status is not null)
-                myTickets = myTickets.Where(c => c.TicketStatus == status).ToList();
+            if (statuses is not null)
+            {
+                List<TicketStatus> ticketStatuses= new List<TicketStatus>();
+                statuses.Split("|").ToList().ForEach(status =>
+                {
+                    if(Enum.TryParse(status, out TicketStatus ticketStatus))
+                        ticketStatuses.Add(ticketStatus);
+                    else
+                        throw new ManagedException("فیلتر معتبر نیست.");
+                });
+
+                myTickets = myTickets.Where(c => ticketStatuses.Contains(c.TicketStatus)).ToList();
+            }
 
             return myTickets;
         }
@@ -324,7 +335,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     new ShoppingCartItemDTO(data?.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)?.FlightLoad.Number ?? 0,
                     shoppingCartItem.ReservedFor.Code, shoppingCartItem.FlightLoadItem.FlightLoadType.Title,
                     shoppingCart.SkyDiveEvent?.TypesAmount?.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType)?.Amount ?? 0,
-                    shoppingCart.SkyDiveEvent.SubjecToVAT, data.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem).FlightLoad.Id
+                    shoppingCart.SkyDiveEvent!.SubjecToVAT, data!.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)!.FlightLoad.Id
                     , shoppingCartItem.FlightLoadItem.FlightLoadType.Id)).ToList()
             };
 

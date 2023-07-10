@@ -185,12 +185,26 @@ namespace SkyDiveTicketing.API.Controllers.Users
         }
 
         [HttpGet("AdminCartableMessages")]
-        public IActionResult GetAdminCartableMessages([FromQuery] PageQuery pageQuery, RequestType? requestType)
+        public IActionResult GetAdminCartableMessages([FromQuery] PageQuery pageQuery, RequestType? requestType, string? search)
         {
             try
             {
-                var messages = _adminCartableService.GetAdminCartableMessages(requestType);
+                var messages = _adminCartableService.GetAdminCartableMessages(requestType, search);
                 return OkResult("کارتابل رسیدگی ادمین", messages.ToPagingAndSorting(pageQuery), messages.Count());
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("RemoveFromCartable/{id}")]
+        public async Task<IActionResult> GetAdminCartableMessages(Guid id)
+        {
+            try
+            {
+                await _adminCartableService.RemoveMessageFromCartable(id);
+                return OkResult("عملیات حذف با موفقیت انجام شد.");
             }
             catch (ManagedException e)
             {

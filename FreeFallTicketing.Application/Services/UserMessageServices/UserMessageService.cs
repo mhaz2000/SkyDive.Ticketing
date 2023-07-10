@@ -28,7 +28,8 @@ namespace SkyDiveTicketing.Application.Services.UserMessageServices
                 await _unitOfWork.MessageRepository.GetAllAsync() :
                 await _unitOfWork.MessageRepository.FindAsync(c => c.UserId == userId);
 
-            return messages.Select(message => new UserMessageDTO(message.Id, message.CreatedAt, message.UpdatedAt, message.Text, message.Visited, message.Title));
+            return messages.OrderByDescending(c => c.CreatedAt)
+                .Select(message => new UserMessageDTO(message.Id, message.CreatedAt, message.UpdatedAt, message.Text, message.Visited, message.Title));
         }
 
         public async Task MessageHasBeenSeen(Guid id)

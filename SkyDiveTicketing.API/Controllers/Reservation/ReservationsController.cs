@@ -137,11 +137,11 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
 
         [HttpGet("UserTickets/{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetMyTickets(Guid id, [FromQuery] PageQuery pageQuery, TicketStatus? status)
+        public async Task<IActionResult> GetMyTickets(Guid id, [FromQuery] PageQuery pageQuery, string? statuses)
         {
             try
             {
-                var tickets = await _reservationService.GetUserTickets(id, status);
+                var tickets = await _reservationService.GetUserTickets(id, statuses);
                 return OkResult("بلیت های کاربر.", tickets.ToPagingAndSorting(pageQuery), tickets.Count());
             }
             catch (ManagedException e)
