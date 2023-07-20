@@ -129,6 +129,10 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             var wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, c => c.User);
 
             double payableAmount = await ReservationProcess(shoppingCart, user);
+            if (wallet.Balance < payableAmount)
+                throw new ManagedException("موجودی کیف پول شما کافی نیست.");
+            
+            _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, payableAmount * (-1));
 
             return true;
         }
