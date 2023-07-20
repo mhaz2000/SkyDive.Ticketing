@@ -327,7 +327,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 throw new ManagedException("کاربر یافت نشد.");
 
             var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetUserShoppingCart(user);
-            if (shoppingCart is null)
+            if (shoppingCart is null || !shoppingCart.Items.Any())
                 throw new ManagedException("سبد خرید شما خالی است.");
 
             var data = await _unitOfWork.SkyDiveEventRepository.GetExpandedSkyDiveEvent(shoppingCart.SkyDiveEvent.Id);
