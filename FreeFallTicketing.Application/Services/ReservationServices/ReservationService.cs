@@ -112,6 +112,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             //check if paid
 
             await ReservationProcess(shoppingCart, user);
+            await _unitOfWork.CommitAsync();
 
             return true;
         }
@@ -133,6 +134,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 throw new ManagedException("موجودی کیف پول شما کافی نیست.");
             
             _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, payableAmount * (-1));
+            await _unitOfWork.CommitAsync();
 
             return true;
         }
@@ -390,7 +392,6 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             }
 
             await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
-            await _unitOfWork.CommitAsync();
 
             return payableAmount;
         }
