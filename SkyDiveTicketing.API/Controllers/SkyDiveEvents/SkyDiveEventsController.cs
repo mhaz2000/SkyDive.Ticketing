@@ -6,8 +6,6 @@ using SkyDiveTicketing.API.Extensions;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Commands.SkyDiveEventCommands;
 using SkyDiveTicketing.Application.Services.SkyDiveEventServices;
-using System.Data;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
 {
@@ -288,7 +286,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
                 var min = start?.ToDateTime();
                 var max = end?.ToDateTime();
 
-                var events = _skyDiveEventService.GetEvents(statusId, min, max);
+                var events = _skyDiveEventService.GetEvents(statusId, min, max, UserId);
                 return OkResult("اطلاعات رویداد ها.", events.ToPagingAndSorting(page), events.Count());
             }
             catch (ManagedException e)

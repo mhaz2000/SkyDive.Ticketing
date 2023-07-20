@@ -134,5 +134,25 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPut("UnAssignTicketType")]
+        public async Task<IActionResult> UnAssignTicketType(UnAssignTicketTypeCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _userTypeService.UnAssignTicketType(command);
+                return OkResult("دسترسی رزور بلیط برای این نوع کاربری بروزرسانی شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

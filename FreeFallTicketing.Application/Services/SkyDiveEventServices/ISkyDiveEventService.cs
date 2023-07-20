@@ -9,7 +9,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
     {
         Task Create(SkyDiveEventCommand command);
         Task<SkyDiveEventDTO> GetEvent(Guid id);
-        IEnumerable<SkyDiveEventDTO> GetEvents(Guid? statusId, DateTime? start, DateTime? end);
+        IEnumerable<SkyDiveEventDTO> GetEvents(Guid? statusId, DateTime? start, DateTime? end, Guid userId);
         Task Remove(Guid id);
         Task Update(SkyDiveEventCommand command, Guid id);
         Task ToggleActivationEvent(Guid id);

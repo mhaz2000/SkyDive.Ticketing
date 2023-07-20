@@ -11,5 +11,6 @@ namespace SkyDiveTicketing.Application.Services.UserTypeServices
         Task<UserTypeDTO> GetUserType(Guid id);
         Task Remove(Guid id);
         Task Update(UserTypeCommand command, Guid id);
+        Task UnAssignTicketType(UnAssignTicketTypeCommand command);
     }
 }

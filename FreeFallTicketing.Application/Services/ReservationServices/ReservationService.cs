@@ -84,10 +84,10 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             if (statuses is not null)
             {
-                List<TicketStatus> ticketStatuses= new List<TicketStatus>();
+                List<TicketStatus> ticketStatuses = new List<TicketStatus>();
                 statuses.Split("|").ToList().ForEach(status =>
                 {
-                    if(Enum.TryParse(status, out TicketStatus ticketStatus))
+                    if (Enum.TryParse(status, out TicketStatus ticketStatus))
                         ticketStatuses.Add(ticketStatus);
                     else
                         throw new ManagedException("فیلتر معتبر نیست.");
@@ -111,29 +111,28 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             //check if paid
 
-            int? number = null;
-            foreach (var shoppingCartItem in shoppingCart.Items)
-            {
-                var ticket = shoppingCartItem.FlightLoadItem.Tickets.FirstOrDefault(c => !c.Paid && !c.ReservedByAdmin && (!c.Locked || c.LockedBy == user));
-                if (ticket is null)
-                    throw new ManagedException("بلیت مورد نظر یافت نشد.");
-
-                var ticketAmount = shoppingCart.SkyDiveEvent!.TypesAmount.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType)!.Amount;
-                var flightLoad = await _unitOfWork.FlightLoadRepository.GetFlightLoadByItem(shoppingCartItem.FlightLoadItem);
-
-                _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketAmount, shoppingCartItem.ReservedFor,
-                    shoppingCart.SkyDiveEvent.Id, flightLoad!.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
-
-                number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
-                    shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "", ticketAmount, TransactionType.Confirmed, user, number);
-            }
-
-            await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
-            await _unitOfWork.CommitAsync();
+            await ReservationProcess(shoppingCart, user);
 
             return true;
-
         }
+
+        public async Task<bool> SetAsPaidByWallet(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            var shoppingCart = await _unitOfWork.ShoppingCartRepository.GetUserShoppingCart(user);
+            if (shoppingCart is null)
+                throw new ManagedException("سبد خرید شما خالی است.");
+
+            var wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, c => c.User);
+
+            double payableAmount = await ReservationProcess(shoppingCart, user);
+
+            return true;
+        }
+
 
         public async Task UnlockTickets()
         {
@@ -203,7 +202,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                             errors.Add($"نوع کاربری با شماره کد {item.UserCode} مجاز به رزرو بلیت های نوع '{ticketType.Title}' نیست.");
 
                         if (otherUser.Status != UserStatus.Active)
-                            errors.Add($"وضعیت حساب کاربری با کد {item.UserCode} تایید نشده است و امکان روزر بلیت وجود ندارد.");
+                            errors.Add($"وضعیت حساب کاربری با کد {item.UserCode} تایید نشده است و امکان رزرو بلیت وجود ندارد.");
                     }
                     else
                     {
@@ -211,7 +210,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                             errors.Add($"نوع کاربری شما مجاز به رزرو بلیت های نوع '{ticketType.Title}' نیست.");
 
                         if (user.Status != UserStatus.Active)
-                            errors.Add($"وضعیت حساب کاربری شما تایید نشده است و امکان روزر بلیت وجود ندارد.");
+                            errors.Add($"وضعیت حساب کاربری شما تایید نشده است و امکان رزرو بلیت وجود ندارد.");
                     }
 
                     SkyDiveEventItem skyDiveEventItem = null;
@@ -233,7 +232,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                         throw new ManagedException("رویدادی پیدا نشد.");
 
                     if (!skyDiveEvent.IsActive || !skyDiveEvent.Status.Reservable)
-                        throw new ManagedException("بلیت های این رویداد قابل روزر نیست.");
+                        throw new ManagedException("بلیت های این رویداد قابل رزرو نیست.");
 
                     var flightLoad = skyDiveEventItem.FlightLoads.FirstOrDefault(c => c.Id == item.FlightLoadId);
                     var flightLoadItem = flightLoad.FlightLoadItems.FirstOrDefault(c => c.FlightLoadType.Id == item.TicketTypeId);
@@ -343,7 +342,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             shoppingCartDto.TotalAmount = shoppingCartDto.Items.Sum(s => s.Amount);
 
-            shoppingCartDto.TaxAmount = shoppingCart.SkyDiveEvent.SubjecToVAT ? Math.Round(settings.VAT * shoppingCartDto.TotalAmount) : 0;
+            shoppingCartDto.TaxAmount = shoppingCart.SkyDiveEvent.SubjecToVAT ? Math.Round((settings.VAT * shoppingCartDto.TotalAmount) / 100) : 0;
 
             return shoppingCartDto;
         }
@@ -356,6 +355,40 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             {
                 _unitOfWork.TicketRepository.Unlock(ticket);
             }
+        }
+
+        private async Task<double> ReservationProcess(ShoppingCart shoppingCart, User user)
+        {
+            var (status, errors) = await CheckTickets(user.Id);
+            if (!status)
+                throw new ManagedException(errors);
+
+            var settings = await _unitOfWork.SettingsRepository.FirstOrDefaultAsync(c => true);
+
+            int? number = null;
+            double payableAmount = 0;
+            foreach (var shoppingCartItem in shoppingCart.Items)
+            {
+                var ticket = shoppingCartItem.FlightLoadItem.Tickets.FirstOrDefault(c => !c.Paid && !c.ReservedByAdmin && (!c.Locked || c.LockedBy == user));
+                if (ticket is null)
+                    throw new ManagedException("بلیت مورد نظر یافت نشد.");
+
+                var ticketAmount = shoppingCart.SkyDiveEvent!.TypesAmount.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType)!.Amount;
+                payableAmount += ticketAmount + (shoppingCart.SkyDiveEvent.SubjecToVAT ? Math.Round((ticketAmount * settings.VAT) / 100) : 0);
+
+                var flightLoad = await _unitOfWork.FlightLoadRepository.GetFlightLoadByItem(shoppingCartItem.FlightLoadItem);
+
+                _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketAmount, shoppingCartItem.ReservedFor,
+                    shoppingCart.SkyDiveEvent.Id, flightLoad!.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
+
+                number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
+                    shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "", ticketAmount, TransactionType.Confirmed, user, number);
+            }
+
+            await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
+            await _unitOfWork.CommitAsync();
+
+            return payableAmount;
         }
     }
 }

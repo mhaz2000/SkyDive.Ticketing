@@ -45,10 +45,12 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id)));
         }
 
-        public IEnumerable<SkyDiveEventDTO> GetEvents(Guid? statusId, DateTime? start, DateTime? end)
+        public IEnumerable<SkyDiveEventDTO> GetEvents(Guid? statusId, DateTime? start, DateTime? end, Guid userId)
         {
+            var isAdmin = _unitOfWork.RoleRepository.GetAdminUsers().Contains(userId);
+            
             PersianCalendar pc = new PersianCalendar();
-            var events = _unitOfWork.SkyDiveEventRepository.FindEvents();
+            var events = _unitOfWork.SkyDiveEventRepository.FindEvents(c => isAdmin ? true : c.IsActive);
 
             if (statusId is not null)
                 events = events.Where(c => c.Status.Id == statusId);
@@ -316,7 +318,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
         public async Task RemoveFlights(Guid id)
         {
-            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetFirstWithIncludeAsync(c=> c.Items.Any(t=> t.Id == id), c=> c.Items);
+            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetFirstWithIncludeAsync(c => c.Items.Any(t => t.Id == id), c => c.Items);
             if (skyDiveEvent is null)
                 throw new ManagedException("رویداد مورد نظر یافت نشد.");
 
@@ -345,7 +347,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 throw new ManagedException("امکان حذف بلیت های رزرو شده وجود ندارد.");
 
             var flightLoadItem = await _unitOfWork.FlightLoadRepository.GetFlightItemByTicket(ticket);
-            if(flightLoadItem is null)
+            if (flightLoadItem is null)
                 throw new ManagedException("پرواز مرتبط با بلیت یافت نشد.");
 
             await _unitOfWork.FlightLoadRepository.RemoveTicket(flightLoadItem, ticket);

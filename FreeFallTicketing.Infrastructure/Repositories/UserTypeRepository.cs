@@ -14,7 +14,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public async Task AddTicketType(SkyDiveEventTicketType ticketType, UserType userType)
         {
-            if (!userType.AllowedTicketTypes.Any(c=> c.TicketTypeId == ticketType.Id))
+            if (!userType.AllowedTicketTypes.Any(c => c.TicketTypeId == ticketType.Id))
             {
                 var entity = new UserTypeTicketType()
                 {
@@ -38,7 +38,21 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public IQueryable<UserType> FindUserType()
         {
-            return Context.UserTypes.Include(c=>c.AllowedTicketTypes).ThenInclude(c=>c.TicketType);
+            return Context.UserTypes.Include(c => c.AllowedTicketTypes).ThenInclude(c => c.TicketType);
+        }
+
+        public async Task RemoveTicketType(SkyDiveEventTicketType ticketType, UserType userType)
+        {
+            if (userType.AllowedTicketTypes.Any(c => c.TicketTypeId == ticketType.Id))
+            {
+                var userTypeTicketType = await Context.UserTypeTicketTypes.FirstOrDefaultAsync(c => c.UserType == userType && c.TicketType == ticketType);
+                ArgumentNullException.ThrowIfNull(userTypeTicketType);
+
+                userType.AllowedTicketTypes.Remove(userTypeTicketType);
+                ticketType.AllowedUserTypes.Remove(userTypeTicketType);
+
+                Context.UserTypeTicketTypes.Remove(userTypeTicketType);
+            }
         }
 
         public void Update(UserType userType, string title)

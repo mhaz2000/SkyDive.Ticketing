@@ -86,10 +86,19 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
+        }
+
+        [HttpPut("SetAsPaidByWallet")]
+        public async Task<IActionResult> SetAsPaidByWallet()
+        {
+            try
             {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+                var result = await _reservationService.SetAsPaidByWallet(UserId);
+                return OkResult("پرداخت موفقیت آمیز بود.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
             }
         }
 
@@ -108,11 +117,6 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 

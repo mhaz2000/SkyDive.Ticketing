@@ -20,7 +20,7 @@ namespace SkyDiveTicketing.Application.Services.AdminCartableServices
             search = string.IsNullOrEmpty(search) ? string.Empty : search;
 
             return _unitOfWork.AdminCartableRepository
-                .GetAdminCartables(c => requestType == null ? true : c.RequestType == requestType && c.Applicant.FullName.Contains(search))
+                .GetAdminCartables(c => requestType == null ? true : c.RequestType == requestType).AsEnumerable().Where(c=> c.Applicant.FullName.Contains(search))
                 .OrderByDescending(c => c.CreatedAt)
                 .Select(cartable => new AdminCartableMessageDTO(cartable.Id, cartable.CreatedAt, cartable.UpdatedAt,
                     cartable.Title, cartable.Applicant.Id, cartable.Applicant.FullName, cartable.Done, cartable.RequestType, cartable.RequestType.GetDescription(),

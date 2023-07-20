@@ -32,6 +32,28 @@ namespace SkyDiveTicketing.Application.Services.UserTypeServices
             await _unitOfWork.CommitAsync();
         }
 
+        public async Task UnAssignTicketType(UnAssignTicketTypeCommand command)
+        {
+            var userType = await _unitOfWork.UserTypeRepository.GetFirstWithIncludeAsync(c => c.Id == command.UserTypeId, c => c.AllowedTicketTypes);
+            if (userType is null)
+                throw new ManagedException("نوع کاربری مورد نظر یافت نشد.");
+
+            var ticketType = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetByIdAsync(command.TicketTypeId);
+            if (ticketType is null)
+                throw new ManagedException("نوع بلیط یافت نشد.");
+
+            try
+            {
+                await _unitOfWork.UserTypeRepository.RemoveTicketType(ticketType, userType);
+            }
+            catch (ArgumentNullException)
+            {
+                throw new ManagedException("این نوع بلیت برای نوع کاربری مورد نظر وجود ندارد.");
+            }
+
+            await _unitOfWork.CommitAsync();
+        }
+
         public async Task Create(UserTypeCommand command)
         {
             var duplicateTitle = await _unitOfWork.UserTypeRepository.AnyAsync(c => c.Title == command.Title);
@@ -55,12 +77,12 @@ namespace SkyDiveTicketing.Application.Services.UserTypeServices
 
         public async Task<UserTypeDTO> GetUserType(Guid id)
         {
-            var userType = await _unitOfWork.UserTypeRepository.GetFirstWithIncludeAsync(c=> c.Id == id, c=> c.AllowedTicketTypes);
+            var userType = await _unitOfWork.UserTypeRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.AllowedTicketTypes);
             if (userType is null)
                 throw new ManagedException("نوع کاربری مورد نظر یافت نشد.");
 
             return new UserTypeDTO(userType.Title, userType.IsDefault, userType.Id, userType.CreatedAt, userType.UpdatedAt,
-                userType.AllowedTicketTypes.Select(allowedType => 
+                userType.AllowedTicketTypes.Select(allowedType =>
                     new UserTypeAllowedTicketTypeDTO(allowedType.TicketTypeId, allowedType.TicketType.CreatedAt, allowedType.TicketType.UpdatedAt, allowedType.TicketType.Title)));
         }
 
