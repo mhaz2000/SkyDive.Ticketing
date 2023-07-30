@@ -79,7 +79,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public IEnumerable<UserDTO> GetUsers(string search, DateTime? minDate, DateTime? maxDate, UserStatus? userStatus)
         {
             var users = _unitOfWork.UserRepository.Include(c => c.UserType)
-                 .Where(c => (c.UserName?.Contains(search) ?? false) || (c.FullName?.Contains(search) ?? false));
+                 .Where(c => (c.NationalCode?.Contains(search) ?? false) || (c.FullName?.Contains(search) ?? false));
 
             var adminUsers = _unitOfWork.RoleRepository.GetAdminUsers();
             users = users.Where(c => !adminUsers.Contains(c.Id));
@@ -91,7 +91,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 users = users.Where(c => c.Status == userStatus);
 
             return users.Select(user => new UserDTO(user.Id, user.UserName, user.PhoneNumber, user.Email, user.FirstName,
-                user.LastName, user.Status, user.Status.GetDescription(), user.Code, user.UserType?.Title, user.CreatedAt, user.UpdatedAt, user.NationalCode, user.BirthDate));
+                user.LastName, user.Status, user.Status.GetDescription(), user.Code, user.UserType?.Title, user.CreatedAt,
+                user.UpdatedAt, user.NationalCode, user.BirthDate));
         }
 
         public async Task<UserLoginDto> LoginUser(LoginCommand command, JwtIssuerOptionsModel jwtIssuerOptions)
@@ -355,7 +356,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task<UserPersonalInformationDTO> GetPersonalInformation(Guid userId)
         {
-            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId && c.Status != UserStatus.Inactive, c=> c.Passenger);
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId && c.Status != UserStatus.Inactive, c => c.Passenger);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 

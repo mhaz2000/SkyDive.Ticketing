@@ -26,10 +26,10 @@ namespace SkyDiveTicketing.Application.Services.SettingsServices
 
         public async Task Update(SettingsCommand command)
         {
-            await _unitOfWork.SettingsRepository.UpdateUrl(command.TermsAndConditionsUrl);
-            foreach (var item in command.UserStatusInfo)
+            await _unitOfWork.SettingsRepository.Update(command.TermsAndConditionsUrl!, command.FileSizeLimitation);
+            foreach (var item in command.UserStatusInfo!)
             {
-                await _unitOfWork.SettingsRepository.UpdateUserStatusInfo(item.Status, item.Description);
+                await _unitOfWork.SettingsRepository.UpdateUserStatusInfo(item.Status, item.Description!);
             }
             
             await _unitOfWork.CommitAsync();

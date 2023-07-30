@@ -29,6 +29,10 @@ namespace SkyDiveTicketing.Application.Services.FileServices
 
         public async Task<Guid> StoreFile(IFormFile file, string path)
         {
+            var settings = await _unitOfWork.SettingsRepository.FirstOrDefaultAsync(c => true);
+            if (settings.FileSizeLimitiation != 0 && file.Length > settings.FileSizeLimitiation * 1000)
+                throw new ManagedException($"حداکثر حجم فایل ارسالی {settings.FileSizeLimitiation} KB است.");
+
             var fileId = Guid.NewGuid();
             var dir = Path.Combine(path, $"{fileId}.dat");
 
