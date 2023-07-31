@@ -48,5 +48,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         Task AcceptingTermsAndConditions(Guid userId);
 
         Task<UserDetailDTO> GetUserDetail(Guid id);
+
+        Task UploadDocument(AdminUploadUserDocumentCommand command, Guid id);
     }
 }

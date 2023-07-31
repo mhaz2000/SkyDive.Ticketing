@@ -113,6 +113,26 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
+        [HttpPut("UploadDocument/{id}")]
+        public async Task<IActionResult> UploadDocument(AdminUploadUserDocumentCommand command, Guid id)
+        {
+            try
+            {
+                command.Validate();
+
+                await _userService.UploadDocument(command, id);
+                return OkResult("مدارک کاربر ویرایش شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpPut("UpdateUserPassword/{id}")]
         public async Task<IActionResult> UpdateUserPassword(Guid id, UserResetPasswordCommand command)
         {

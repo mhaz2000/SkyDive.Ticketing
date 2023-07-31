@@ -9,8 +9,6 @@ namespace SkyDiveTicketing.Application.Validators.WalletValidators
         {
             RuleFor(c => c.Amount).NotNull().WithMessage("مبلغ الزامی است.");
             RuleFor(c => c.UserId).NotNull().WithMessage("شناسه کاربر الزامی است.");
-
-            RuleFor(c => c.Amount).GreaterThan(0).WithMessage("مبلغ باید بزرگتر از صفر باشد.");
         }
     }
 }

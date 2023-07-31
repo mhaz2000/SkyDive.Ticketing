@@ -6,6 +6,8 @@ namespace SkyDiveTicketing.Application.Commands.UserCommands
     public class UserCheckPersonalInformationCommand : UserCommand
     {
         public bool IsConfirmed { get; set; }
+        public string Message { get; set; }
+
         public override void Validate()
         {
             base.Validate();
