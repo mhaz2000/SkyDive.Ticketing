@@ -329,8 +329,8 @@ namespace SkyDiveTicketing.API.Controllers.Users
             try
             {
                 var userDocuments = await _userService.GetUserDocuments(userId ?? UserId);
-                return OkResult("مدارک کاربر.", userDocuments, userDocuments.AttorneyDocuments.Count() + userDocuments.MedicalDocuments.Count() +
-                    userDocuments.NationalCardDocuments.Count() + userDocuments.LogBookDocuments.Count());
+                return OkResult("مدارک کاربر.", userDocuments, userDocuments.AttorneyDocuments?.Count() ?? 0 + userDocuments.MedicalDocuments?.Count() ?? 0 +
+                    userDocuments.NationalCardDocuments?.Count() ?? 0 + userDocuments.LogBookDocuments?.Count() ?? 0);
             }
             catch (ManagedException e)
             {

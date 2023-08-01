@@ -383,19 +383,19 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             return new UserDocumentsDTO(userId, user.CreatedAt, user.UpdatedAt)
             {
-                AttorneyDocuments = user.Passenger?.AttorneyDocumentFiles.Select(document =>
+                AttorneyDocuments = user.Passenger?.AttorneyDocumentFiles?.Select(document =>
                     new UserDocumentDetailDTO(document.Id, document.CreatedAt, document.UpdatedAt, document.FileId, document.ExpirationDate,
                     document.Status.GetDescription(), document.Status))!,
 
-                MedicalDocuments = user.Passenger?.MedicalDocumentFiles.Select(document =>
+                MedicalDocuments = user.Passenger?.MedicalDocumentFiles?.Select(document =>
                     new UserDocumentDetailDTO(document.Id, document.CreatedAt, document.UpdatedAt, document.FileId, document.ExpirationDate,
                     document.Status.GetDescription(), document.Status))!,
 
-                LogBookDocuments = user.Passenger?.LogBookDocumentFiles.Select(document =>
+                LogBookDocuments = user.Passenger?.LogBookDocumentFiles?.Select(document =>
                     new UserDocumentDetailDTO(document.Id, document.CreatedAt, document.UpdatedAt, document.FileId, document.ExpirationDate,
                     document.Status.GetDescription(), document.Status))!,
 
-                NationalCardDocuments = user.Passenger?.NationalCardDocumentFiles.Select(document =>
+                NationalCardDocuments = user.Passenger?.NationalCardDocumentFiles?.Select(document =>
                     new UserDocumentDetailDTO(document.Id, document.CreatedAt, document.UpdatedAt, document.FileId, document.ExpirationDate,
                     document.Status.GetDescription(), document.Status))!
             };
@@ -491,10 +491,10 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
-            var attorneyDocumentFile = user.Passenger.AttorneyDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
-            var medicalDocumentFile = user.Passenger.MedicalDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
-            var logBookDocumentFile = user.Passenger.LogBookDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
-            var nationalCardDocumentFile = user.Passenger.NationalCardDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+            var attorneyDocumentFile = user.Passenger.AttorneyDocumentFiles?.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+            var medicalDocumentFile = user.Passenger.MedicalDocumentFiles?.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+            var logBookDocumentFile = user.Passenger.LogBookDocumentFiles?.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+            var nationalCardDocumentFile = user.Passenger.NationalCardDocumentFiles?.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
 
             var documentsConfirmed = attorneyDocumentFile?.Status == DocumentStatus.Confirmed &&
                                      medicalDocumentFile?.Status == DocumentStatus.Confirmed &&
