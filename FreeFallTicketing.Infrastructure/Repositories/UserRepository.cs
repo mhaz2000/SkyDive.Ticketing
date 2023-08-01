@@ -133,10 +133,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public IQueryable<User> GetAllWithIncludes(Expression<Func<User, bool>> predicate)
         {
             return Context.Users
-                .Include(c => c.Passenger).ThenInclude(c => c.NationalCardDocumentFile)
-                .Include(c => c.Passenger).ThenInclude(c => c.AttorneyDocumentFile)
-                .Include(c => c.Passenger).ThenInclude(c => c.MedicalDocumentFile)
-                .Include(c => c.Passenger).ThenInclude(c => c.LogBookDocumentFile)
+                .Include(c => c.Passenger).ThenInclude(c => c.NationalCardDocumentFiles)
+                .Include(c => c.Passenger).ThenInclude(c => c.AttorneyDocumentFiles)
+                .Include(c => c.Passenger).ThenInclude(c => c.MedicalDocumentFiles)
+                .Include(c => c.Passenger).ThenInclude(c => c.LogBookDocumentFiles)
                 .Where(predicate);
         }
 
@@ -254,7 +254,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public async Task<User?> GetUserWithInclude(Expression<Func<User, bool>> filter)
         {
             return await Context.Users
-                .Include(c => c.Passenger)
+                .Include(c => c.Passenger).ThenInclude(c => c.NationalCardDocumentFiles)
+                .Include(c => c.Passenger).ThenInclude(c => c.AttorneyDocumentFiles)
+                .Include(c => c.Passenger).ThenInclude(c => c.MedicalDocumentFiles)
+                .Include(c => c.Passenger).ThenInclude(c => c.LogBookDocumentFiles)
                 .Include(c => c.UserType)
                 .ThenInclude(c => c!.AllowedTicketTypes).ThenInclude(c => c.TicketType).FirstOrDefaultAsync(filter);
         }

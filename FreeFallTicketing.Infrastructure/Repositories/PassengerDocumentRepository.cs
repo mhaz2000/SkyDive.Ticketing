@@ -17,13 +17,13 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             var documents = Context.MedicalDocuments.Where(c => c.ExpirationDate != null && c.ExpirationDate < DateTime.Now);
             var users = Context.Users
                 .Include(c => c.Messages)
-                .Include(c => c.Passenger).ThenInclude(c => c.MedicalDocumentFile);
+                .Include(c => c.Passenger).ThenInclude(c => c.MedicalDocumentFiles);
 
             foreach (var document in documents)
             {
                 document.SetStatus(DocumentStatus.Expired);
 
-                var user = await users.FirstOrDefaultAsync(c => c.Passenger.MedicalDocumentFile == document);
+                var user = await users.FirstOrDefaultAsync(c => c.Passenger.MedicalDocumentFiles.Any(file => file == document && file.Status == DocumentStatus.Confirmed));
                 if (user is not null)
                 {
                     user.Status = UserStatus.Pending;
@@ -44,12 +44,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             var documents = Context.AttorneyDocuments.Where(c => c.ExpirationDate != null && c.ExpirationDate < DateTime.Now);
             var users = Context.Users
                 .Include(c => c.Messages)
-                .Include(c => c.Passenger).ThenInclude(c => c.AttorneyDocumentFile);
+                .Include(c => c.Passenger).ThenInclude(c => c.AttorneyDocumentFiles);
 
             foreach (var document in documents)
             {
+                var user = await users.FirstOrDefaultAsync(c => c.Passenger.AttorneyDocumentFiles.Any(file => file == document && file.Status == DocumentStatus.Confirmed));
                 document.SetStatus(DocumentStatus.Expired);
-                var user = await users.FirstOrDefaultAsync(c => c.Passenger.AttorneyDocumentFile == document);
                 if (user is not null)
                 {
                     user.Status = UserStatus.Pending;

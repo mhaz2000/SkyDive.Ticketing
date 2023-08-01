@@ -20,10 +20,10 @@ namespace SkyDiveTicketing.Core.Entities
             EmergencyPhone = emergencyPhone;
             EmergencyContact = emergencyContact;
             CustomFields = new List<UserCustomField>();
-            MedicalDocumentFile = new MedicalDocument();
-            LogBookDocumentFile = new LogBookDocument();
-            AttorneyDocumentFile = new AttorneyDocument();
-            NationalCardDocumentFile = new NationalCardDocument();
+            MedicalDocumentFiles = new List<MedicalDocument>();
+            LogBookDocumentFiles = new List<LogBookDocument>();
+            AttorneyDocumentFiles = new List<AttorneyDocument>();
+            NationalCardDocumentFiles = new List<NationalCardDocument>();
         }
 
 
@@ -70,26 +70,21 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// فایل سند پزشکی
         /// </summary>
-        public MedicalDocument? MedicalDocumentFile { get; set; }
+        public ICollection<MedicalDocument> MedicalDocumentFiles { get; set; }
 
         /// <summary>
         /// سند لاگ بوک
         /// </summary>
-        public LogBookDocument? LogBookDocumentFile { get; set; }
+        public ICollection<LogBookDocument> LogBookDocumentFiles { get; set; }
 
         /// <summary>
         /// سند وکالت نامه محضری
         /// </summary>
-        public AttorneyDocument? AttorneyDocumentFile { get; set; }
+        public ICollection<AttorneyDocument> AttorneyDocumentFiles { get; set; }
 
         /// <summary>
         /// فایل کارت ملی
         /// </summary>
-        public NationalCardDocument? NationalCardDocumentFile { get; set; }
-
-        public Guid? MedicalDocumentFileId { get; set; }
-        public Guid? LogBookDocumentFileId { get; set; }
-        public Guid? AttorneyDocumentFileId { get; set; }
-        public Guid? NationalCardDocumentFileId { get; set; }
+        public ICollection<NationalCardDocument> NationalCardDocumentFiles { get; set; }
     }
 }

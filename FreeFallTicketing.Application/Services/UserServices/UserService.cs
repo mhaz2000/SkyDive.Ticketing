@@ -28,10 +28,10 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public async Task CompeleteUserPersonalInformation(UserPersonalInformationCompletionCommand command, bool registration)
         {
             Expression<Func<User, object>>[] includeExpressions = {
-                c => c.Passenger!.AttorneyDocumentFile!,
-                c => c.Passenger!.NationalCardDocumentFile!,
-                c => c.Passenger!.LogBookDocumentFile!,
-                c => c.Passenger!.MedicalDocumentFile!,
+                c => c.Passenger!.AttorneyDocumentFiles,
+                c => c.Passenger!.NationalCardDocumentFiles,
+                c => c.Passenger!.LogBookDocumentFiles,
+                c => c.Passenger!.MedicalDocumentFiles,
                 c => c.Messages!
             };
 
@@ -370,11 +370,11 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public async Task<UserDocumentsDTO> GetUserDocuments(Guid userId)
         {
             Expression<Func<User, object>>[] includeExpressions = {
-                c=> c.Passenger,
-                c => c.Passenger.AttorneyDocumentFile,
-                c => c.Passenger.NationalCardDocumentFile,
-                c=> c.Passenger.LogBookDocumentFile,
-                c=> c.Passenger.MedicalDocumentFile
+                c=> c.Passenger!,
+                c => c.Passenger!.AttorneyDocumentFiles,
+                c => c.Passenger!.NationalCardDocumentFiles,
+                c=> c.Passenger!.LogBookDocumentFiles,
+                c=> c.Passenger!.MedicalDocumentFiles
             };
 
             var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == userId && c.Status != UserStatus.Inactive, includeExpressions);
@@ -383,25 +383,21 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             return new UserDocumentsDTO(userId, user.CreatedAt, user.UpdatedAt)
             {
-                AttorneyDocument = user.Passenger?.AttorneyDocumentFile is not null ?
-                    new UserDocumentDetailDTO(user.Passenger.AttorneyDocumentFile.Id, user.Passenger.AttorneyDocumentFile.CreatedAt, user.Passenger.AttorneyDocumentFile.UpdatedAt,
-                    user.Passenger.AttorneyDocumentFile.FileId, user.Passenger.AttorneyDocumentFile.ExpirationDate, user.Passenger.AttorneyDocumentFile.Status.GetDescription(),
-                    user.Passenger.AttorneyDocumentFile.Status) : null,
+                AttorneyDocuments = user.Passenger?.AttorneyDocumentFiles.Select(document =>
+                    new UserDocumentDetailDTO(document.Id, document.CreatedAt, document.UpdatedAt, document.FileId, document.ExpirationDate,
+                    document.Status.GetDescription(), document.Status))!,
 
-                MedicalDocument = user.Passenger?.MedicalDocumentFile is not null ?
-                    new UserDocumentDetailDTO(user.Passenger.MedicalDocumentFile.Id, user.Passenger.MedicalDocumentFile.CreatedAt, user.Passenger.MedicalDocumentFile.UpdatedAt,
-                    user.Passenger.MedicalDocumentFile.FileId, user.Passenger.MedicalDocumentFile.ExpirationDate, user.Passenger.MedicalDocumentFile.Status.GetDescription(),
-                    user.Passenger.MedicalDocumentFile.Status) : null,
+                MedicalDocuments = user.Passenger?.MedicalDocumentFiles.Select(document =>
+                    new UserDocumentDetailDTO(document.Id, document.CreatedAt, document.UpdatedAt, document.FileId, document.ExpirationDate,
+                    document.Status.GetDescription(), document.Status))!,
 
-                LogBookDocument = user.Passenger?.LogBookDocumentFile is not null ?
-                    new UserDocumentDetailDTO(user.Passenger.LogBookDocumentFile.Id, user.Passenger.LogBookDocumentFile.CreatedAt, user.Passenger.LogBookDocumentFile.UpdatedAt,
-                    user.Passenger.LogBookDocumentFile.FileId, user.Passenger.LogBookDocumentFile.ExpirationDate, user.Passenger.LogBookDocumentFile.Status.GetDescription(),
-                    user.Passenger.LogBookDocumentFile.Status) : null,
+                LogBookDocuments = user.Passenger?.LogBookDocumentFiles.Select(document =>
+                    new UserDocumentDetailDTO(document.Id, document.CreatedAt, document.UpdatedAt, document.FileId, document.ExpirationDate,
+                    document.Status.GetDescription(), document.Status))!,
 
-                NationalCardDocument = user.Passenger?.NationalCardDocumentFile is not null ?
-                    new UserDocumentDetailDTO(user.Passenger.NationalCardDocumentFile.Id, user.Passenger.NationalCardDocumentFile.CreatedAt, user.Passenger.NationalCardDocumentFile.UpdatedAt,
-                    user.Passenger.NationalCardDocumentFile.FileId, user.Passenger.NationalCardDocumentFile.ExpirationDate, user.Passenger.NationalCardDocumentFile.Status.GetDescription(),
-                    user.Passenger.NationalCardDocumentFile.Status) : null
+                NationalCardDocuments = user.Passenger?.NationalCardDocumentFiles.Select(document =>
+                    new UserDocumentDetailDTO(document.Id, document.CreatedAt, document.UpdatedAt, document.FileId, document.ExpirationDate,
+                    document.Status.GetDescription(), document.Status))!
             };
         }
 
@@ -411,38 +407,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-        }
-
-        private void UploadDocument(User user, UploadDocumentDetailCommand? medicalDocument, UploadDocumentDetailCommand? logBookDocument,
-            UploadDocumentDetailCommand? attorneyDocument, UploadDocumentDetailCommand? nationalCardDocument)
-        {
-            if (nationalCardDocument is not null && nationalCardDocument.FileId is not null)
-                _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, nationalCardDocument.FileId.Value);
-
-            if (attorneyDocument is not null && attorneyDocument.FileId is not null)
-            {
-                if (attorneyDocument.ExpirationDate is null)
-                    throw new ManagedException("تاریخ انقضای وکالتنامه محضری الزامی است.");
-
-                _unitOfWork.PassengerRepository.AddAttorneyDocument(user.Passenger, attorneyDocument.FileId.Value, attorneyDocument.ExpirationDate);
-            }
-
-            if (logBookDocument is not null && logBookDocument.FileId is not null)
-                _unitOfWork.PassengerRepository.AddLogBookDocument(user.Passenger, logBookDocument.FileId.Value);
-
-            if (medicalDocument is not null)
-            {
-                if (medicalDocument.ExpirationDate is null)
-                    throw new ManagedException("تاریخ انقضای مدارک پزشکی الزامی است.");
-
-                _unitOfWork.PassengerRepository.AddMedicalDocument(user.Passenger, medicalDocument.FileId.Value, medicalDocument.ExpirationDate);
-            }
-        }
-
-        private async Task OtherPersonalInformation(User user, UserPersonalInformationCompletionCommand command)
-        {
-            _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, command.CityAndState, command.Address ?? string.Empty,
-                command.EmergencyContact ?? string.Empty, command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
         }
 
         public async Task CreateUser(AdminUserCommand command)
@@ -527,10 +491,20 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
+            var attorneyDocumentFile = user.Passenger.AttorneyDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+            var medicalDocumentFile = user.Passenger.MedicalDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+            var logBookDocumentFile = user.Passenger.LogBookDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+            var nationalCardDocumentFile = user.Passenger.NationalCardDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+
+            var documentsConfirmed = attorneyDocumentFile?.Status == DocumentStatus.Confirmed &&
+                                     medicalDocumentFile?.Status == DocumentStatus.Confirmed &&
+                                     logBookDocumentFile?.Status == DocumentStatus.Confirmed &&
+                                     nationalCardDocumentFile.Status == DocumentStatus.Confirmed;
+
             return new UserDetailDTO(id, user.CreatedAt, user.UpdatedAt, user.UserName, user.FirstName!, user.LastName, user.UserType!.Title, user.UserType.Id,
                 user.NationalCode!, user.BirthDate, user.Passenger?.CityAndState!, user.Passenger?.Address!,
                 user.Code, user.Email, user.PhoneNumber, user.Passenger?.Height, user.Passenger?.Weight, user.Status, user.Status.GetDescription(),
-                user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone);
+                user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone, documentsConfirmed);
         }
 
         private string FixingPhoneNumber(string phoneNumber)
@@ -549,10 +523,10 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         public async Task UploadDocument(AdminUploadUserDocumentCommand command, Guid id)
         {
             Expression<Func<User, object>>[] includeExpressions = {
-                c => c.Passenger!.AttorneyDocumentFile!,
-                c => c.Passenger!.NationalCardDocumentFile!,
-                c => c.Passenger!.LogBookDocumentFile!,
-                c => c.Passenger!.MedicalDocumentFile!,
+                c => c.Passenger!.AttorneyDocumentFiles,
+                c => c.Passenger!.NationalCardDocumentFiles,
+                c => c.Passenger!.LogBookDocumentFiles,
+                c => c.Passenger!.MedicalDocumentFiles,
                 c => c.Messages!
             };
 
@@ -563,6 +537,40 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             UploadDocument(user, command.MedicalDocument, command.LogBookDocument, command.AttorneyDocument, command.NationalCardDocument);
 
             await _unitOfWork.CommitAsync();
+        }
+
+        private async Task UploadDocument(User user, UploadDocumentDetailCommand? medicalDocument, UploadDocumentDetailCommand? logBookDocument,
+            UploadDocumentDetailCommand? attorneyDocument, UploadDocumentDetailCommand? nationalCardDocument)
+        {
+            if (nationalCardDocument is not null && nationalCardDocument.FileId is not null)
+                await _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, nationalCardDocument.FileId.Value);
+
+            if (attorneyDocument is not null && attorneyDocument.FileId is not null)
+            {
+                if (attorneyDocument.ExpirationDate is null)
+                    throw new ManagedException("تاریخ انقضای وکالتنامه محضری الزامی است.");
+
+                await _unitOfWork.PassengerRepository.AddAttorneyDocumentAsync(user.Passenger, attorneyDocument.FileId.Value, attorneyDocument.ExpirationDate);
+            }
+
+            if (logBookDocument is not null && logBookDocument.FileId is not null)
+                await _unitOfWork.PassengerRepository.AddLogBookDocumentAsync(user.Passenger, logBookDocument.FileId.Value);
+
+            if (medicalDocument is not null)
+            {
+                if (medicalDocument.ExpirationDate is null)
+                    throw new ManagedException("تاریخ انقضای مدارک پزشکی الزامی است.");
+
+                await _unitOfWork.PassengerRepository.AddMedicalDocumentAsync(user.Passenger, medicalDocument.FileId.Value, medicalDocument.ExpirationDate);
+            }
+        }
+
+        private async Task OtherPersonalInformation(User user, UserPersonalInformationCompletionCommand command)
+        {
+            _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, command.CityAndState, command.Address ?? string.Empty,
+                command.EmergencyContact ?? string.Empty, command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
+
+            await Task.CompletedTask;
         }
     }
 }

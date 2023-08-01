@@ -38,16 +38,16 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
                 nationalCardDocument?.SetStatus(DocumentStatus.NotLoaded);
             }
 
-            var user = _unitOfWork.UserRepository.GetAllWithIncludes(c => c.Passenger.NationalCardDocumentFile.Id == documentId ||
-            c.Passenger.AttorneyDocumentFile.Id == documentId ||
-            c.Passenger.MedicalDocumentFile.Id == documentId ||
-            c.Passenger.LogBookDocumentFile.Id == documentId).FirstOrDefault();
+            var user = _unitOfWork.UserRepository.GetAllWithIncludes(c => c.Passenger!.NationalCardDocumentFiles.Any(c => c.Id == documentId) ||
+            c.Passenger.AttorneyDocumentFiles.Any(c => c.Id == documentId) ||
+            c.Passenger.MedicalDocumentFiles.Any(c=> c.Id == documentId) ||
+            c.Passenger.LogBookDocumentFiles.Any(c=> c.Id == documentId)).FirstOrDefault();
 
             var activeCondition = user is not null &&
-                user.Passenger.AttorneyDocumentFile.Status == DocumentStatus.Confirmed &&
-                user.Passenger.MedicalDocumentFile.Status == DocumentStatus.Confirmed &&
-                user.Passenger.LogBookDocumentFile.Status == DocumentStatus.Confirmed &&
-                user.Passenger.NationalCardDocumentFile.Status == DocumentStatus.Confirmed;
+                user.Passenger.AttorneyDocumentFiles.OrderByDescending(c=>c.CreatedAt).FirstOrDefault()?.Status == DocumentStatus.Confirmed &&
+                user.Passenger.MedicalDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault()?.Status == DocumentStatus.Confirmed &&
+                user.Passenger.LogBookDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault()?.Status == DocumentStatus.Confirmed &&
+                user.Passenger.NationalCardDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault()?.Status == DocumentStatus.Confirmed;
 
             if (activeCondition)
             {

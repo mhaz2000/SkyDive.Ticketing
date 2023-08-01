@@ -66,26 +66,6 @@ namespace SkyDiveTicketing.Infrastructure.Data
 
             #endregion
 
-            modelBuilder.Entity<Passenger>()
-                .HasOne(p => p.MedicalDocumentFile)
-                .WithOne()
-                .HasForeignKey<Passenger>(p => p.MedicalDocumentFileId);
-
-            modelBuilder.Entity<Passenger>()
-                .HasOne(p => p.LogBookDocumentFile)
-                .WithOne()
-                .HasForeignKey<Passenger>(p => p.LogBookDocumentFileId);
-
-            modelBuilder.Entity<Passenger>()
-                .HasOne(p => p.AttorneyDocumentFile)
-                .WithOne()
-                .HasForeignKey<Passenger>(p => p.AttorneyDocumentFileId);
-
-            modelBuilder.Entity<Passenger>()
-                .HasOne(p => p.NationalCardDocumentFile)
-                .WithOne()
-                .HasForeignKey<Passenger>(p => p.NationalCardDocumentFileId);
-
             modelBuilder.Entity<Ticket>().HasOne(c => c.ReservedBy).WithMany().HasForeignKey("ReservedById");
         }
     }

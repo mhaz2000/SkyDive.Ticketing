@@ -32,6 +32,6 @@ namespace SkyDiveTicketing.Application.DTOs.AdminCartableDTOs
         public bool Done { get; private set; }
         public RequestType RequestType { get; set; }
         public string RequestTypeDisplay { get; set; }
-        public TimeSpan Time => CreatedAt.TimeOfDay;
+        public TimeSpan Time => CreatedAt.ToLocalTime().TimeOfDay;
     }
 }

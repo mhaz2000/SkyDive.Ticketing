@@ -11,25 +11,43 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public void AddAttorneyDocument(Passenger passenger, Guid fileId, DateTime? expirationDate)
+        public async Task AddAttorneyDocumentAsync(Passenger passenger, Guid fileId, DateTime? expirationDate)
         {
-            passenger.AttorneyDocumentFile?.Upload(fileId, expirationDate);
+            AttorneyDocument attorneyDocument = new AttorneyDocument();
+            attorneyDocument.Upload(fileId, expirationDate);
+
+            await Context.AttorneyDocuments.AddAsync(attorneyDocument);
+            passenger.AttorneyDocumentFiles.Add(attorneyDocument);
         }
 
-        public void AddLogBookDocument(Passenger passenger, Guid fileId)
+        public async Task AddLogBookDocumentAsync(Passenger passenger, Guid fileId)
         {
-            passenger.LogBookDocumentFile?.Upload(fileId, null);
+            LogBookDocument logBookDocument = new LogBookDocument();
+            logBookDocument.Upload(fileId, null);
+
+            await Context.LogBookDocuments.AddAsync(logBookDocument);
+            passenger.LogBookDocumentFiles.Add(logBookDocument);
         }
 
-        public void AddMedicalDocument(Passenger passenger, Guid fileId, DateTime? expirationDate)
+        public async Task AddMedicalDocumentAsync(Passenger passenger, Guid fileId, DateTime? expirationDate)
         {
-            passenger.MedicalDocumentFile?.Upload(fileId, expirationDate);
+            MedicalDocument medicalDocument = new MedicalDocument();
+            medicalDocument.Upload(fileId,expirationDate);
+
+            await Context.MedicalDocuments.AddAsync(medicalDocument);
+            passenger.MedicalDocumentFiles.Add(medicalDocument);
         }
 
-        public void AddNationalCardDocument(Passenger passenger, Guid fileId)
+        public async Task AddNationalCardDocument(Passenger passenger, Guid fileId)
         {
-            if (passenger.NationalCardDocumentFile.Status != DocumentStatus.Confirmed)
-                passenger.NationalCardDocumentFile?.Upload(fileId, null);
+            if (passenger.NationalCardDocumentFiles.All(c => c.Status != DocumentStatus.Confirmed))
+            {
+                NationalCardDocument nationalCard = new NationalCardDocument();
+                nationalCard.Upload(fileId, null);
+
+                await Context.NationalCardDocuments.AddAsync(nationalCard);
+                passenger.NationalCardDocumentFiles.Add(nationalCard);
+            }
         }
     }
 }

@@ -5,9 +5,9 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface IPassengerRepository : IRepository<Passenger>
     {
-        void AddNationalCardDocument(Passenger passenger, Guid fileId);
-        void AddAttorneyDocument(Passenger passenger, Guid fileId, DateTime? expirationDate);
-        void AddLogBookDocument(Passenger passenger, Guid fileId);
-        void AddMedicalDocument(Passenger passenger, Guid fileId, DateTime? expirationDate);
+        Task AddNationalCardDocument(Passenger passenger, Guid fileId);
+        Task AddAttorneyDocumentAsync(Passenger passenger, Guid fileId, DateTime? expirationDate);
+        Task AddLogBookDocumentAsync(Passenger passenger, Guid fileId);
+        Task AddMedicalDocumentAsync(Passenger passenger, Guid fileId, DateTime? expirationDate);
     }
 }

@@ -11,27 +11,32 @@ namespace SkyDiveTicketing.Application.DTOs.UserDTOs
     {
         public UserDocumentsDTO(Guid id, DateTime createdAt, DateTime updatedAt) : base(id, createdAt, updatedAt)
         {
+            MedicalDocuments = new List<UserDocumentDetailDTO>();
+            LogBookDocuments = new List<UserDocumentDetailDTO>();
+            AttorneyDocuments = new List<UserDocumentDetailDTO>();
+            NationalCardDocuments = new List<UserDocumentDetailDTO>();
+
         }
 
         /// <summary>
         /// فایل سند پزشکی
         /// </summary>
-        public UserDocumentDetailDTO? MedicalDocument { get; set; }
+        public IEnumerable<UserDocumentDetailDTO> MedicalDocuments { get; set; }
 
         /// <summary>
         /// سند لاگ بوک
         /// </summary>
-        public UserDocumentDetailDTO? LogBookDocument { get; set; }
+        public IEnumerable<UserDocumentDetailDTO> LogBookDocuments { get; set; }
 
         /// <summary>
         /// سند وکالت نامه محضری
         /// </summary>
-        public UserDocumentDetailDTO? AttorneyDocument { get; set; }
+        public IEnumerable<UserDocumentDetailDTO> AttorneyDocuments { get; set; }
 
         /// <summary>
         /// فایل کارت ملی
         /// </summary>
-        public UserDocumentDetailDTO? NationalCardDocument { get; set; }
+        public IEnumerable<UserDocumentDetailDTO> NationalCardDocuments { get; set; }
     }
 
     public class UserDocumentDetailDTO : BaseDTO<Guid>
