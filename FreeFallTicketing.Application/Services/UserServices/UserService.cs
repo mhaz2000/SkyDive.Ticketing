@@ -50,7 +50,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             else
             {
                 await OtherPersonalInformation(user, command);
-                UploadDocument(user, command.MedicalDocument, command.LogBookDocument, command.AttorneyDocument, command.NationalCardDocument);
+                await UploadDocument(user, command.MedicalDocument, command.LogBookDocument, command.AttorneyDocument, command.NationalCardDocument);
 
                 await _unitOfWork.UserRepository.AddMessage(user, "اطلاعات حساب کاربری جهت رسیدگی و تایید ارسال شد.", "در خواست تایید پروفایل کاربری");
                 await _unitOfWork.AdminCartableRepository.AddToCartable($"اطلاعات حساب کاربری {user.FirstName} {user.LastName} ثبت شد، لطفا نسبت به تایید یا رد آن ها اقدام فرمایید.",
@@ -72,7 +72,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (checkUsernameDuplication)
                 throw new ManagedException("نام کاربری تکراری است.");
 
-            _unitOfWork.UserRepository.CompeleteUserSecurityInfo(command.Username, command.Password, user);
+            _unitOfWork.UserRepository.CompeleteUserSecurityInfo(command.Username!, command.Password!, user);
             await _unitOfWork.CommitAsync();
         }
 
@@ -320,9 +320,12 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public async Task CheckPersonalInformation(UserCheckPersonalInformationCommand command)
         {
-            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Id == command.Id && c.Status != UserStatus.Inactive);
+            var user = await _unitOfWork.UserRepository.GetFirstWithIncludeAsync(c => c.Id == command.Id && c.Status != UserStatus.Inactive, c => c.UserType);
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
+
+            if (user.UserType.IsDefault)
+                throw new ManagedException("نوع کاربری برای این شخص تعیین نشده است.");
 
             _unitOfWork.UserRepository.CheckPersonalInformation(user, command.IsConfirmed);
 
@@ -534,7 +537,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            UploadDocument(user, command.MedicalDocument, command.LogBookDocument, command.AttorneyDocument, command.NationalCardDocument);
+            await UploadDocument(user, command.MedicalDocument, command.LogBookDocument, command.AttorneyDocument, command.NationalCardDocument);
 
             await _unitOfWork.CommitAsync();
         }
@@ -545,7 +548,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (nationalCardDocument is not null && nationalCardDocument.FileId is not null)
                 await _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, nationalCardDocument.FileId.Value);
 
-            if (attorneyDocument is not null && attorneyDocument.FileId is not null)
+            if (attorneyDocument is not null && attorneyDocument.FileId is not null && user.Passenger!.AttorneyDocumentFiles.All(c => c.FileId != attorneyDocument.FileId))
             {
                 if (attorneyDocument.ExpirationDate is null)
                     throw new ManagedException("تاریخ انقضای وکالتنامه محضری الزامی است.");
@@ -553,10 +556,10 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 await _unitOfWork.PassengerRepository.AddAttorneyDocumentAsync(user.Passenger, attorneyDocument.FileId.Value, attorneyDocument.ExpirationDate);
             }
 
-            if (logBookDocument is not null && logBookDocument.FileId is not null)
+            if (logBookDocument is not null && logBookDocument.FileId is not null && user.Passenger!.LogBookDocumentFiles.All(c => c.FileId != logBookDocument.FileId))
                 await _unitOfWork.PassengerRepository.AddLogBookDocumentAsync(user.Passenger, logBookDocument.FileId.Value);
 
-            if (medicalDocument is not null)
+            if (medicalDocument is not null && medicalDocument.FileId is not null && user.Passenger!.MedicalDocumentFiles.All(c => c.FileId != medicalDocument.FileId))
             {
                 if (medicalDocument.ExpirationDate is null)
                     throw new ManagedException("تاریخ انقضای مدارک پزشکی الزامی است.");

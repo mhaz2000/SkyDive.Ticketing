@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Data;
+using System.Net;
 
 namespace SkyDiveTicketing.Infrastructure.Repositories
 {
@@ -97,6 +98,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 Code = await GetUserCode(),
                 UserType = defaultType
             };
+
+            var passenger = new Passenger();
+            await Context.Passengers.AddAsync(passenger);
+
+            user.Passenger = passenger;
 
             await Context.Users.AddAsync(user);
 

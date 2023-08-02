@@ -6,7 +6,7 @@ namespace SkyDiveTicketing.Core.Entities
     {
         public Passenger()
         {
-
+            NationalCode = string.Empty;
         }
 
         public Passenger(string nationalCode, string? cityAndState, string address, float? height, float? weight, string emergencyContact, string emergencyPhone)

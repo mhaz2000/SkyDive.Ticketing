@@ -43,19 +43,14 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
             c.Passenger.MedicalDocumentFiles.Any(c=> c.Id == documentId) ||
             c.Passenger.LogBookDocumentFiles.Any(c=> c.Id == documentId)).FirstOrDefault();
 
-            var activeCondition = user is not null &&
-                user.Passenger.AttorneyDocumentFiles.OrderByDescending(c=>c.CreatedAt).FirstOrDefault()?.Status == DocumentStatus.Confirmed &&
-                user.Passenger.MedicalDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault()?.Status == DocumentStatus.Confirmed &&
-                user.Passenger.LogBookDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault()?.Status == DocumentStatus.Confirmed &&
-                user.Passenger.NationalCardDocumentFiles.OrderByDescending(c => c.CreatedAt).FirstOrDefault()?.Status == DocumentStatus.Confirmed;
-
-            if (activeCondition)
+            if (!isConfirmed)
             {
-                _unitOfWork.UserRepository.ChangeUserStatus(user, UserStatus.Active);
-                await _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز اطلاعات حساب کاربری شما تایید شد.", "تایید حساب کاربری");
+                _unitOfWork.UserRepository.ChangeUserStatus(user, UserStatus.AwaitingCompletion);
+                await _unitOfWork.UserRepository.AddMessage(user, $"{user.FirstName} {user.LastName} عزیز مدرک بارگذاری شده تایید نشد.", "عدم تایید مدرک");
 
                 //send sms
             }
+
             await _unitOfWork.CommitAsync();
         }
 
