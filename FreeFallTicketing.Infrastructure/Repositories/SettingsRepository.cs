@@ -12,16 +12,23 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task Update(string url, int fileSizeLimitation)
+        public async Task Update(string url, int fileSizeLimitation, string registrationUrl)
         {
             var settings = Context.Settings.FirstOrDefault();
 
             if (settings is null)
-                await Context.Settings.AddAsync(new Settings() { TermsAndConditionsUrl = url, FileSizeLimitiation = fileSizeLimitation });
+                await Context.Settings.AddAsync(new Settings()
+                {
+                    TermsAndConditionsUrl = url,
+                    FileSizeLimitiation = fileSizeLimitation,
+                    RegistrationTermsAndConditionsUrl = registrationUrl
+                });
             else
             {
                 settings.TermsAndConditionsUrl = url;
                 settings.FileSizeLimitiation = fileSizeLimitation;
+                settings.RegistrationTermsAndConditionsUrl = registrationUrl;
+
             }
         }
 

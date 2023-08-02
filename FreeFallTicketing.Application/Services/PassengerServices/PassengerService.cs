@@ -1,6 +1,7 @@
 ﻿using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
+using System.Reflection.Metadata;
 
 namespace SkyDiveTicketing.Application.Services.PassengerServices
 {
@@ -50,6 +51,44 @@ namespace SkyDiveTicketing.Application.Services.PassengerServices
 
                 //send sms
             }
+
+            await _unitOfWork.CommitAsync();
+        }
+
+        public async Task RemoveDocument(Guid id)
+        {
+            var nationalCardDocument = await _unitOfWork.PassengerNationalCardDocumentRepository.GetByIdAsync(id);
+            var attorneyDocument = await _unitOfWork.PassengerAttorneyDocumentRepository.GetByIdAsync(id);
+            var logBookDocument = await _unitOfWork.PassengerLogBookDocumentRepository.GetByIdAsync(id);
+            var medicalDocument = await _unitOfWork.PassengerMedicalDocumentRepository.GetByIdAsync(id);
+
+            var user = _unitOfWork.UserRepository.GetAllWithIncludes(c => c.Passenger!.NationalCardDocumentFiles.Any(c => c.Id == id) ||
+                c.Passenger.AttorneyDocumentFiles.Any(c => c.Id == id) ||
+                c.Passenger.MedicalDocumentFiles.Any(c => c.Id == id) ||
+                c.Passenger.LogBookDocumentFiles.Any(c => c.Id == id)).FirstOrDefault();
+
+            if (nationalCardDocument is not null)
+            {
+                _unitOfWork.PassengerNationalCardDocumentRepository.ChangeUserStatusIfNeeded(nationalCardDocument, user);
+                _unitOfWork.PassengerNationalCardDocumentRepository.Remove(nationalCardDocument);
+            }
+            else if (attorneyDocument is not null)
+            {
+                _unitOfWork.PassengerAttorneyDocumentRepository.ChangeUserStatusIfNeeded(attorneyDocument, user);
+                _unitOfWork.PassengerAttorneyDocumentRepository.Remove(attorneyDocument);
+            }
+            else if (logBookDocument is not null)
+            {
+                _unitOfWork.PassengerLogBookDocumentRepository.ChangeUserStatusIfNeeded(logBookDocument, user);
+                _unitOfWork.PassengerLogBookDocumentRepository.Remove(logBookDocument);
+            }
+            else if (medicalDocument is not null)
+            {
+                _unitOfWork.PassengerMedicalDocumentRepository.ChangeUserStatusIfNeeded(medicalDocument, user);
+                _unitOfWork.PassengerMedicalDocumentRepository.Remove(medicalDocument);
+            }
+            else
+                throw new ManagedException("مدرک مورد نظر یافت نشد.");
 
             await _unitOfWork.CommitAsync();
         }

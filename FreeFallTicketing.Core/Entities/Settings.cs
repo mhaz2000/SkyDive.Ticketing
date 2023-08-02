@@ -11,6 +11,7 @@ namespace SkyDiveTicketing.Core.Entities
 
         public int FileSizeLimitiation { get; set; }
         public string? TermsAndConditionsUrl { get; set; }
+        public string? RegistrationTermsAndConditionsUrl { get; set; }
         public float VAT { get; set; }
         public int JumpDuration { get; set; }
         public ICollection<UserStatusInfo> UserStatusInfo { get; set; }

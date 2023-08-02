@@ -12,6 +12,16 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
+        public void ChangeUserStatusIfNeeded(MedicalDocument document, User? user)
+        {
+
+            if (user is null)
+                return;
+
+            if (Context.MedicalDocuments.OrderByDescending(c => c.CreatedAt).FirstOrDefault() == document)
+                user.Status = UserStatus.AwaitingCompletion;
+        }
+
         public async Task ExpireDocuments()
         {
             var documents = Context.MedicalDocuments.Where(c => c.ExpirationDate != null && c.ExpirationDate < DateTime.Now);
@@ -39,6 +49,16 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
+        public void ChangeUserStatusIfNeeded(AttorneyDocument document, User? user)
+        {
+
+            if (user is null)
+                return;
+
+            if (Context.AttorneyDocuments.OrderByDescending(c => c.CreatedAt).FirstOrDefault() == document)
+                user.Status = UserStatus.AwaitingCompletion;
+        }
+
         public async Task ExpireDocuments()
         {
             var documents = Context.AttorneyDocuments.Where(c => c.ExpirationDate != null && c.ExpirationDate < DateTime.Now);
@@ -64,12 +84,33 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public PassengerNationalCardDocumentRepository(DataContext context) : base(context)
         {
         }
+
+        public void ChangeUserStatusIfNeeded(NationalCardDocument document, User? user)
+        {
+
+            if (user is null)
+                return;
+
+            if (Context.NationalCardDocuments.OrderByDescending(c => c.CreatedAt).FirstOrDefault() == document)
+                user.Status = UserStatus.AwaitingCompletion;
+        }
     }
 
     public class PassengerLogBookDocumentRepository : Repository<LogBookDocument>, IPassengerLogBookDocumentRepository
     {
+
         public PassengerLogBookDocumentRepository(DataContext context) : base(context)
         {
+        }
+
+        public void ChangeUserStatusIfNeeded(LogBookDocument document, User? user)
+        {
+            if (user is null)
+                return;
+
+            if(Context.LogBookDocuments.OrderByDescending(c => c.CreatedAt).FirstOrDefault() == document)
+                user.Status = UserStatus.AwaitingCompletion;
+
         }
     }
 }

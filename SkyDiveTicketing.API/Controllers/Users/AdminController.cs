@@ -23,14 +23,11 @@ namespace SkyDiveTicketing.API.Controllers.Users
         private readonly IUserService _userService;
         private readonly IAdminCartableService _adminCartableService;
         private readonly IPassengerService _passengerService;
-        private readonly IUserTypeService _userTypeService;
 
-        public AdminController(IUserService userService, IPassengerService passengerService, IUserTypeService userTypeService,
-            IAdminCartableService adminCartableService)
+        public AdminController(IUserService userService, IPassengerService passengerService, IAdminCartableService adminCartableService)
         {
             _userService = userService;
             _passengerService = passengerService;
-            _userTypeService = userTypeService;
             _adminCartableService = adminCartableService;
         }
 
@@ -62,7 +59,7 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 command.Validate();
 
                 await _userService.CheckPersonalInformation(command);
-                return OkResult(command.IsConfirmed ? "اطلاعات کاربر با موفقیت تایید شد." : "مدارک کاربر رد شد.");
+                return OkResult(command.IsConfirmed ? "اطلاعات کاربر با موفقیت تایید شد." : "اطلاعات کاربر رد شد.");
             }
             catch (ManagedException e)
             {
@@ -71,11 +68,6 @@ namespace SkyDiveTicketing.API.Controllers.Users
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
 
@@ -128,6 +120,20 @@ namespace SkyDiveTicketing.API.Controllers.Users
                 return BadRequest(e.Message);
             }
             catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("RemoveDocument/{id}")]
+        public async Task<IActionResult> RemoveDocument(Guid id)
+        {
+            try
+            {
+                await _passengerService.RemoveDocument(id);
+                return OkResult("مدرک کاربر حذف شد.");
+            }
+            catch (ManagedException e)
             {
                 return BadRequest(e.Message);
             }

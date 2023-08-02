@@ -10,6 +10,7 @@ namespace SkyDiveTicketing.Application.Commands.SettingsCommands
         public int FileSizeLimitation { get; set; }
 
         public string? TermsAndConditionsUrl { get; set; }
+        public string? RegistrationTermsAndConditionsUrl { get; set; }
 
         public ICollection<UserStatusInfoCommand>? UserStatusInfo { get; set; }
 

@@ -7,7 +7,7 @@ namespace SkyDiveTicketing.Application.Validators.UserValidators
     {
         public UserCheckPersonalInformationCommandValidator()
         {
-            RuleFor(c=> c.IsConfirmed).NotNull().NotEmpty().WithMessage("تایید یا عدم تایید کاربر مشخص نشده است.");
+            RuleFor(c=> c.IsConfirmed).NotNull().WithMessage("تایید یا عدم تایید کاربر مشخص نشده است.");
         }
     }
 }

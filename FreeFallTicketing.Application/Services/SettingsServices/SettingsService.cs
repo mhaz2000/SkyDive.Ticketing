@@ -20,13 +20,16 @@ namespace SkyDiveTicketing.Application.Services.SettingsServices
             if (settings is null)
                 throw new ManagedException("تنظیماتی یافت نشد.");
 
-            return new SettingsDTO(settings.Id, settings.CreatedAt, settings.UpdatedAt,
-                settings.UserStatusInfo.Select(s => new UserStatusInfoDTO(s.UserStatus, s.Description)), settings.TermsAndConditionsUrl, settings.JumpDuration);
+            return new SettingsDTO(settings.Id, settings.CreatedAt, settings.UpdatedAt, 
+                settings.UserStatusInfo.Select(s => new UserStatusInfoDTO(s.UserStatus, s.Description)), settings.TermsAndConditionsUrl,
+                settings.RegistrationTermsAndConditionsUrl, settings.JumpDuration, settings.FileSizeLimitiation);
         }
 
         public async Task Update(SettingsCommand command)
         {
-            await _unitOfWork.SettingsRepository.Update(command.TermsAndConditionsUrl!, command.FileSizeLimitation);
+            await _unitOfWork.SettingsRepository.Update(command.TermsAndConditionsUrl ?? string.Empty, command.FileSizeLimitation,
+                command.RegistrationTermsAndConditionsUrl ?? string.Empty);
+
             foreach (var item in command.UserStatusInfo!)
             {
                 await _unitOfWork.SettingsRepository.UpdateUserStatusInfo(item.Status, item.Description!);

@@ -324,7 +324,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            if (user.UserType.IsDefault)
+            if (user.UserType.IsDefault && command.IsConfirmed)
                 throw new ManagedException("نوع کاربری برای این شخص تعیین نشده است.");
 
             _unitOfWork.UserRepository.CheckPersonalInformation(user, command.IsConfirmed);
@@ -510,19 +510,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 user.Passenger?.EmergencyContact, user.Passenger?.EmergencyPhone, documentsConfirmed);
         }
 
-        private string FixingPhoneNumber(string phoneNumber)
-        {
-            string fixNumber = phoneNumber;
-
-            if (phoneNumber.Contains("+98"))
-                fixNumber = phoneNumber.Replace("+98", "0");
-
-            if (phoneNumber.StartsWith("0098"))
-                fixNumber = "0" + phoneNumber.Substring(4);
-
-            return fixNumber;
-        }
-
         public async Task UploadDocument(AdminUploadUserDocumentCommand command, Guid id)
         {
             Expression<Func<User, object>>[] includeExpressions = {
@@ -542,10 +529,23 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await _unitOfWork.CommitAsync();
         }
 
+        private string FixingPhoneNumber(string phoneNumber)
+        {
+            string fixNumber = phoneNumber;
+
+            if (phoneNumber.Contains("+98"))
+                fixNumber = phoneNumber.Replace("+98", "0");
+
+            if (phoneNumber.StartsWith("0098"))
+                fixNumber = "0" + phoneNumber.Substring(4);
+
+            return fixNumber;
+        }
+
         private async Task UploadDocument(User user, UploadDocumentDetailCommand? medicalDocument, UploadDocumentDetailCommand? logBookDocument,
             UploadDocumentDetailCommand? attorneyDocument, UploadDocumentDetailCommand? nationalCardDocument)
         {
-            if (nationalCardDocument is not null && nationalCardDocument.FileId is not null)
+            if (nationalCardDocument is not null && nationalCardDocument.FileId is not null && user.Passenger!.NationalCardDocumentFiles.All(c => c.FileId != nationalCardDocument.FileId))
                 await _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, nationalCardDocument.FileId.Value);
 
             if (attorneyDocument is not null && attorneyDocument.FileId is not null && user.Passenger!.AttorneyDocumentFiles.All(c => c.FileId != attorneyDocument.FileId))
@@ -575,5 +575,6 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
             await Task.CompletedTask;
         }
+
     }
 }
