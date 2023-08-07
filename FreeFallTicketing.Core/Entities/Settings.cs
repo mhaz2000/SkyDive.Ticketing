@@ -9,7 +9,7 @@ namespace SkyDiveTicketing.Core.Entities
             UserStatusInfo = new List<UserStatusInfo>();
         }
 
-        public int FileSizeLimitiation { get; set; }
+        public int FileSizeLimitation { get; set; }
         public string? TermsAndConditionsUrl { get; set; }
         public string? RegistrationTermsAndConditionsUrl { get; set; }
         public float VAT { get; set; }

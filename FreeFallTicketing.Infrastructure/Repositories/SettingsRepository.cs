@@ -20,13 +20,13 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 await Context.Settings.AddAsync(new Settings()
                 {
                     TermsAndConditionsUrl = url,
-                    FileSizeLimitiation = fileSizeLimitation,
+                    FileSizeLimitation = fileSizeLimitation,
                     RegistrationTermsAndConditionsUrl = registrationUrl
                 });
             else
             {
                 settings.TermsAndConditionsUrl = url;
-                settings.FileSizeLimitiation = fileSizeLimitation;
+                settings.FileSizeLimitation = fileSizeLimitation;
                 settings.RegistrationTermsAndConditionsUrl = registrationUrl;
 
             }

@@ -21,8 +21,8 @@ namespace SkyDiveTicketing.Application.Services.SettingsServices
                 throw new ManagedException("تنظیماتی یافت نشد.");
 
             return new SettingsDTO(settings.Id, settings.CreatedAt, settings.UpdatedAt, 
-                settings.UserStatusInfo.Select(s => new UserStatusInfoDTO(s.UserStatus, s.Description)), settings.TermsAndConditionsUrl,
-                settings.RegistrationTermsAndConditionsUrl, settings.JumpDuration, settings.FileSizeLimitiation);
+                settings.UserStatusInfo.Select(s => new UserStatusInfoDTO(s.UserStatus, s.Description)), settings.TermsAndConditionsUrl!,
+                settings.RegistrationTermsAndConditionsUrl!, settings.JumpDuration, settings.FileSizeLimitation);
         }
 
         public async Task Update(SettingsCommand command)

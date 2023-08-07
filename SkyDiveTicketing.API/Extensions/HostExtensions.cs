@@ -82,7 +82,7 @@ namespace SkyDiveTicketing.API.Extensions
                     UpdatedAt = DateTime.Now,
                     IsDeleted = false,
                     JumpDuration = 6,
-                    FileSizeLimitiation = 500,
+                    FileSizeLimitation = 500,
                     TermsAndConditionsUrl = string.Empty,
                     RegistrationTermsAndConditionsUrl = string.Empty,
                     UserStatusInfo = new List<UserStatusInfo>(),
