@@ -9,7 +9,7 @@ namespace SkyDiveTicketing.Core.Entities
 
         }
 
-        public Transaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, int invoiceNumber, User payer) : base()
+        public Transaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, int? invoiceNumber, User payer) : base()
         {
             InvoiceNumber = invoiceNumber;
             EventName = eventName;
@@ -58,7 +58,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// <summary>
         /// شماره فاکتور
         /// </summary>
-        public int InvoiceNumber { get; set; }
+        public int? InvoiceNumber { get; set; }
 
         /// <summary>
         /// پرداخت کننده

@@ -263,7 +263,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 if (errors.Any())
                     throw new ManagedException(string.Join("\n", errors));
 
-                if (_unitOfWork.ShoppingCartRepository.Include(c => c.SkyDiveEvent, c => c.Items).Any(c => c.SkyDiveEvent != skyDiveEvent && c.Items.Any()))
+                if (_unitOfWork.ShoppingCartRepository.Include(c => c.SkyDiveEvent, c => c.Items).Any(c => c.SkyDiveEvent != skyDiveEvent && c.Items.Any() && c.User == user))
                     throw new ManagedException("شما سبد خرید تسویه نشده برای رویداد دیگری دارید، لطفا اقدام به حذف آیتم های سبد خرید یا تسویه آن ها نمایید.");
 
                 await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
@@ -387,8 +387,9 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketAmount, shoppingCartItem.ReservedFor,
                     shoppingCart.SkyDiveEvent.Id, flightLoad!.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
 
-                number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
-                    shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "", ticketAmount, TransactionType.Confirmed, user, number);
+                number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber, 
+                    shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "",
+                    ticketAmount, TransactionType.Confirmed, user, false, number);
             }
 
             await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);

@@ -85,7 +85,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             users = users.Where(c => !adminUsers.Contains(c.Id));
 
             if (minDate is not null && maxDate is not null)
-                users = users.Where(c => c.CreatedAt >= minDate && c.CreatedAt <= maxDate);
+                users = users.Where(c => c.CreatedAt.Date >= minDate.Value.Date && c.CreatedAt.Date <= maxDate.Value.Date);
 
             if (userStatus is not null)
                 users = users.Where(c => c.Status == userStatus);
@@ -545,13 +545,20 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         private async Task UploadDocument(User user, UploadDocumentDetailCommand? medicalDocument, UploadDocumentDetailCommand? logBookDocument,
             UploadDocumentDetailCommand? attorneyDocument, UploadDocumentDetailCommand? nationalCardDocument)
         {
+            List<string> errors = new List<string>();
+
+            var settings = _unitOfWork.SettingsRepository.FirstOrDefault(c=> true);
+
             if (nationalCardDocument is not null && nationalCardDocument.FileId is not null && user.Passenger!.NationalCardDocumentFiles.All(c => c.FileId != nationalCardDocument.FileId))
                 await _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, nationalCardDocument.FileId.Value);
 
             if (attorneyDocument is not null && attorneyDocument.FileId is not null && user.Passenger!.AttorneyDocumentFiles.All(c => c.FileId != attorneyDocument.FileId))
             {
                 if (attorneyDocument.ExpirationDate is null)
-                    throw new ManagedException("تاریخ انقضای وکالتنامه محضری الزامی است.");
+                    errors.Add("تاریخ انقضای وکالتنامه محضری الزامی است.");
+
+                if(attorneyDocument.ExpirationDate!.Value.AddDays(settings.AttorneyDocumentsValidityDuration * (-1)) < DateTime.Now)
+                    errors.Add("حداقل مدت اعتبار وکالتنامه محضری رعایت نشده است.");
 
                 await _unitOfWork.PassengerRepository.AddAttorneyDocumentAsync(user.Passenger, attorneyDocument.FileId.Value, attorneyDocument.ExpirationDate);
             }
@@ -562,16 +569,39 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (medicalDocument is not null && medicalDocument.FileId is not null && user.Passenger!.MedicalDocumentFiles.All(c => c.FileId != medicalDocument.FileId))
             {
                 if (medicalDocument.ExpirationDate is null)
-                    throw new ManagedException("تاریخ انقضای مدارک پزشکی الزامی است.");
+                    errors.Add("تاریخ انقضای مدارک پزشکی الزامی است.");
+
+                if (medicalDocument.ExpirationDate!.Value.AddDays(settings.MedicalDocumentsValidityDuration * (-1)) < DateTime.Now)
+                    errors.Add("حداقل مدت اعتبار مدارک پزشکی رعایت نشده است.");
+
 
                 await _unitOfWork.PassengerRepository.AddMedicalDocumentAsync(user.Passenger, medicalDocument.FileId.Value, medicalDocument.ExpirationDate);
             }
+
+            if (errors.Any())
+                throw new ManagedException(String.Join("\n", errors));
         }
 
         private async Task OtherPersonalInformation(User user, UserPersonalInformationCompletionCommand command)
         {
+            var fixEmergencyPhoneNumber = string.IsNullOrEmpty(command.EmergencyPhone) ? string.Empty : FixingPhoneNumber(command.EmergencyPhone);
+
+            List<string> errors = new List<string>();
+
+            var emailDuplicationCheck = await _unitOfWork.UserRepository
+                .AnyAsync(c => !string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower() && c.Status != UserStatus.Inactive && c.Id != user.Id);
+
+            if (emailDuplicationCheck)
+                errors.Add("ایمیل تکراری است.");
+
+            if (user.PhoneNumber == fixEmergencyPhoneNumber)
+                errors.Add("شماره موبایل اضطراری نباید با شماره موبایل خود شخص یکسان باشد.");
+
+            if (errors.Any())
+                    throw new ManagedException(string.Join("\n", errors));
+
             _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, command.CityAndState, command.Address ?? string.Empty,
-                command.EmergencyContact ?? string.Empty, command.EmergencyPhone ?? string.Empty, command.Height, command.Weight, user);
+                command.EmergencyContact ?? string.Empty, fixEmergencyPhoneNumber, command.Height, command.Weight, user);
 
             await Task.CompletedTask;
         }

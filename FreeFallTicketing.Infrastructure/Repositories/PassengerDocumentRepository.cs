@@ -24,7 +24,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public async Task ExpireDocuments()
         {
-            var documents = Context.MedicalDocuments.Where(c => c.ExpirationDate != null && c.ExpirationDate < DateTime.Now);
+            var settings = Context.Settings.Single();
+
+            var documents = Context.MedicalDocuments
+                .Where(c => c.ExpirationDate != null && c.ExpirationDate.Value.AddDays(settings.AttorneyDocumentsValidityDuration * (-1)) < DateTime.Now);
+
             var users = Context.Users
                 .Include(c => c.Messages)
                 .Include(c => c.Passenger).ThenInclude(c => c.MedicalDocumentFiles);
@@ -61,7 +65,11 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public async Task ExpireDocuments()
         {
-            var documents = Context.AttorneyDocuments.Where(c => c.ExpirationDate != null && c.ExpirationDate < DateTime.Now);
+            var settings = Context.Settings.Single();
+
+            var documents = Context.AttorneyDocuments
+                .Where(c => c.ExpirationDate != null && c.ExpirationDate.Value.AddDays(settings.AttorneyDocumentsValidityDuration * (-1)) < DateTime.Now);
+
             var users = Context.Users
                 .Include(c => c.Messages)
                 .Include(c => c.Passenger).ThenInclude(c => c.AttorneyDocumentFiles);

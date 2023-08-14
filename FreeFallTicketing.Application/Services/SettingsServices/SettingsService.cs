@@ -22,13 +22,14 @@ namespace SkyDiveTicketing.Application.Services.SettingsServices
 
             return new SettingsDTO(settings.Id, settings.CreatedAt, settings.UpdatedAt, 
                 settings.UserStatusInfo.Select(s => new UserStatusInfoDTO(s.UserStatus, s.Description)), settings.TermsAndConditionsUrl!,
-                settings.RegistrationTermsAndConditionsUrl!, settings.JumpDuration, settings.FileSizeLimitation);
+                settings.RegistrationTermsAndConditionsUrl!, settings.JumpDuration, settings.FileSizeLimitation,
+                settings.AttorneyDocumentsValidityDuration, settings.MedicalDocumentsValidityDuration);
         }
 
         public async Task Update(SettingsCommand command)
         {
             await _unitOfWork.SettingsRepository.Update(command.TermsAndConditionsUrl ?? string.Empty, command.FileSizeLimitation,
-                command.RegistrationTermsAndConditionsUrl ?? string.Empty);
+                command.RegistrationTermsAndConditionsUrl ?? string.Empty, command.AttorneyDocumentsValidityDuration ?? 0, command.MedicalDocumentsValidityDuration ?? 0);
 
             foreach (var item in command.UserStatusInfo!)
             {

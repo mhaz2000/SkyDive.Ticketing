@@ -48,14 +48,16 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task Create(JumpRecordCommand command, Guid userId)
+        public async Task Create(JumpRecordCommand command, Guid userId, Guid createdById)
         {
             var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
             if (user is null)
                 throw new ManagedException("کاربر مورد نظر یافت نشد.");
 
+            var createdByAdmin = _unitOfWork.RoleRepository.GetAdminUsers().Contains(createdById);
+
             await _unitOfWork.JumpRecordRepository.AddJumpRecord(command.Date, command.Location, command.Equipments, command.PlaneType, command.Height,
-                command.Time, command.Description, user);
+                command.Time, command.Description, user, createdByAdmin);
 
             await _unitOfWork.CommitAsync();
         }
@@ -80,6 +82,18 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
             return jumpRecords.Select(jumpRecord => new JumpRecordDTO(jumpRecord.Id, jumpRecord.CreatedAt,
                 jumpRecord.UpdatedAt, jumpRecord.Date, jumpRecord.Location, jumpRecord.Equipments, jumpRecord.PlaneType, jumpRecord.Height,
                 jumpRecord.Time, jumpRecord.Description, jumpRecord.Confirmed));
+        }
+
+        public async Task Remove(Guid id)
+        {
+            var jumpRecord = await _unitOfWork.JumpRecordRepository.GetFirstWithIncludeAsync(c=> c.Id == id, c=> c.User);
+            if (jumpRecord is null)
+                throw new ManagedException("سابقه پرش یافت نشد.");
+
+            await _unitOfWork.UserRepository.AddMessage(jumpRecord.User, "سابقه پرش توسط ادمین رد شد.", "رد سابقه پرش");
+            _unitOfWork.JumpRecordRepository.Remove(jumpRecord);
+
+            await _unitOfWork.CommitAsync();
         }
     }
 }

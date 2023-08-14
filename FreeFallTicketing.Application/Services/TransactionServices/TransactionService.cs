@@ -30,12 +30,15 @@ namespace SkyDiveTicketing.Application.Services.TransactionServices
         {
             PersianCalendar pc = new PersianCalendar();
 
-            var transaction = await _unitOfWork.TransactionRepositroy.GetFirstWithIncludeAsync(c=> c.Id == id, c=> c.Payer);
+            var transaction = await _unitOfWork.TransactionRepositroy.GetFirstWithIncludeAsync(c => c.Id == id, c => c.Payer);
             if (transaction is null)
                 throw new ManagedException("تراکنش مورد نظر یافت نشد.");
 
+            if (transaction.InvoiceNumber is null)
+                throw new ManagedException("امکان چاپ تراکنش های ایجاد شده از طریق شارژ کیف پول، وجود ندارد.");
+
             return PdfHelper.InvoicePdf($"{pc.GetYear(transaction.CreatedAt)}/{pc.GetMonth(transaction.CreatedAt).ToString("00")}/{pc.GetDayOfMonth(transaction.CreatedAt).ToString("00")}",
-                transaction.InvoiceNumber, transaction.Payer.FullName, transaction.Payer.NationalCode ?? "", transaction.Payer.PhoneNumber, transaction.Amount,
+                transaction.InvoiceNumber!.Value, transaction.Payer.FullName, transaction.Payer.NationalCode ?? "", transaction.Payer.PhoneNumber, transaction.Amount,
                 transaction.TicketNumber, transaction.VAT, transaction.TotalAmount);
         }
     }

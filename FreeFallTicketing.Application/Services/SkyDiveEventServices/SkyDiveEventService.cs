@@ -295,7 +295,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             return skyDiveEventItem.FlightLoads.Sum(flightLoad =>
             {
                 var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(c => c.ReservedBy is null && !c.Locked).Count());
-                return flightLoad.Capacity - ticketsNumber;
+                return ticketsNumber-flightLoad.VoidableNumber;
             });
         }
 

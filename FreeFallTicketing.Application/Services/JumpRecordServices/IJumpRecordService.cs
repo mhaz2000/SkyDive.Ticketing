@@ -7,8 +7,9 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
     {
         Task CheckIfExpired();
         Task ConfirmJumpRecord(Guid id, bool isConfirmed);
-        Task Create(JumpRecordCommand command, Guid userId);
+        Task Create(JumpRecordCommand command, Guid userId, Guid createdById);
         Task<IEnumerable<JumpRecordDTO>> GetAllJumpRecords();
         Task<IEnumerable<JumpRecordDTO>> GetJumpRecords(Guid userId);
+        Task Remove(Guid id);
     }
 }

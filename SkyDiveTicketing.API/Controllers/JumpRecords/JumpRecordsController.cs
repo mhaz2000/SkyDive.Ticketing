@@ -27,8 +27,8 @@ namespace SkyDiveTicketing.API.Controllers.JumpRecords
             {
                 command.Validate();
 
-                await _jumpRecordService.Create(command, UserId);
-                return OkResult("بلیت با موفقیت ویرایش شد.");
+                await _jumpRecordService.Create(command, command.UserId ?? UserId, UserId);
+                return OkResult("سابقه پرش با موفقیت اضافه شد.");
             }
             catch (ManagedException e)
             {
@@ -38,10 +38,20 @@ namespace SkyDiveTicketing.API.Controllers.JumpRecords
             {
                 return BadRequest(e.Message);
             }
-            catch (Exception ex)
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Remove(Guid id)
+        {
+            try
             {
-                Console.WriteLine(ex+"\n----------------------");
-                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+                await _jumpRecordService.Remove(id);
+                return OkResult("سابقه پرش با موفقیت حذف شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
             }
         }
 
@@ -63,7 +73,6 @@ namespace SkyDiveTicketing.API.Controllers.JumpRecords
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }
-
 
         [HttpGet("AllJumpRecords")]
         [Authorize(Roles = "Admin")]

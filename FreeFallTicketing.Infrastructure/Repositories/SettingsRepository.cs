@@ -12,7 +12,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task Update(string url, int fileSizeLimitation, string registrationUrl)
+        public async Task Update(string url, int fileSizeLimitation, string registrationUrl, int attorneyDocumentsValidityDuration, int medicalDocumentsValidityDuration)
         {
             var settings = Context.Settings.FirstOrDefault();
 
@@ -21,14 +21,17 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 {
                     TermsAndConditionsUrl = url,
                     FileSizeLimitation = fileSizeLimitation,
-                    RegistrationTermsAndConditionsUrl = registrationUrl
+                    RegistrationTermsAndConditionsUrl = registrationUrl,
+                    AttorneyDocumentsValidityDuration = attorneyDocumentsValidityDuration,
+                    MedicalDocumentsValidityDuration = medicalDocumentsValidityDuration
                 });
             else
             {
                 settings.TermsAndConditionsUrl = url;
                 settings.FileSizeLimitation = fileSizeLimitation;
                 settings.RegistrationTermsAndConditionsUrl = registrationUrl;
-
+                settings.AttorneyDocumentsValidityDuration = attorneyDocumentsValidityDuration;
+                settings.MedicalDocumentsValidityDuration = medicalDocumentsValidityDuration;
             }
         }
 

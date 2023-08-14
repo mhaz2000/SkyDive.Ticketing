@@ -27,7 +27,7 @@ namespace SkyDiveTicketing.Application.Services.WalletServices
             _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, command.Amount);
             
             await _unitOfWork.TransactionRepositroy
-                .AddTransaction(string.Empty, string.Empty, "شارژ کیف پول", command.Amount, Core.Entities.TransactionType.Confirmed, user);
+                .AddTransaction(string.Empty, string.Empty, "شارژ کیف پول", command.Amount, Core.Entities.TransactionType.Confirmed, user, true);
 
             await _unitOfWork.UserRepository
                 .AddMessage(user, $"موجودی کیف پول شما {Math.Abs(command.Amount)} ریال {(command.Amount > 0 ? "افزایش" : "کاهش")} پیدا کرد.", "کیف پول");

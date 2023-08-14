@@ -6,6 +6,7 @@ namespace SkyDiveTicketing.Application.Commands.JumpRecordCommands
 {
     public class JumpRecordCommand : ICommandBase
     {
+        public Guid? UserId { get; set; }
         public DateTime Date { get; set; }
         public string? Location { get; set; }
         public string? Equipments { get; set; }
