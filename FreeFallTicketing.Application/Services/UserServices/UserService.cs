@@ -84,8 +84,11 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             var adminUsers = _unitOfWork.RoleRepository.GetAdminUsers();
             users = users.Where(c => !adminUsers.Contains(c.Id));
 
-            if (minDate is not null && maxDate is not null)
-                users = users.Where(c => c.CreatedAt.Date >= minDate.Value.Date && c.CreatedAt.Date <= maxDate.Value.Date);
+            if (minDate is not null)
+                users = users.Where(c => c.CreatedAt.Date >= minDate.Value.Date);
+
+            if(maxDate is not null)
+                users = users.Where(c => c.CreatedAt.Date <= maxDate.Value.Date);
 
             if (userStatus is not null)
                 users = users.Where(c => c.Status == userStatus);
@@ -527,6 +530,15 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await UploadDocument(user, command.MedicalDocument, command.LogBookDocument, command.AttorneyDocument, command.NationalCardDocument);
 
             await _unitOfWork.CommitAsync();
+        }
+
+        public async Task<TinyUserDto> GetUserByCode(int code)
+        {
+            var user = await _unitOfWork.UserRepository.FirstOrDefaultAsync(c => c.Code == code && c.Status == UserStatus.Active);
+            if (user is null)
+                throw new ManagedException("کاربر فعالی با کد وارد شده وجود ندارد.");
+
+            return new TinyUserDto(user.Id, user.Code, user.FullName);
         }
 
         private string FixingPhoneNumber(string phoneNumber)

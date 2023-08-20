@@ -204,6 +204,9 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                         if (otherUser is null)
                             throw new ManagedException("کاربری با این کد یافت نشد.");
 
+                        if(otherUser.Id == user.Id)
+                            throw new ManagedException("می‌بایست کد کاربری شخصی به غیر از خودتان را وارد نمایید.");
+
                         if (!otherUser.UserType.AllowedTicketTypes.Any(c => c.TicketTypeId == item.TicketTypeId))
                             errors.Add($"نوع کاربری با شماره کد {item.UserCode} مجاز به رزرو بلیت های نوع '{ticketType.Title}' نیست.");
 

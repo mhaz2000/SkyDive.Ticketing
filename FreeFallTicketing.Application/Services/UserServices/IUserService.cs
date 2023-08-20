@@ -50,5 +50,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         Task<UserDetailDTO> GetUserDetail(Guid id);
 
         Task UploadDocument(AdminUploadUserDocumentCommand command, Guid id);
+
+        Task<TinyUserDto> GetUserByCode(int code);
     }
 }

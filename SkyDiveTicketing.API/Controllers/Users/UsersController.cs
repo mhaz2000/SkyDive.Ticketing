@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.Application.Services.PassengerServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Newtonsoft.Json.Linq;
+using SkyDiveTicketing.Core.Entities;
 
 namespace SkyDiveTicketing.API.Controllers.Users
 {
@@ -345,6 +346,20 @@ namespace SkyDiveTicketing.API.Controllers.Users
             {
                 await _userService.AcceptingTermsAndConditions(UserId);
                 return OkResult("قوانین و شرایط پذیرفته شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("GetByCode/{code}")]
+        public async Task<IActionResult> GetUserByCode(int code)
+        {
+            try
+            {
+                var user = await _userService.GetUserByCode(code);
+                return OkResult("کاربر مورد نظر یافت شد.",user);
             }
             catch (ManagedException e)
             {
