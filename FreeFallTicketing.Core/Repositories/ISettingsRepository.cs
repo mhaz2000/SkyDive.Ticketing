@@ -5,7 +5,7 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface ISettingsRepository : IRepository<Settings>
     {
-        Task Update(string url, int fileSizeLimitation, string registrationUrl, int attorneyDocumentsValidityDuration, int medicalDocumentsValidityDuration);
+        Task Update(string url, int fileSizeLimitation, string registrationUrl, int attorneyDocumentsValidityDuration, int medicalDocumentsValidityDuration, int jumpDuration);
 
         Task UpdateUserStatusInfo(UserStatus userStatus, string description);
     }

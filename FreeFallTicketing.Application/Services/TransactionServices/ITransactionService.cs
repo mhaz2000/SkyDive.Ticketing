@@ -6,5 +6,6 @@ namespace SkyDiveTicketing.Application.Services.TransactionServices
     {
         Task<IEnumerable<TransactionDTO>> GetTransactions(Guid userId);
         Task<MemoryStream> PrintInvoice(Guid id);
+        Task RemoveTransaction(Guid transactionId);
     }
 }

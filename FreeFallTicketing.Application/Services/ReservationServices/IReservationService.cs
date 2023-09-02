@@ -13,7 +13,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
         Task<bool> SetAsPaid(Guid userId);
         Task CancelTicketRequest(Guid id, Guid userId);
         Task CancelTicketResponse(Guid id, bool response);
-        Task<MemoryStream> PrintTicket(Guid id);
+        Task<MemoryStream> PrintTicket(List<Guid> ids);
         Task<ShoppingCartDTO> GetUserShoppingCart(Guid userId);
         Task<bool> SetAsPaidByWallet(Guid userId);
     }

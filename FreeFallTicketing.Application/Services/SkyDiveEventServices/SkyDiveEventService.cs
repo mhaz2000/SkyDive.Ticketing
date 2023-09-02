@@ -40,7 +40,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 throw new ManagedException("رویداد مورد نظر یافت نشد.");
 
             return new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
-                skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Items?.Sum(c => c.FlightLoads?.Sum(t => t.Capacity) ?? 0) ?? 0, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
+                skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Items?.Sum(c => GetEmptyCapacity(c)) ?? 0, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
                 skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title, skyDiveEvent.Status.Reservable, skyDiveEvent.Status.Id,
                 skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id)));
         }
@@ -138,7 +138,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
                 typesAmount.Add(ticketType, item.Qty);
             }
 
-            await _unitOfWork.SkyDiveEventRepository.AddFlightsAsync(skyDiveEvent, skyDiveEventDay, typesAmount, command.FlightQty, command.VoidableQty, sum + command.VoidableQty);
+            await _unitOfWork.SkyDiveEventRepository.AddFlightsAsync(skyDiveEvent, skyDiveEventDay, typesAmount, command.FlightQty, command.VoidableQty, sum);
 
             await _unitOfWork.CommitAsync();
         }
@@ -294,7 +294,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
         {
             return skyDiveEventItem.FlightLoads.Sum(flightLoad =>
             {
-                var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(c => c.ReservedBy is null && !c.Locked).Count());
+                var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(c => c.ReservedBy is null && !c.Locked && !c.Voidable).Count());
                 return ticketsNumber-flightLoad.VoidableNumber;
             });
         }

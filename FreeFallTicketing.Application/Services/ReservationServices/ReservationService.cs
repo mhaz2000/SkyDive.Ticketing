@@ -132,7 +132,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             double payableAmount = await ReservationProcess(shoppingCart, user);
             if (wallet.Balance < payableAmount)
                 throw new ManagedException("موجودی کیف پول شما کافی نیست.");
-            
+
             _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, payableAmount * (-1));
             await _unitOfWork.CommitAsync();
 
@@ -183,8 +183,8 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 await _unitOfWork.ShoppingCartRepository.RemoveUserShoppingCart(user);
             else
             {
-                //var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.IsActive).AsEnumerable();
-                var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.FindEvents().AsEnumerable();
+                var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.IsActive).AsEnumerable();
+                //var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.FindEvents().AsEnumerable();
 
                 SkyDiveEvent? skyDiveEvent = null;
 
@@ -204,10 +204,10 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                         if (otherUser is null)
                             throw new ManagedException("کاربری با این کد یافت نشد.");
 
-                        if(otherUser.Id == user.Id)
+                        if (otherUser.Id == user.Id)
                             throw new ManagedException("می‌بایست کد کاربری شخصی به غیر از خودتان را وارد نمایید.");
 
-                        if (!otherUser.UserType.AllowedTicketTypes.Any(c => c.TicketTypeId == item.TicketTypeId))
+                        if (!otherUser.UserType!.AllowedTicketTypes.Any(c => c.TicketTypeId == item.TicketTypeId))
                             errors.Add($"نوع کاربری با شماره کد {item.UserCode} مجاز به رزرو بلیت های نوع '{ticketType.Title}' نیست.");
 
                         if (otherUser.Status != UserStatus.Active)
@@ -215,7 +215,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     }
                     else
                     {
-                        if (!user.UserType.AllowedTicketTypes.Any(c => c.TicketTypeId == item.TicketTypeId))
+                        if (!user.UserType!.AllowedTicketTypes.Any(c => c.TicketTypeId == item.TicketTypeId))
                             errors.Add($"نوع کاربری شما مجاز به رزرو بلیت های نوع '{ticketType.Title}' نیست.");
 
                         if (user.Status != UserStatus.Active)
@@ -227,7 +227,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     skyDiveEvent = skyDiveEvents?
                         .FirstOrDefault(skyDiveEvent =>
                         {
-                            skyDiveEventItem = skyDiveEvent.Items.FirstOrDefault(day => day.FlightLoads.Any(flight => flight.Id == item.FlightLoadId));
+                            skyDiveEventItem = skyDiveEvent.Items.FirstOrDefault(day => day.FlightLoads.Any(flight => flight.Id == item.FlightLoadId))!;
                             if (skyDiveEventItem is not null)
                                 return true;
                             else
@@ -244,19 +244,25 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                         throw new ManagedException("بلیت های این رویداد قابل رزرو نیست.");
 
                     var flightLoad = skyDiveEventItem.FlightLoads.FirstOrDefault(c => c.Id == item.FlightLoadId);
-                    var flightLoadItem = flightLoad.FlightLoadItems.FirstOrDefault(c => c.FlightLoadType.Id == item.TicketTypeId);
+                    var flightLoadItem = flightLoad!.FlightLoadItems.FirstOrDefault(c => c.FlightLoadType.Id == item.TicketTypeId);
 
                     duplicationCheck.Add((otherUser?.Code ?? user.Code).ToString() + flightLoad.Number.ToString());
 
-                    var availableTicket = flightLoadItem.Tickets.Where(c => !c.Locked && !c.ReservedByAdmin && !c.Paid).FirstOrDefault();
+                    var availableTicket = flightLoadItem!.Tickets.Where(c => !c.Locked && !c.ReservedByAdmin && !c.Paid).FirstOrDefault();
 
                     if (availableTicket is null)
                         errors.Add($"برای پرواز شماره {flightLoad.Number} بلیت {flightLoadItem.FlightLoadType.Title} به میزان درخواستی وجود ندارد.");
                     else
                     {
-                        _unitOfWork.TicketRepository.ReserveTicket(availableTicket, user);
+                        //check if another user has reserved a ticket for this user
+                        if (flightLoadItem.Tickets.Any(c => c.ReservedFor is not null && c.ReservedFor == (otherUser ?? user)))
+                            throw new ManagedException("هر شخص مجاز به رزرو یک بلیت در هر پرواز می‌باشد.");
+
+                        _unitOfWork.TicketRepository.ReserveTicket(availableTicket, user, otherUser ?? user);
 
                         flightLoadItems.Add(new Tuple<FlightLoadItem, User>(flightLoadItem, otherUser ?? user));
+
+
                     }
                 }
 
@@ -264,7 +270,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     throw new ManagedException("هر شخص مجاز به رزرو یک بلیت در هر پرواز می‌باشد.");
 
                 if (errors.Any())
-                    throw new ManagedException(string.Join("\n", errors));
+                    throw new ManagedException(string.Join("\n", errors.Distinct()));
 
                 if (_unitOfWork.ShoppingCartRepository.Include(c => c.SkyDiveEvent, c => c.Items).Any(c => c.SkyDiveEvent != skyDiveEvent && c.Items.Any() && c.User == user))
                     throw new ManagedException("شما سبد خرید تسویه نشده برای رویداد دیگری دارید، لطفا اقدام به حذف آیتم های سبد خرید یا تسویه آن ها نمایید.");
@@ -308,19 +314,26 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task<MemoryStream> PrintTicket(Guid id)
+        public async Task<MemoryStream> PrintTicket(List<Guid> ids)
         {
             PersianCalendar pc = new PersianCalendar();
 
-            var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.ReservedBy);
-            if (ticket is null)
-                throw new ManagedException("بلیت مورد نظر یافت نشد.");
+            List<TicketPrintModel> list = new List<TicketPrintModel>();
+            foreach (var id in ids)
+            {
+                var ticket = await _unitOfWork.TicketRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.ReservedBy);
+                if (ticket is null)
+                    throw new ManagedException("بلیت مورد نظر یافت نشد.");
 
-            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId.Value);
+                var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetByIdAsync(ticket.SkyDiveEventId.Value);
 
-            return PdfHelper.TicketPdf(ticket.ReservedBy.FullName, ticket.TicketType, ticket.TicketNumber,
-                skyDiveEvent.Location, $"{pc.GetYear(ticket.FlightDate.Value)}/{pc.GetMonth(ticket.FlightDate.Value)}/{pc.GetDayOfMonth(ticket.FlightDate.Value)}",
-                ticket.FlightNumber.Value.ToString("000"), ticket.ReservedBy.NationalCode ?? string.Empty);
+                list.Add(new TicketPrintModel(ticket.ReservedBy.FullName, ticket.TicketType, ticket.TicketNumber,
+                     skyDiveEvent.Location, $"{pc.GetYear(ticket.FlightDate.Value)}/{pc.GetMonth(ticket.FlightDate.Value)}/{pc.GetDayOfMonth(ticket.FlightDate.Value)}",
+                     ticket.FlightNumber.Value.ToString("000"), ticket.ReservedBy.NationalCode ?? string.Empty)
+                    );
+            }
+
+            return PdfHelper.TicketPdf(list);
         }
 
         public async Task<ShoppingCartDTO> GetUserShoppingCart(Guid userId)
@@ -390,7 +403,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketAmount, shoppingCartItem.ReservedFor,
                     shoppingCart.SkyDiveEvent.Id, flightLoad!.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
 
-                number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber, 
+                number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
                     shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "",
                     ticketAmount, TransactionType.Confirmed, user, false, number);
             }

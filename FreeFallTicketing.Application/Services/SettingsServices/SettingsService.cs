@@ -29,7 +29,8 @@ namespace SkyDiveTicketing.Application.Services.SettingsServices
         public async Task Update(SettingsCommand command)
         {
             await _unitOfWork.SettingsRepository.Update(command.TermsAndConditionsUrl ?? string.Empty, command.FileSizeLimitation,
-                command.RegistrationTermsAndConditionsUrl ?? string.Empty, command.AttorneyDocumentsValidityDuration ?? 0, command.MedicalDocumentsValidityDuration ?? 0);
+                command.RegistrationTermsAndConditionsUrl ?? string.Empty, command.AttorneyDocumentsValidityDuration ?? 0,
+                command.MedicalDocumentsValidityDuration ?? 0, command.JumpDuration);
 
             foreach (var item in command.UserStatusInfo!)
             {

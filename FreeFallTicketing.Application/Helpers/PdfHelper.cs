@@ -2,7 +2,7 @@
 {
     public class PdfHelper
     {
-        public static MemoryStream TicketPdf(string name, string ticketType, string ticketNumber, string location, string date, string flightNumber, string nationalCode)
+        public static MemoryStream TicketPdf(List<TicketPrintModel> models)
         {
             var html = $@"
                 <html lang=""en"">
@@ -15,30 +15,38 @@
                   <body>
                     <div
                       style=""
-                        display: flex;
-                        justify-content: center;
                         height: 100%;
+                        width: 800px;
                         align-items: center;
                         font-family: 'B Nazanin';
+                        margin: auto;
                       "">
-                      <div style=""border: 4px solid black; padding: 0 50px; text-align: center; width: 300px;"">
-                        <h2>{name}</h2>
-                        <h2>نوع بلیت: {ticketType}</h2>
-                        <h2>{ticketNumber}</h2>
+                    ";
+            
+            foreach (var model in models)
+            {
+                html += $@"<div style=""display: inline-block; border: 4px solid black; padding: 0 50px; text-align: center; width: 250px; margin:50px 20px;"">
+                        <h2>{model.Name}</h2>
+                        <h2>نوع بلیت: {model.TicketType}</h2>
+                        <h2>{model.TicketNumber}</h2>
                         <p style=""font-size: 1.3rem"">
                           <strong>محل رویداد:</strong>
-                          <span>{location}</span>
+                          <span>{model.Location}</span>
                         </p>
                         <div style=""display: flex; justify-content: space-around;"">
-                            <p style=""font-size: 1.3rem""><strong>تاریخ: </strong>{date}</p>
-                            <p style=""font-size: 1.3rem""><strong>شماره پرواز: </strong>{flightNumber}</p>
+                            <p style=""font-size: 1.3rem""><strong>تاریخ: </strong>{model.Date}</p>
+                            <p style=""font-size: 1.3rem""><strong>شماره پرواز: </strong>{model.FlightNumber}</p>
                         </div>
                         <p style=""font-size: 1.3rem"">
                           <strong>کد ملی:</strong>
-                          <span>{nationalCode}</span>
+                          <span>{model.NationalCode}</span>
                         </p>
                       </div>
-                    </div>
+                    ";
+
+            }
+
+            html += @"</div>
                   </body>
                 </html>";
 
@@ -87,7 +95,7 @@
                       <div style=""border: 6px solid black; padding: 0 50px; text-align: center; width: 650px;"">
                         <h2>صورت حساب فروش</h2>
                         <div style=""width: 100%;position: relative;"">
-                          <p style=""position: absolute; right: 0;"">فروشنده: شرکت پرواز های تفریحی</p>
+                          <p style=""position: absolute; right: 0;"">فروشنده: باشگاه سقوط آزاد ایرانیان</p>
                           <p style=""position: absolute; left: 0;width: 35%;"">تاریخ: {date}</p>
                         </div>
                         <br>
@@ -127,5 +135,27 @@
 
             return new MemoryStream(pdfBytes);
         }
+    }
+
+    public class TicketPrintModel
+    {
+        public TicketPrintModel(string name, string ticketType, string ticketNumber, string location, string date, string flightNumber, string nationalCode)
+        {
+            Name = name;
+            TicketType = ticketType;
+            TicketNumber = ticketNumber;
+            Location = location;
+            Date = date;
+            FlightNumber = flightNumber;
+            NationalCode = nationalCode;
+        }
+
+        public string Name { get; set; }
+        public string TicketType { get; set; }
+        public string TicketNumber { get; set; }
+        public string Location { get; set; }
+        public string Date { get; set; }
+        public string FlightNumber { get; set; }
+        public string NationalCode { get; set; }
     }
 }

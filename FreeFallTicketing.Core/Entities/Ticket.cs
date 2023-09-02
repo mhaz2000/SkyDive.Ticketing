@@ -25,6 +25,8 @@ namespace SkyDiveTicketing.Core.Entities
         public bool Voidable { get; set; }
         public User? ReservedBy { get; set; }
         public Guid? ReservedById { get; set; }
+        public User? ReservedFor { get; set; }
+        public Guid? ReservedForId { get; set; }
         public bool ReservedByAdmin { get; set; }
         public bool Paid { get; private set; }
         public bool Locked { get; private set; }
@@ -78,11 +80,13 @@ namespace SkyDiveTicketing.Core.Entities
         {
             Locked = false;
             LockedBy = null;
+            ReservedFor= null;
         }
-        public void SetAsLock(User user)
+        public void SetAsLock(User user, User resrevedFor)
         {
             LockedBy = user;
             Locked = true;
+            ReservedFor = resrevedFor;
         }
     }
 

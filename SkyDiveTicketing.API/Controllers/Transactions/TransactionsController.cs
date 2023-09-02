@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Base;
 using SkyDiveTicketing.Application.Services.TransactionServices;
+using SkyDiveTicketing.Core.Entities;
 using System.Data;
 
 namespace SkyDiveTicketing.API.Controllers.Transactions
@@ -53,6 +54,21 @@ namespace SkyDiveTicketing.API.Controllers.Transactions
             {
                 var invoiceFile = await _transactionService.PrintInvoice(id);
                 return File(invoiceFile, "application/octet-stream");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("{transactionId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveTransaction(Guid transactionId)
+        {
+            try
+            {
+                await _transactionService.RemoveTransaction(transactionId);
+                return OkResult("تراکنش با موفقیت پاک شد.");
             }
             catch (ManagedException e)
             {

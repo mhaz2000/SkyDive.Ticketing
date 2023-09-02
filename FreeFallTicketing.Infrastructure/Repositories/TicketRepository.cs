@@ -40,9 +40,9 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
            return Context.CancelledTickets.Include(c => c.ReservedBy).Include(c => c.PaidBy);
         }
 
-        public void ReserveTicket(Ticket ticket, User user)
+        public void ReserveTicket(Ticket ticket, User user, User resrevedFor)
         {
-            ticket.SetAsLock(user);
+            ticket.SetAsLock(user, resrevedFor);
             ticket.ReserveTime = DateTime.Now;
         }
 

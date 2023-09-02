@@ -11,6 +11,7 @@
     <PackageReference Include="kavenegar" Version="1.2.4" />
     <PackageReference Include="MD.PersianDateTime" Version="4.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <PackageReference Include="NReco.PdfGenerator" Version="1.2.1" />

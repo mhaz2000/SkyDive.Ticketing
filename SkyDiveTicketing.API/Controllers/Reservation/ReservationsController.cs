@@ -154,12 +154,12 @@ namespace SkyDiveTicketing.API.Controllers.Reservation
             }
         }
 
-        [HttpGet("PrintTicket/{id}")]
-        public async Task<IActionResult> PrintTicket(Guid id)
+        [HttpPut("PrintTicket")]
+        public async Task<IActionResult> PrintTicket(List<Guid> ids)
         {
             try
             {
-                var ticketFile = await _reservationService.PrintTicket(id);
+                var ticketFile = await _reservationService.PrintTicket(ids);
                 return File(ticketFile, "application/octet-stream");
             }
             catch (ManagedException e)

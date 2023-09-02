@@ -22,7 +22,7 @@ namespace SkyDiveTicketing.Application.Services.TransactionServices
 
             var transactions = await _unitOfWork.TransactionRepositroy.GetListWithIncludeAsync("Payer", c => c.Payer == user);
 
-            return transactions.Select(transaction => new TransactionDTO(transaction.Id, transaction.CreatedAt, transaction.UpdatedAt,
+            return transactions.OrderByDescending(c=>c.CreatedAt).Select(transaction => new TransactionDTO(transaction.Id, transaction.CreatedAt, transaction.UpdatedAt,
                 transaction.CreatedAt, transaction.TicketNumber, transaction.EventName, transaction.PaymentInformation, transaction.TotalAmount, transaction.Type, transaction.InvoiceNumber));
         }
 
@@ -40,6 +40,16 @@ namespace SkyDiveTicketing.Application.Services.TransactionServices
             return PdfHelper.InvoicePdf($"{pc.GetYear(transaction.CreatedAt)}/{pc.GetMonth(transaction.CreatedAt).ToString("00")}/{pc.GetDayOfMonth(transaction.CreatedAt).ToString("00")}",
                 transaction.InvoiceNumber!.Value, transaction.Payer.FullName, transaction.Payer.NationalCode ?? "", transaction.Payer.PhoneNumber, transaction.Amount,
                 transaction.TicketNumber, transaction.VAT, transaction.TotalAmount);
+        }
+
+        public async Task RemoveTransaction(Guid transactionId)
+        {
+            var transaction = await _unitOfWork.TransactionRepositroy.GetByIdAsync(transactionId);
+            if (transaction is null)
+                throw new ManagedException("تراکنش مورد نظر یافت نشد.");
+
+            _unitOfWork.TransactionRepositroy.Remove(transaction);
+            await _unitOfWork.CommitAsync();
         }
     }
 }

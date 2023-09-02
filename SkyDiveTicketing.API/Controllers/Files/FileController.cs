@@ -24,7 +24,7 @@ namespace SkyDiveTicketing.API.Controllers.Files
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] FileCommand command)
         {
-            var fileId = await _fileService.StoreFile(command.File, _fileStoragePath);
+            var fileId = await _fileService.StoreFile(command.File, _fileStoragePath, command.IgnoreFileSizeLimitation);
 
             return Ok(fileId);
         }

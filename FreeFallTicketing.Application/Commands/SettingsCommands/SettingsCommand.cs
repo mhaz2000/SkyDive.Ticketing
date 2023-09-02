@@ -13,6 +13,7 @@ namespace SkyDiveTicketing.Application.Commands.SettingsCommands
         public int? MedicalDocumentsValidityDuration { get; set; }
         public int? AttorneyDocumentsValidityDuration { get; set; }
         public ICollection<UserStatusInfoCommand>? UserStatusInfo { get; set; }
+        public int JumpDuration { get; set; }
 
         public void Validate() => new SettingsCommandValidator().Validate(this).RaiseExceptionIfRequired();
     }

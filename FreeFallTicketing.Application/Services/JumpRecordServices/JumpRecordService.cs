@@ -68,7 +68,7 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
 
             return jumpRecords.Select(jumpRecord => new JumpRecordDTO(jumpRecord.Id, jumpRecord.CreatedAt,
                 jumpRecord.UpdatedAt, jumpRecord.Date, jumpRecord.Location, jumpRecord.Equipments, jumpRecord.PlaneType, jumpRecord.Height,
-                jumpRecord.Time, jumpRecord.Description, jumpRecord.Confirmed));
+                jumpRecord.Time, jumpRecord.Description, jumpRecord.Confirmed, jumpRecord.User.Id));
         }
 
         public async Task<IEnumerable<JumpRecordDTO>> GetJumpRecords(Guid userId)
@@ -81,7 +81,7 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
 
             return jumpRecords.Select(jumpRecord => new JumpRecordDTO(jumpRecord.Id, jumpRecord.CreatedAt,
                 jumpRecord.UpdatedAt, jumpRecord.Date, jumpRecord.Location, jumpRecord.Equipments, jumpRecord.PlaneType, jumpRecord.Height,
-                jumpRecord.Time, jumpRecord.Description, jumpRecord.Confirmed));
+                jumpRecord.Time, jumpRecord.Description, jumpRecord.Confirmed, jumpRecord.User.Id));
         }
 
         public async Task Remove(Guid id)
