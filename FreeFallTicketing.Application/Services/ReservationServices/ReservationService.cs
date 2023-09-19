@@ -246,7 +246,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     var flightLoad = skyDiveEventItem.FlightLoads.FirstOrDefault(c => c.Id == item.FlightLoadId);
                     var flightLoadItem = flightLoad!.FlightLoadItems.FirstOrDefault(c => c.FlightLoadType.Id == item.TicketTypeId);
 
-                    duplicationCheck.Add((otherUser?.Code ?? user.Code).ToString() + flightLoad.Number.ToString());
+                    duplicationCheck.Add((otherUser?.Code ?? user.Code).ToString() + flightLoad.Number.ToString() + skyDiveEventItem.Id.ToString());
 
                     var availableTicket = flightLoadItem!.Tickets.Where(c => !c.Locked && !c.ReservedByAdmin && !c.Paid).FirstOrDefault();
 
