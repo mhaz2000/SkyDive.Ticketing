@@ -52,7 +52,7 @@ namespace SkyDiveTicketing.Core.Entities
         public void SetRequest(AdminCartable request)
         {
             RelatedAdminCartableRequest = request;
-            CancellationRequest= true;
+            CancellationRequest = true;
         }
         public void SetAsPaid(double amount, Guid skyDiveEventId, int flightNumber, string ticketType, DateTime flightDate)
         {
@@ -80,7 +80,7 @@ namespace SkyDiveTicketing.Core.Entities
         {
             Locked = false;
             LockedBy = null;
-            ReservedFor= null;
+            ReservedFor = null;
         }
         public void SetAsLock(User user, User resrevedFor)
         {

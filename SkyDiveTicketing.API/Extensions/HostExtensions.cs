@@ -86,7 +86,7 @@ namespace SkyDiveTicketing.API.Extensions
                     TermsAndConditionsUrl = string.Empty,
                     RegistrationTermsAndConditionsUrl = string.Empty,
                     UserStatusInfo = new List<UserStatusInfo>(),
-                    VAT = 0.09f
+                    VAT = 9
                 });
 
                 dataContext.SaveChanges();

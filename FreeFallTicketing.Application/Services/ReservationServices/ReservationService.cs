@@ -139,7 +139,6 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             return true;
         }
 
-
         public async Task UnlockTickets()
         {
             var tickets = _unitOfWork.TicketRepository.Include(c => c.LockedBy!).AsEnumerable()
@@ -369,9 +368,27 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             return shoppingCartDto;
         }
 
+        public async Task RemoveShoppingCart(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+            if (user is null)
+                throw new ManagedException("کاربری یافت نشد.");
+
+            UnlockShoppingCartItems(user);
+            await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);
+            await _unitOfWork.CommitAsync();
+        }
+
         private void UnlockShoppingCartItems(User user)
         {
-            var tickets = _unitOfWork.TicketRepository.Include(c => c.LockedBy).Where(c => c.LockedBy == user && !c.Paid);
+            Expression<Func<Ticket, object>>[] includeExpressions = {
+                c => c.LockedBy!,
+                c=> c.ReservedFor!
+            };
+
+            var tickets = _unitOfWork.TicketRepository
+                .Include(includeExpressions)
+                .Where(c => c.LockedBy == user && !c.Paid);
 
             foreach (var ticket in tickets)
             {

@@ -22,8 +22,8 @@ namespace SkyDiveTicketing.Application.Services.TransactionServices
 
             var transactions = await _unitOfWork.TransactionRepositroy.GetListWithIncludeAsync("Payer", c => c.Payer == user);
 
-            return transactions.OrderByDescending(c=>c.CreatedAt).Select(transaction => new TransactionDTO(transaction.Id, transaction.CreatedAt, transaction.UpdatedAt,
-                transaction.CreatedAt, transaction.TicketNumber, transaction.EventName, transaction.PaymentInformation, transaction.TotalAmount, transaction.Type, transaction.InvoiceNumber));
+            return transactions.OrderByDescending(c => c.CreatedAt).ToList().Select(transaction => new TransactionDTO(transaction.Id, transaction.CreatedAt, transaction.UpdatedAt,
+                transaction.CreatedAt, transaction.TicketNumber, transaction.EventName, transaction.PaymentInformation, transaction.Amount + transaction.VAT, transaction.Type, transaction.InvoiceNumber));
         }
 
         public async Task<MemoryStream> PrintInvoice(Guid id)

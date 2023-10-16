@@ -47,7 +47,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
         public async Task ClearShoppingCartAsync(User user)
         {
-            var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c => c.Items)
+            var shoppingCart = await Context.ShoppingCarts.Include(c => c.User).Include(c=> c.SkyDiveEvent).Include(c => c.Items)
                 .Where(c => c.User == user).FirstOrDefaultAsync();
 
             if (shoppingCart is not null)

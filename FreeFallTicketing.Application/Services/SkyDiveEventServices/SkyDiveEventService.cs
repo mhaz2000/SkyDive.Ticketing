@@ -48,7 +48,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
         public IEnumerable<SkyDiveEventDTO> GetEvents(Guid? statusId, DateTime? start, DateTime? end, Guid userId)
         {
             var isAdmin = _unitOfWork.RoleRepository.GetAdminUsers().Contains(userId);
-            
+
             PersianCalendar pc = new PersianCalendar();
             var events = _unitOfWork.SkyDiveEventRepository.FindEvents(c => isAdmin ? true : c.IsActive);
 
@@ -294,8 +294,8 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
         {
             return skyDiveEventItem.FlightLoads.Sum(flightLoad =>
             {
-                var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(c => c.ReservedBy is null && !c.Locked && !c.Voidable).Count());
-                return ticketsNumber-flightLoad.VoidableNumber;
+                var ticketsNumber = flightLoad.FlightLoadItems.Sum(item => item.Tickets.Where(c => c.ReservedBy is null && !c.Locked && !c.Voidable && !c.ReservedByAdmin).Count());
+                return ticketsNumber - flightLoad.VoidableNumber;
             });
         }
 

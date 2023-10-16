@@ -45,5 +45,20 @@ namespace SkyDiveTicketing.API.Controllers.ShoppingCarts
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpDelete("Remove")]
+        public async Task<IActionResult> RemoveShoppingCart()
+        {
+            try
+            {
+                await _reservationService.RemoveShoppingCart(UserId);
+
+                return OkResult("سبد خرید با موفقیت حذف شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
