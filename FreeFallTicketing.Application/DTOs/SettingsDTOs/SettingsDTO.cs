@@ -5,7 +5,7 @@ namespace SkyDiveTicketing.Application.DTOs.SettingsDTOs
     public class SettingsDTO : BaseDTO<Guid>
     {
         public SettingsDTO(Guid id, DateTime createdAt, DateTime updatedAt, IEnumerable<UserStatusInfoDTO> userStatusInfo, string url, string registrationUrl,
-            int jumpDuration, int fileSizeLimitation, int attorneyDocumentsValidityDuration, int medicalDocumentsValidityDuration) : base(id, createdAt, updatedAt)
+            int jumpDuration, int fileSizeLimitation, int attorneyDocumentsValidityDuration, int medicalDocumentsValidityDuration, float vat) : base(id, createdAt, updatedAt)
         {
             UserStatusInfo = userStatusInfo;
             TermsAndConditionsUrl = url;
@@ -13,7 +13,8 @@ namespace SkyDiveTicketing.Application.DTOs.SettingsDTOs
             RegistrationTermsAndConditionsUrl = registrationUrl;
             FileSizeLimitation = fileSizeLimitation;
             MedicalDocumentsValidityDuration = medicalDocumentsValidityDuration;
-            AttorneyDocumentsValidityDuration= attorneyDocumentsValidityDuration;
+            AttorneyDocumentsValidityDuration = attorneyDocumentsValidityDuration;
+            VAT = vat;
         }
 
         public int FileSizeLimitation { get; set; }
@@ -22,7 +23,7 @@ namespace SkyDiveTicketing.Application.DTOs.SettingsDTOs
         public int JumpDuration { get; set; }
         public int MedicalDocumentsValidityDuration { get; set; }
         public int AttorneyDocumentsValidityDuration { get; set; }
-
+        public float VAT { get; set; }
         public IEnumerable<UserStatusInfoDTO> UserStatusInfo { get; set; }
 
     }
