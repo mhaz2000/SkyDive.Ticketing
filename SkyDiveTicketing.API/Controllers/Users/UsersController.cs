@@ -5,10 +5,6 @@ using SkyDiveTicketing.Application.Commands.UserCommands;
 using SkyDiveTicketing.Application.Services.UserServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SkyDiveTicketing.Application.Services.PassengerServices;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Newtonsoft.Json.Linq;
-using SkyDiveTicketing.Core.Entities;
 
 namespace SkyDiveTicketing.API.Controllers.Users
 {

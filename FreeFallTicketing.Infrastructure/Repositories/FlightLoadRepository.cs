@@ -108,5 +108,17 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             Context.Tickets.Remove(ticket);
         }
+
+        public void RemoveFlight(SkyDiveEventItem? skyDiveEventItem, FlightLoad flight)
+        {
+            foreach (var item in flight.FlightLoadItems)
+            {
+                Context.Tickets.RemoveRange(item.Tickets);
+                Context.FlightLoadItems.Remove(item);
+            }
+            skyDiveEventItem.FlightLoads.Remove(flight);
+
+            Context.FlightLoads.Remove(flight);
+        }
     }
 }

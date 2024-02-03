@@ -15,5 +15,6 @@ namespace SkyDiveTicketing.Core.Repositories
 
         void RemoveFlights(IEnumerable<FlightLoad> flights, SkyDiveEventItem skyDiveEventDay);
         Task RemoveTicket(FlightLoadItem flightLoadItem, Ticket ticket);
+        void RemoveFlight(SkyDiveEventItem skyDiveEventItem, FlightLoad flight);
     }
 }

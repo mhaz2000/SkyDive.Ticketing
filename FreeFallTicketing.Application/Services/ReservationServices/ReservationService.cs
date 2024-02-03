@@ -183,7 +183,6 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             else
             {
                 var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.IsActive).AsEnumerable();
-                //var skyDiveEvents = _unitOfWork.SkyDiveEventRepository.FindEvents().AsEnumerable();
 
                 SkyDiveEvent? skyDiveEvent = null;
 

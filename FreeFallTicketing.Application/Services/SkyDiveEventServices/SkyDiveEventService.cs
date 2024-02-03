@@ -353,5 +353,21 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             await _unitOfWork.FlightLoadRepository.RemoveTicket(flightLoadItem, ticket);
             await _unitOfWork.CommitAsync();
         }
+
+        public async Task RemoveFlight(Guid id)
+        {
+            var flight = await _unitOfWork.FlightLoadRepository.GetExpandedById(id);
+            if (flight is null)
+                throw new ManagedException("پرواز مورد نظر یافت نشد.");
+
+            if (flight.FlightLoadItems.Any(t => t.Tickets.Any(y => y.Locked || y.Paid)))
+                throw new ManagedException("بلیتی در این پرواز رزرو شده است.");
+
+
+            var skyDiveEventDay = await _unitOfWork.SkyDiveEventItemRepository.GetFirstWithIncludeAsync(c=> c.FlightLoads.Any(t=> t.Id == id), c=> c.FlightLoads);
+
+            _unitOfWork.FlightLoadRepository.RemoveFlight(skyDiveEventDay, flight);
+            await _unitOfWork.CommitAsync();
+        }
     }
 }
