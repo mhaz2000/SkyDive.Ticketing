@@ -120,5 +120,15 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             Context.FlightLoads.Remove(flight);
         }
+
+        public void SetFlightStatus(FlightLoad flight, FlightStatus status)
+        {
+            flight.Status = status;
+        }
+
+        public void SetFlightName(FlightLoad flight, string name)
+        {
+            flight.Name = name;
+        }
     }
 }

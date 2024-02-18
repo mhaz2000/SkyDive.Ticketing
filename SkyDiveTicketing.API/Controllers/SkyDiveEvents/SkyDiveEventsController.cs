@@ -207,6 +207,48 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpPut("SetFlightStatus/{id}")]
+        public async Task<IActionResult> SetFlightStatus(Guid id, [FromBody] SetFlightStatusCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _skyDiveEventService.SetFlightStatus(command, id);
+                return OkResult("رویداد با موفقیت ویرایش شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("SetFlightName/{id}")]
+        public async Task<IActionResult> SetFlightName(Guid id, [FromBody] SetFlightNameCommand command)
+        {
+            try
+            {
+                command.Validate();
+
+                await _skyDiveEventService.SetFlightName(command, id);
+                return OkResult("رویداد با موفقیت ویرایش شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpGet("EventDayFlights/{id}")]
         public IActionResult GetEventDayFlights(Guid id, [FromQuery] PageQuery page)
         {

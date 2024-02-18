@@ -1,4 +1,5 @@
 ﻿using SkyDiveTicketing.Core.Entities.Base;
+using System.ComponentModel;
 
 namespace SkyDiveTicketing.Core.Entities
 {
@@ -17,9 +18,12 @@ namespace SkyDiveTicketing.Core.Entities
             Date = date;
             Capacity = capacity;
             VoidableNumber = voidableNumber;
+            Status = FlightStatus.NotDone;
+            Name = string.Empty;
         }
 
         public int Number { get; set; }
+        public string Name { get; set; }
         public DateTime Date { get; set; }
         public int Capacity { get; set; }
 
@@ -27,6 +31,8 @@ namespace SkyDiveTicketing.Core.Entities
         /// غیر قابل رزرو
         /// </summary>
         public int VoidableNumber { get; set; }
+
+        public FlightStatus Status { get; set; }
 
 
         public ICollection<FlightLoadItem> FlightLoadItems { get; set; }
@@ -58,4 +64,17 @@ namespace SkyDiveTicketing.Core.Entities
 
         public ICollection<Ticket> Tickets { get; set; }
     }
+
+    public enum FlightStatus
+    {
+        [Description("انجام نشده")]
+        NotDone,
+        [Description("معلق شده")]
+        Suspended,
+        [Description("کنسل شده")]
+        Canceled,
+        [Description("انجام شده")]
+        Done
+    }
+
 }

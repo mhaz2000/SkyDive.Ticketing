@@ -27,5 +27,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
         Task RemoveFlights(Guid id);
         Task RemoveTicket(Guid id);
         Task RemoveFlight(Guid id);
+        Task SetFlightStatus(SetFlightStatusCommand command, Guid id);
+        Task SetFlightName(SetFlightNameCommand command, Guid id);
     }
 }

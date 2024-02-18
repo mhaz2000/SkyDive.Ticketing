@@ -1,4 +1,5 @@
-﻿using SkyDiveTicketing.Application.Commands.Base;
+﻿using FluentValidation;
+using SkyDiveTicketing.Application.Commands.Base;
 using SkyDiveTicketing.Application.Validators.Extensions;
 using SkyDiveTicketing.Application.Validators.SkyDiveEventValidatorts;
 

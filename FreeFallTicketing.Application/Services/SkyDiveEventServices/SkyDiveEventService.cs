@@ -3,6 +3,7 @@ using SkyDiveTicketing.Application.Commands.SkyDiveEventCommands;
 using SkyDiveTicketing.Application.DTOs.FlightLoadDTOs;
 using SkyDiveTicketing.Application.DTOs.SkyDiveEventDTOs;
 using SkyDiveTicketing.Application.DTOs.TicketDTOs;
+using SkyDiveTicketing.Application.Helpers;
 using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
 using System.Globalization;
@@ -205,12 +206,13 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (skyDiveEvent is null)
                 throw new ManagedException("رویدادی پیدا نشد.");
 
-            var skyDiveEventItem = skyDiveEvent.Items.FirstOrDefault(c => c.Id == id);
+            var skyDiveEventItem = skyDiveEvent.Items.FirstOrDefault(c => c.Id == id)!;
 
             return new SkyDiveEventItemDTO(skyDiveEventItem.Id, skyDiveEventItem.CreatedAt, skyDiveEventItem.UpdatedAt, skyDiveEventItem.Date)
             {
                 Flights = skyDiveEventItem.FlightLoads.OrderBy(c => c.Number).Skip((pageIndex - 1) * pageSize).Take(pageSize)
-                    .Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number, flight.Capacity, flight.VoidableNumber))
+                    .Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number,
+                            flight.Capacity, flight.VoidableNumber, flight.Name, flight.Status.GetDescription()))
             };
         }
 
@@ -367,6 +369,26 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             var skyDiveEventDay = await _unitOfWork.SkyDiveEventItemRepository.GetFirstWithIncludeAsync(c=> c.FlightLoads.Any(t=> t.Id == id), c=> c.FlightLoads);
 
             _unitOfWork.FlightLoadRepository.RemoveFlight(skyDiveEventDay, flight);
+            await _unitOfWork.CommitAsync();
+        }
+
+        public async Task SetFlightStatus(SetFlightStatusCommand command, Guid id)
+        {
+            var flight = await _unitOfWork.FlightLoadRepository.GetExpandedById(id);
+            if (flight is null)
+                throw new ManagedException("پرواز مورد نظر یافت نشد.");
+
+            _unitOfWork.FlightLoadRepository.SetFlightStatus(flight, command.Status);
+            await _unitOfWork.CommitAsync();
+        }
+
+        public async Task SetFlightName(SetFlightNameCommand command, Guid id)
+        {
+            var flight = await _unitOfWork.FlightLoadRepository.GetExpandedById(id);
+            if (flight is null)
+                throw new ManagedException("پرواز مورد نظر یافت نشد.");
+
+            _unitOfWork.FlightLoadRepository.SetFlightName(flight, command.Name);
             await _unitOfWork.CommitAsync();
         }
     }
