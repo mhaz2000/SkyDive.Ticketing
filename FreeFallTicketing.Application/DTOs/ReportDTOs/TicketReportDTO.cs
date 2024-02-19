@@ -4,10 +4,10 @@
     {
         public int EventCode { get; set; }
         public string EventTitle { get; set; }
-        public DateTime EventDate { get; set; }
+        public string EventDate { get; set; }
         public string FlightName { get; set; }
         public string FlightStatus { get; set; }
-        public DateTime FlightDate { get; set; }
+        public string FlightDate { get; set; }
         public int FlightNumber { get; set; }
         public string TicketNumber { get; set; }
         public string TicketType { get; set; }

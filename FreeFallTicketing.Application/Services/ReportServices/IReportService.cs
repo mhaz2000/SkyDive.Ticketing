@@ -5,6 +5,8 @@ namespace SkyDiveTicketing.Application.Services.ReportServices
 {
     public interface IReportService
     {
-        Task<(IQueryable<TicketReportDTO> Data, int Total)> GetTicketsReport(TicketReportCommand command);
+        Task<(IQueryable<TicketReportDTO> Data, int Total, Guid cacheId)> GetTicketsReport(TicketReportCommand command);
+        Task<MemoryStream> PrintTicketsReport(Guid id);
+
     }
 }

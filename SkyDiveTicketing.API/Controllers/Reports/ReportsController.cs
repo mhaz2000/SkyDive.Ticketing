@@ -28,8 +28,8 @@ namespace SkyDiveTicketing.API.Controllers.Reports
             {
                 command.Validate();
 
-                (var data, var total) = await _reportService.GetTicketsReport(command);
-                return OkResult("گزارش  بلیت ها", data.ToPagingAndSorting(pageQuery), total);
+                (var data, var total, var cacheId) = await _reportService.GetTicketsReport(command);
+                return OkResult(cacheId.ToString(), data.ToPagingAndSorting(pageQuery), total);
             }
             catch (ValidationException e)
             {
@@ -39,6 +39,21 @@ namespace SkyDiveTicketing.API.Controllers.Reports
             {
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
+        }
+
+        [HttpPut("PrintTicketsReport/{id}")]
+        public async Task<IActionResult> PrintTicketsReport(Guid id)
+        {
+            try
+            {
+                var stream = await _reportService.PrintTicketsReport(id);
+                return File(stream, "application/octet-stream");
+            }
+            catch (Exception)
+            {
+                return BadRequest("متاسفانه خطای سیستمی رخ داده");
+            }
+
         }
     }
 }
