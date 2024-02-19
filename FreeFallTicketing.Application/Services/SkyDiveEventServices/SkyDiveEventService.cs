@@ -40,10 +40,10 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (skyDiveEvent is null)
                 throw new ManagedException("رویداد مورد نظر یافت نشد.");
 
-            return new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
+            return await Task.FromResult(new SkyDiveEventDTO(skyDiveEvent.Id, skyDiveEvent.CreatedAt, skyDiveEvent.UpdatedAt, skyDiveEvent.Title, skyDiveEvent.StartDate, skyDiveEvent.EndDate,
                 skyDiveEvent.Image, skyDiveEvent.IsActive, skyDiveEvent.Items?.Sum(c => GetEmptyCapacity(c)) ?? 0, skyDiveEvent.Code.ToString("000"), skyDiveEvent.Location, skyDiveEvent.SubjecToVAT,
                 skyDiveEvent.Voidable, skyDiveEvent.TermsAndConditions ?? "", skyDiveEvent.Status.Title, skyDiveEvent.Status.Reservable, skyDiveEvent.Status.Id,
-                skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id)));
+                skyDiveEvent.Items.Select(item => new SkyDiveEventDayDTO($"{pc.GetYear(item.Date)}/{pc.GetMonth(item.Date)}/{pc.GetDayOfMonth(item.Date)}", item.Id))));
         }
 
         public IEnumerable<SkyDiveEventDTO> GetEvents(Guid? statusId, DateTime? start, DateTime? end, Guid userId)
@@ -71,6 +71,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
         public async Task ToggleActivationEvent(Guid id)
         {
+
             var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Id == id).FirstOrDefault();
             if (skyDiveEvent is null)
                 throw new ManagedException("رویداد مورد نظر یافت نشد.");
@@ -212,7 +213,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             {
                 Flights = skyDiveEventItem.FlightLoads.OrderBy(c => c.Number).Skip((pageIndex - 1) * pageSize).Take(pageSize)
                     .Select(flight => new FlightDTO(flight.Id, flight.CreatedAt, flight.UpdatedAt, flight.Number,
-                            flight.Capacity, flight.VoidableNumber, flight.Name, flight.Status.GetDescription()))
+                            flight.Capacity, flight.VoidableNumber, flight.Name, flight.Status.GetHashCode()))
             };
         }
 
@@ -252,15 +253,18 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
 
         public async Task PublishEvent(Guid id)
         {
+            var eventTypes = await _unitOfWork.SkyDiveEventTicketTypeRepository.GetAllAsync();
             var skyDiveEvent = _unitOfWork.SkyDiveEventRepository.FindEvents(c => c.Id == id).FirstOrDefault();
             if (skyDiveEvent is null)
                 throw new ManagedException("رویداد مورد نظر یافت نشد.");
 
-            if (skyDiveEvent.Items.All(c => c.FlightLoads.Any()))
-                _unitOfWork.SkyDiveEventRepository.PublishEvent(skyDiveEvent);
-            else
+            if (!skyDiveEvent.Items.All(c => c.FlightLoads.Any()))
                 throw new ManagedException("اطلاعات رویداد ناقص است. برای تمامی روز های رویداد پرواز ایجاد نمایید.");
 
+            if (skyDiveEvent.TypesAmount is null || !skyDiveEvent.TypesAmount.Any() || skyDiveEvent.TypesAmount.Count() != eventTypes.Count())
+                throw new ManagedException("قیمت انواع بلیت مشخص نشده است.");
+
+            _unitOfWork.SkyDiveEventRepository.PublishEvent(skyDiveEvent);
             await _unitOfWork.CommitAsync();
         }
 

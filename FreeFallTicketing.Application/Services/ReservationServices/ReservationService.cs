@@ -352,10 +352,11 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             {
                 Items = shoppingCart.Items.Select(shoppingCartItem =>
                     new ShoppingCartItemDTO(data?.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)?.FlightLoad.Number ?? 0,
+                    data?.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)?.FlightLoad.Date,
                     shoppingCartItem.ReservedFor.Code, shoppingCartItem.FlightLoadItem.FlightLoadType.Title,
                     shoppingCart.SkyDiveEvent?.TypesAmount?.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType)?.Amount ?? 0,
-                    shoppingCart.SkyDiveEvent!.SubjecToVAT, data!.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)!.FlightLoad.Id
-                    , shoppingCartItem.FlightLoadItem.FlightLoadType.Id)).ToList()
+                    shoppingCart.SkyDiveEvent!.SubjecToVAT, data!.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)!.FlightLoad.Id,
+                    shoppingCartItem.FlightLoadItem.FlightLoadType.Id)).ToList()
             };
 
             shoppingCartDto.SkyDiveEventId = shoppingCart.SkyDiveEvent.Id;

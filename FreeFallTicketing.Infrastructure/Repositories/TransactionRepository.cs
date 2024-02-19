@@ -18,7 +18,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             int number = invoiceNumber ?? Context.Transactions.OrderByDescending(s => s.InvoiceNumber).FirstOrDefault()?.InvoiceNumber ?? 0;
             await Context.Transactions.AddAsync(new Transaction(ticketNumber, eventName, paymetInformation, amount, type, walletCharging ? number : ++number, payer,
-               walletCharging ? amount : Math.Truncate(amount * settings.VAT / 100)));
+               walletCharging ? 0 : Math.Truncate(amount * settings.VAT / 100)));
 
             return number;
         }

@@ -24,7 +24,7 @@ namespace SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs
     public class ShoppingCartItemDTO
     {
 
-        public ShoppingCartItemDTO(int flightNumber, int qty, string type, double amount, bool subjectToVAT, Guid flightLoadId, Guid ticketTypeId)
+        public ShoppingCartItemDTO(int flightNumber, DateTime? flightDate, int qty, string type, double amount, bool subjectToVAT, Guid flightLoadId, Guid ticketTypeId)
         {
             FlightNumber = flightNumber;
             UserCode = qty;
@@ -33,6 +33,7 @@ namespace SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs
             SubjectToVAT = subjectToVAT;
             FlightLoadId = flightLoadId;
             TicketTypeId = ticketTypeId;
+            FlightDate = flightDate;
         }
 
         public bool SubjectToVAT { get; set; }
@@ -40,6 +41,7 @@ namespace SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs
         public int UserCode { get; set; }
         public string Type { get; set; }
         public Guid TicketTypeId { get; set; }
+        public DateTime? FlightDate { get; set; }
         public double Amount { get; set; }
         public Guid FlightLoadId { get; set; }
 

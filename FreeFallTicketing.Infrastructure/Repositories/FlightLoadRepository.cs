@@ -37,7 +37,6 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             flightItem.SeatNumber--;
             flightItem.Tickets.Remove(ticket);
 
-            flightLoad.Capacity -= flightItem.FlightLoadType.Capacity;
 
             if (!flightItem.Tickets.Any())
             {
@@ -67,7 +66,6 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 flightLoad.FlightLoadItems.Add(newFlightItem);
             }
 
-            flightLoad.Capacity += ticketType.Capacity;
         }
 
         public Task<FlightLoad?> GetFlightLoadByItem(FlightLoadItem flightLoadItem)
@@ -94,8 +92,6 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public async Task RemoveTicket(FlightLoadItem flightLoadItem, Ticket ticket)
         {
             var flight = await Context.FlightLoads.Include(c => c.FlightLoadItems).FirstOrDefaultAsync(c => c.FlightLoadItems.Contains(flightLoadItem));
-
-            flight.Capacity -= flightLoadItem.FlightLoadType.Capacity;
 
             flightLoadItem.SeatNumber--;
             flightLoadItem.Tickets.Remove(ticket);

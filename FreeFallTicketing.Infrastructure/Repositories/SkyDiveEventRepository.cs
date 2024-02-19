@@ -88,7 +88,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 .Include(c => c.Status)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.FlightLoadType)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedBy)
-                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedFor)
+                .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).ThenInclude(c => c.ReservedFor).ThenInclude(c => c.Passenger)
                 .Include(c => c.Items).ThenInclude(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets).AsQueryable();
 
             if (predicate is not null)
@@ -183,7 +183,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         public async Task<IEnumerable<FlightLoad>?> GetSkyDiveEventDayFlights(Guid id)
         {
             return (await Context.SkyDiveEventItems.Include(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets)
-                .FirstOrDefaultAsync(c=>c.Id == id))?.FlightLoads;
+                .FirstOrDefaultAsync(c => c.Id == id))?.FlightLoads;
         }
     }
 }

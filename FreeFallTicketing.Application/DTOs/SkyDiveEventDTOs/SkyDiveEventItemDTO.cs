@@ -14,7 +14,7 @@
 
     public class FlightDTO : BaseDTO<Guid>
     {
-        public FlightDTO(Guid id, DateTime createdAt, DateTime updatedAt, int flightNumber, int capacity, int voidableQty, string name, string status) : base(id, createdAt, updatedAt)
+        public FlightDTO(Guid id, DateTime createdAt, DateTime updatedAt, int flightNumber, int capacity, int voidableQty, string name, int status) : base(id, createdAt, updatedAt)
         {
             FlightNumber = flightNumber;
             Capacity = capacity;
@@ -27,7 +27,7 @@
         public int Capacity { get; set; }
         public int VoidableQty { get; set; }
         public string Name { get; set; }
-        public string Status { get; set; }
+        public int Status { get; set; }
     }
 
     public class TicketDTO : BaseDTO<Guid>

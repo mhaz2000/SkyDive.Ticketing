@@ -74,6 +74,7 @@ namespace SkyDiveTicketing.Core.Entities
             FlightDate = null;
             PaidTime = null;
             ReservedBy = null;
+            ReservedFor = null;
             PaidBy = null;
         }
         public void SetAsUnLock()

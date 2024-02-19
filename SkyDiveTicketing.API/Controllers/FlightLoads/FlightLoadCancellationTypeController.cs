@@ -27,17 +27,12 @@ namespace SkyDiveTicketing.API.Controllers.FlightLoads
                 await _flightLoadCancellationRateService.Create(command);
                 return OkResult("نرخ‌های کنسلی لود پرواز با موفقیت ثبت شد.");
             }
-            catch (ManagedException e)
-            {
-                return BadRequest(e.Message);
-            }
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex+"\n----------------------");
                 return BadRequest("متاسفانه خطای سیستمی رخ داده");
             }
         }

@@ -16,7 +16,6 @@ namespace SkyDiveTicketing.Core.Entities
             FlightLoadItems = new List<FlightLoadItem>();
             Number = number;
             Date = date;
-            Capacity = capacity;
             VoidableNumber = voidableNumber;
             Status = FlightStatus.NotDone;
             Name = string.Empty;
@@ -25,7 +24,12 @@ namespace SkyDiveTicketing.Core.Entities
         public int Number { get; set; }
         public string Name { get; set; }
         public DateTime Date { get; set; }
-        public int Capacity { get; set; }
+        public int Capacity => FlightLoadItems?
+            .Sum(s =>
+            {
+                var availableTicket = s.Tickets?.Where(c => !c.Paid && !c.ReservedByAdmin && !c.Locked)?.Count() ?? 0;
+                return (s.FlightLoadType?.Capacity ?? 0) * availableTicket;
+            }) ?? 0;
 
         /// <summary>
         /// غیر قابل رزرو

@@ -65,6 +65,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             ticket.SetAsPaid(amount, skyDiveEventId, flightNumber, ticketType, flightDate);
             ticket.PaidTime = DateTime.Now;
             ticket.ReservedBy = user;
+            ticket.ReservedFor = user;
             ticket.PaidBy = paidBy;
         }
 

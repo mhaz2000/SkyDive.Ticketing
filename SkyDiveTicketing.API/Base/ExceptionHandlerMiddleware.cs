@@ -51,6 +51,7 @@ namespace SkyDiveTicketing.API.Base
                 var newExceptionLog = ExceptionLog.Create(requestUrl, exception.Message, exception.InnerException?.Message, exception.StackTrace);
                 await logger.LogAsync(newExceptionLog);
 
+                Console.WriteLine(exception.Message);
                 await ConfigureResponse(context, HttpStatusCode.InternalServerError, "متاسفانه خطای سیستمی رخ داده است، در صورت لزوم با پشتیبانی تماس حاصل نمایید");
             }
         }
