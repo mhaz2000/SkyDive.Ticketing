@@ -91,7 +91,7 @@ namespace SkyDiveTicketing.Core.Entities
         /// </summary>
         public ICollection<SkyDiveEventTicketTypeAmount> TypesAmount { get; set; }
 
-        public int Capacity => Items?.Sum(x => x.FlightLoads?.Sum(s => s.Capacity) ?? 0) ?? 0;
+        public int Capacity => Items?.Sum(x => x.FlightLoads?.Where(c => c.Status == FlightStatus.NotDone).Sum(s => s.Capacity) ?? 0) ?? 0;
 
 
         public void ToggleActivation() => IsActive = !IsActive;

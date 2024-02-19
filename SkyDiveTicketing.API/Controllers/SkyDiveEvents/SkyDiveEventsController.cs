@@ -194,7 +194,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
                 command.Validate();
 
                 await _skyDiveEventService.AddFlight(command, id);
-                return OkResult("رویداد با موفقیت ویرایش شد.");
+                return OkResult("پرواز های جدید با موفقیت ثبت گردید.");
             }
             catch (ManagedException e)
             {
@@ -215,7 +215,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
                 command.Validate();
 
                 await _skyDiveEventService.SetFlightStatus(command, id);
-                return OkResult("رویداد با موفقیت ویرایش شد.");
+                return OkResult("پرواز با موفقیت ویرایش شد.");
             }
             catch (ManagedException e)
             {
@@ -236,7 +236,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
                 command.Validate();
 
                 await _skyDiveEventService.SetFlightName(command, id);
-                return OkResult("رویداد با موفقیت ویرایش شد.");
+                return OkResult("پرواز با موفقیت ویرایش شد.");
             }
             catch (ManagedException e)
             {
