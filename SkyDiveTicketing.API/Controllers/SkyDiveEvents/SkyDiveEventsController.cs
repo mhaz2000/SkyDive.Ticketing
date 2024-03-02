@@ -156,7 +156,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
             try
             {
                 await _skyDiveEventService.RemoveFlight(id);
-                return OkResult("پرواز مورد نظر با موفقیت حذف شدند.");
+                return OkResult("پرواز مورد نظر با موفقیت حذف شد.");
             }
             catch (ManagedException e)
             {

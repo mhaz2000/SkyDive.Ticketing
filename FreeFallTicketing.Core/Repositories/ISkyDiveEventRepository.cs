@@ -20,6 +20,8 @@ namespace SkyDiveTicketing.Core.Repositories
         Task<IEnumerable<TicketDetailModel>> GetExpandedSkyDiveEvent(Guid id);
         void PublishEvent(SkyDiveEvent skyDiveEvent);
         Task<bool> HasFlightLoad(Guid id);
+        Task<bool> CheckIfCriticalDataIsChanged(SkyDiveEvent skyDiveEvent, string title, string location, bool voidable,
+            bool subjecToVAT, DateTime startDate, DateTime endDate);
         Task<IEnumerable<FlightLoad>?> GetSkyDiveEventDayFlights(Guid id);
     }
 }

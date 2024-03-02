@@ -30,7 +30,7 @@ namespace SkyDiveTicketing.Application.Services.WalletServices
                 .AddTransaction(string.Empty, string.Empty, command.Amount > 0 ? "شارژ کیف پول" : "برداشت از کیف پول", command.Amount, Core.Entities.TransactionType.Confirmed, user, true);
 
             await _unitOfWork.UserRepository
-                .AddMessage(user, $"موجودی کیف پول شما {Math.Abs(command.Amount)} ریال {(command.Amount > 0 ? "افزایش" : "کاهش")} پیدا کرد.", "کیف پول");
+                .AddMessage(user, $"موجودی کیف پول شما {Math.Abs(command.Amount).ToString("N0")} ریال {(command.Amount > 0 ? "افزایش" : "کاهش")} پیدا کرد.", "کیف پول");
 
             await _unitOfWork.CommitAsync();
         }

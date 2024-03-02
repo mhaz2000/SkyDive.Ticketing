@@ -60,7 +60,7 @@ namespace SkyDiveTicketing.API.Extensions
 
         private static void CreateSkyDiveEventStatuses(DataContext dataContext)
         {
-            if(!dataContext.SkyDiveEventStatuses.Any())
+            if (!dataContext.SkyDiveEventStatuses.Any())
             {
                 dataContext.SkyDiveEventStatuses.Add(new SkyDiveEventStatus("برگزار شده", false));
                 dataContext.SkyDiveEventStatuses.Add(new SkyDiveEventStatus("لغو شده", false));
@@ -110,9 +110,10 @@ namespace SkyDiveTicketing.API.Extensions
                 };
 
                 var done = userManager.CreateAsync(newUser, "123456");
+                var adminRole = context.Roles.Single(c => c.Name == "Admin");
 
                 if (done.Result.Succeeded)
-                    userManager.AddToRoleAsync(newUser, "Admin");
+                    context.UserRoles.AddAsync(new IdentityUserRole<Guid>() { RoleId = adminRole.Id, UserId = newUser.Id });
 
                 context.SaveChanges();
             }

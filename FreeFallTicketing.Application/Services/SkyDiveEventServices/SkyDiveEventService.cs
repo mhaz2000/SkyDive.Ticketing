@@ -109,7 +109,11 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             if (status is null)
                 throw new ManagedException("وضعیت رویداد معتبر نیست.");
 
-            if (await _unitOfWork.SkyDiveEventRepository.HasFlightLoad(id))
+            var condition = await _unitOfWork.SkyDiveEventRepository.HasFlightLoad(id) && skyDiveEvent.IsActive &&
+                await _unitOfWork.SkyDiveEventRepository.CheckIfCriticalDataIsChanged(skyDiveEvent, command.Title, command.Location, command.Voidable,
+                command.SubjecToVAT, command.StartDate, command.EndDate);
+
+            if (condition)
                 throw new ManagedException("برای این رویداد پرواز ثبت شده است.");
 
             await _unitOfWork.SkyDiveEventRepository.Update(command.Title, command.Location, command.Voidable, command.SubjecToVAT,

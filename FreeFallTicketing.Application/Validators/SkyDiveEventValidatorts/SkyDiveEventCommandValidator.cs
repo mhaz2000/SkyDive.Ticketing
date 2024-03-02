@@ -18,7 +18,7 @@ namespace SkyDiveTicketing.Application.Validators.SkyDiveEventValidatorts
             RuleFor(c => c.SubjecToVAT).NotNull().WithMessage("فیلد ارزش افزوده نمی‌تواند خالی باشد.");
             RuleFor(c => c.SubjecToVAT).NotNull().WithMessage("وضعیت نمی‌تواند خالی باشد.");
 
-            RuleFor(c => c.EndDate).GreaterThan(t => t.StartDate).WithMessage("تاریخ شروع باید بعد از تاریخ پایان باشد.");
+            RuleFor(c => c.EndDate).GreaterThanOrEqualTo(t => t.StartDate).WithMessage("تاریخ شروع نمی‌تواند قبل از تاریخ پایان باشد.");
         }
     }
 }

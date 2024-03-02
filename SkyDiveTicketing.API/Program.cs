@@ -126,7 +126,6 @@ builder.Services.AddHangfire(configuration => configuration
 
 builder.Services.AddHangfireServer();
 
-
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin",
@@ -147,13 +146,9 @@ Registry.Register(builder.Services);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    //app.UseSwagger();
-//    //app.UseSwaggerUI();
-//}
-    app.UseHangfireDashboard();
+app.MigrateDatabase<Program>();
+
+app.UseHangfireDashboard();
 
 app.UseCors(c =>
 {
@@ -169,7 +164,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MigrateDatabase<Program>();
 
 RecurringJob.AddOrUpdate<IPassengerDocumentJob>("ExpiredDocument", c => c.CheckPassengerDocumentExpirationDate(), Cron.Daily);
 RecurringJob.AddOrUpdate<ITicketJob>("UnlockTicket", c => c.CheckTicketLockTime(), Cron.Minutely);

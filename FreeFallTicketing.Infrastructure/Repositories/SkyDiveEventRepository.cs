@@ -185,5 +185,12 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
             return (await Context.SkyDiveEventItems.Include(c => c.FlightLoads).ThenInclude(c => c.FlightLoadItems).ThenInclude(c => c.Tickets)
                 .FirstOrDefaultAsync(c => c.Id == id))?.FlightLoads;
         }
+
+        public Task<bool> CheckIfCriticalDataIsChanged(SkyDiveEvent skyDiveEvent, string title, string location, bool voidable,
+            bool subjecToVAT, DateTime startDate, DateTime endDate)
+        {
+            return Task.FromResult(skyDiveEvent.Title != title || skyDiveEvent.Location != location || skyDiveEvent.Voidable != voidable ||
+                skyDiveEvent.SubjecToVAT != subjecToVAT || skyDiveEvent.StartDate != startDate || skyDiveEvent.EndDate != endDate);
+        }
     }
 }

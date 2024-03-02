@@ -69,7 +69,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
                 myTickets.Add(new MyTicketDTO(ticket.Id, ticket.CreatedAt, ticket.UpdatedAt, ticket.TicketNumber, ticket.FlightDate!.Value,
                     ticket.FlightNumber!.Value.ToString("000"), skyDiveEvent.Location, ticket.TicketType!, skyDiveEvent.TermsAndConditions!,
-                    skyDiveEvent.Voidable, skyDiveEvent.Id, skyDiveEvent.Code, skyDiveEvent.StartDate >= DateTime.Now ? TicketStatus.Held : TicketStatus.Reserved));
+                    skyDiveEvent.Voidable, skyDiveEvent.Id, skyDiveEvent.Code, skyDiveEvent.StartDate <= DateTime.Now ? TicketStatus.Held : TicketStatus.Reserved));
             }
 
             var cancelledTickets = _unitOfWork.TicketRepository.GetCancelledTickets().Where(c => c.ReservedBy == user);
