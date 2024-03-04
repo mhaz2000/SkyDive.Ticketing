@@ -17,6 +17,7 @@ using SkyDiveTicketing.API.Jobs.PassengerDocumentJobs;
 using SkyDiveTicketing.API.Jobs.TicketJobs;
 using System.Text.Json.Serialization;
 using SkyDiveTicketing.API.Jobs.JumpRecordJobs;
+using SkyDiveTicketing.Application.PaymentServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -116,7 +117,7 @@ builder.Services.AddScoped<ILogUnitOfWork, LogUnitOfWork>();
 builder.Services.AddScoped<IJumpRecordJob, JumpRecordJob>();
 builder.Services.AddScoped<ExceptionLogger>();
 
-
+builder.Services.AddHttpClient<ZarinpalPaymentService>();
 
 builder.Services.AddHangfire(configuration => configuration
              .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)

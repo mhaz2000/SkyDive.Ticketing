@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SkyDiveTicketing.API.Base;
 using SkyDiveTicketing.Application.Base;
+using SkyDiveTicketing.Application.PaymentServices;
 using SkyDiveTicketing.Application.Services.ReservationServices;
+using SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices;
 
 namespace SkyDiveTicketing.API.Controllers.ShoppingCarts
 {
@@ -10,10 +12,12 @@ namespace SkyDiveTicketing.API.Controllers.ShoppingCarts
     public class ShoppingCartsController : ApiControllerBase
     {
         private readonly IReservationService _reservationService;
+        private readonly IShoppingCartCheckoutService _shoppingCartCheckoutService;
 
-        public ShoppingCartsController(IReservationService reservationService)
+        public ShoppingCartsController(IReservationService reservationService, IShoppingCartCheckoutService shoppingCartCheckoutService)
         {
             _reservationService = reservationService;
+            _shoppingCartCheckoutService = shoppingCartCheckoutService;
         }
 
         [HttpGet("CheckTickets")]
@@ -24,6 +28,34 @@ namespace SkyDiveTicketing.API.Controllers.ShoppingCarts
                 (bool res, string message) = await _reservationService.CheckTickets(UserId);
 
                 return res ? OkResult("مشکلی در سبد خرید وجود ندارد.") : BadRequest(message);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost("Checkout")]
+        public async Task<IActionResult> ShoppingCartCheckout()
+        {
+            try
+            {
+                var redirectUrl = await _shoppingCartCheckoutService.Checkout(UserId);
+                return OkResult(redirectUrl);
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("Verify")]
+        public async Task<IActionResult> PaymentVerfication(string authority)
+        {
+            try
+            {
+                var referenceId = await _shoppingCartCheckoutService.Verfiy(UserId, authority);
+                return OkResult(referenceId.ToString());
             }
             catch (ManagedException e)
             {

@@ -13,6 +13,8 @@ using SkyDiveTicketing.Application.Services.WalletServices;
 using SkyDiveTicketing.Application.Services.UserMessageServices;
 using SkyDiveTicketing.Application.Services.AdminCartableServices;
 using SkyDiveTicketing.Application.Services.ReportServices;
+using SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices;
+using SkyDiveTicketing.Application.PaymentServices;
 
 namespace SkyDiveTicketing.Application
 {
@@ -33,7 +35,9 @@ namespace SkyDiveTicketing.Application
             services.AddScoped<IUserMessageService, UserMessageService>();
             services.AddScoped<ISkyDiveEventService, SkyDiveEventService>();
             services.AddScoped<IAdminCartableService, AdminCartableService>();
+            services.AddScoped<IZarinpalPaymentService, ZarinpalPaymentService>();
             services.AddScoped<ISkyDiveEventStatusService, SkyDiveEventStatusService>();
+            services.AddScoped<IShoppingCartCheckoutService, ShoppingCartCheckoutService>();
             services.AddScoped<ISkyDiveEventTicketTypeService, SkyDiveEventTicketTypeService>();
             services.AddScoped<IFlightLoadCancellationTypeService, FlightLoadCancellationTypeService>();
         }
