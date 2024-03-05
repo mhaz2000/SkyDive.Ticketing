@@ -45,7 +45,7 @@ namespace SkyDiveTicketing.Application.PaymentServices
             return $"{_gatewayUrl}/{paymentResponse.Data.Authority}";
         }
 
-        public async Task<int> Verify(string authority, double amount)
+        public async Task<ulong> Verify(string authority, double amount)
         {
             var verifyRequest = new VerifyRequest()
             {
@@ -59,7 +59,7 @@ namespace SkyDiveTicketing.Application.PaymentServices
             if (verifyResponse is null)
                 throw new ManagedException("در فرایند پرداخت خطایی رخ داده است.");
 
-            if (verifyResponse.Data.Code != 100 || verifyResponse.Data.Code != 101)
+            if (verifyResponse.Data.Code != 100 && verifyResponse.Data.Code != 101)
                 throw new ManagedException(string.Join("\n", verifyResponse.Errors));
 
             return verifyResponse.Data.Ref_id;

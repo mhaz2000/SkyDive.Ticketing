@@ -1,6 +1,8 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Extensions.Configuration;
 using SkyDiveTicketing.Application.Base;
+using SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs;
 using SkyDiveTicketing.Application.PaymentServices;
 using SkyDiveTicketing.Application.Services.ReservationServices;
 using SkyDiveTicketing.Core.Entities;
@@ -57,7 +59,7 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
             return payableAmount;
         }
 
-        public async Task<int> Verfiy(Guid userId, string authority)
+        public async Task<PaidShoppingCartDTO> Verfiy(Guid userId, string authority)
         {
             var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
             if (user is null)
@@ -68,13 +70,32 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
             if (!shoppingCart!.Items.Any())
                 throw new ManagedException("سبد خرید خالی است.");
 
+            var shoppingCartInfo = await _reservationService.GetUserShoppingCart(userId);
+
             var amount = await CalculateAmount(shoppingCart, user);
 
             var refId = await _paymentService.Verify(authority, amount);
 
             await _reservationService.SetAsPaid(userId);
 
-            return refId;
+            await AddTransactions(shoppingCart, user, amount, refId);
+
+            return new PaidShoppingCartDTO(refId.ToString())
+            {
+                Items = shoppingCartInfo.Items,
+                SkyDiveEventId = shoppingCartInfo.SkyDiveEventId,
+                TaxAmount = shoppingCartInfo.TaxAmount,
+                TotalAmount = shoppingCartInfo.TotalAmount
+            };
+        }
+
+        private async Task AddTransactions(ShoppingCart shoppingCart, User user, double amount, ulong refId)
+        {
+            var events = await _unitOfWork.SkyDiveEventRepository.GetAllAsync();
+
+            shoppingCart.Items.SelectMany(item => item.FlightLoadItem.Tickets.Where(c => c.PaidBy == user), (shoppingCartItem, ticket) =>
+                _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber, events.FirstOrDefault(c => c.Id == ticket.SkyDiveEventId)!.Title, refId.ToString(),
+                amount, TransactionType.Confirmed, user, false));
         }
     }
 }

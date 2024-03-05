@@ -54,8 +54,8 @@ namespace SkyDiveTicketing.API.Controllers.ShoppingCarts
         {
             try
             {
-                var referenceId = await _shoppingCartCheckoutService.Verfiy(UserId, authority);
-                return OkResult(referenceId.ToString());
+                var data = await _shoppingCartCheckoutService.Verfiy(UserId, authority);
+                return OkResult("پرداخت با موفقیت انجام شد.", data);
             }
             catch (ManagedException e)
             {

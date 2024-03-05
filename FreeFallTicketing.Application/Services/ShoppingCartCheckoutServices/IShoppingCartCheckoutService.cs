@@ -1,8 +1,10 @@
-﻿namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
+﻿using SkyDiveTicketing.Application.DTOs.ShoppingCartDTOs;
+
+namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
 {
     public interface IShoppingCartCheckoutService
     {
         Task<string> Checkout(Guid userId);
-        Task<int> Verfiy(Guid userId, string authority);
+        Task<PaidShoppingCartDTO> Verfiy(Guid userId, string authority);
     }
 }

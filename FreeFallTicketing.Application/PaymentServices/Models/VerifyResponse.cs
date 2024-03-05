@@ -8,7 +8,7 @@
     internal record VerifyResponseData
     {
         public int Code { get; set; }
-        public int Ref_id { get; set; }
+        public ulong Ref_id { get; set; }
         public string Fee_type { get; set; }
         public int Fee { get; set; }
     }
