@@ -95,8 +95,9 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
         {
             var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.FirstOrDefaultAsync(c=> c.Id == shoppingCart.SkyDiveEventId);
 
-            shoppingCart.Items.SelectMany(item => item.TicketsNumber, (item, ticketNumber) =>
-                _unitOfWork.TransactionRepositroy.AddTransaction(ticketNumber, skyDiveEvent!.Title, refId.ToString(), amount, TransactionType.Confirmed, user, false));
+            shoppingCart.Items.SelectMany(item => item.TicketsNumber, async (item, ticketNumber) =>
+               await _unitOfWork.TransactionRepositroy.AddTransaction(ticketNumber, skyDiveEvent!.Title, refId.ToString(), amount, TransactionType.Confirmed, user,
+               !skyDiveEvent.SubjecToVAT));
         }
     }
 }
