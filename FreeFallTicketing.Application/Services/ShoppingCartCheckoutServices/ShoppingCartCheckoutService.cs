@@ -78,7 +78,9 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
 
             await _reservationService.SetAsPaid(userId);
 
-            await AddTransactions(shoppingCart, user, amount, refId);
+            await AddTransactions(shoppingCartInfo, user, amount, refId);
+
+            await _unitOfWork.CommitAsync();
 
             return new PaidShoppingCartDTO(refId.ToString())
             {
@@ -89,13 +91,12 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
             };
         }
 
-        private async Task AddTransactions(ShoppingCart shoppingCart, User user, double amount, ulong refId)
+        private async Task AddTransactions(ShoppingCartDTO shoppingCart, User user, double amount, ulong refId)
         {
-            var events = await _unitOfWork.SkyDiveEventRepository.GetAllAsync();
+            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.FirstOrDefaultAsync(c=> c.Id == shoppingCart.SkyDiveEventId);
 
-            shoppingCart.Items.SelectMany(item => item.FlightLoadItem.Tickets.Where(c => c.PaidBy == user), (shoppingCartItem, ticket) =>
-                _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber, events.FirstOrDefault(c => c.Id == ticket.SkyDiveEventId)!.Title, refId.ToString(),
-                amount, TransactionType.Confirmed, user, false));
+            shoppingCart.Items.SelectMany(item => item.TicketsNumber, (item, ticketNumber) =>
+                _unitOfWork.TransactionRepositroy.AddTransaction(ticketNumber, skyDiveEvent!.Title, refId.ToString(), amount, TransactionType.Confirmed, user, false));
         }
     }
 }

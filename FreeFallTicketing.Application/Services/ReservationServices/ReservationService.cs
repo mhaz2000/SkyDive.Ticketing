@@ -112,7 +112,6 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             //check if paid
 
             await ReservationProcess(shoppingCart, user);
-            await _unitOfWork.CommitAsync();
 
             return true;
         }
@@ -356,7 +355,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     shoppingCartItem.ReservedFor.Code, shoppingCartItem.FlightLoadItem.FlightLoadType.Title,
                     shoppingCart.SkyDiveEvent?.TypesAmount?.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType)?.Amount ?? 0,
                     shoppingCart.SkyDiveEvent!.SubjecToVAT, data!.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)!.FlightLoad.Id,
-                    shoppingCartItem.FlightLoadItem.FlightLoadType.Id)).ToList()
+                    shoppingCartItem.FlightLoadItem.FlightLoadType.Id, shoppingCartItem.FlightLoadItem.Tickets.Where(c=> c.ReservedBy == user).Select(s=> s.TicketNumber))).ToList()
             };
 
             shoppingCartDto.SkyDiveEventId = shoppingCart.SkyDiveEvent.Id;
