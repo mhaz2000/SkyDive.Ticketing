@@ -45,7 +45,7 @@ namespace SkyDiveTicketing.API.Controllers.SkyDiveEvents
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] SkyDiveEventCommand command)
+        public async Task<IActionResult> Update(Guid id, [FromBody] SkyDiveEventUpdateCommand command)
         {
             try
             {

@@ -99,7 +99,7 @@ namespace SkyDiveTicketing.Application.Services.SkyDiveEventServices
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task Update(SkyDiveEventCommand command, Guid id)
+        public async Task Update(SkyDiveEventUpdateCommand command, Guid id)
         {
             var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.GetFirstWithIncludeAsync(c => c.Id == id, c => c.Status);
             if (skyDiveEvent is null)

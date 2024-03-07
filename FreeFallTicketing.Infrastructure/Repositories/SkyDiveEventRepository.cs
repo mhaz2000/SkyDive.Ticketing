@@ -28,7 +28,7 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
 
             var ticketCounter = !string.IsNullOrEmpty(lastTicketNumber) ? int.Parse(lastTicketNumber.Substring(lastTicketNumber.Count() - 4)) : 0;
 
-            var lastNumber = skyDiveEventDay.FlightLoads.OrderByDescending(s => s.Number).FirstOrDefault()?.Number ?? 0;
+            var lastNumber = skyDiveEvent.Items.SelectMany(s=> s.FlightLoads).OrderByDescending(s => s.Number).FirstOrDefault()?.Number ?? 0;
             for (int i = 0; i < flightQty; i++)
             {
                 var flightLoad = new FlightLoad(++lastNumber, skyDiveEventDay.Date, capacity, voidableQty);
