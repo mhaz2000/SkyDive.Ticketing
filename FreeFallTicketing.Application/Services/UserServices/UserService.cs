@@ -502,8 +502,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             var logBookDocumentFile = user.Passenger.LogBookDocumentFiles?.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
             var nationalCardDocumentFile = user.Passenger.NationalCardDocumentFiles?.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
 
-            var documentsConfirmed = attorneyDocumentFile?.Status == DocumentStatus.Confirmed &&
-                                     medicalDocumentFile?.Status == DocumentStatus.Confirmed &&
+            var documentsConfirmed = attorneyDocumentFile is null ? true: attorneyDocumentFile?.Status == DocumentStatus.Confirmed &&
+                                     medicalDocumentFile is null ? true:  medicalDocumentFile?.Status == DocumentStatus.Confirmed &&
                                      logBookDocumentFile?.Status == DocumentStatus.Confirmed &&
                                      nationalCardDocumentFile.Status == DocumentStatus.Confirmed;
 
