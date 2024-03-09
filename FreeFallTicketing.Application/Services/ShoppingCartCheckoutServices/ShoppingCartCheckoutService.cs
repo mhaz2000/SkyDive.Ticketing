@@ -7,6 +7,8 @@ using SkyDiveTicketing.Application.PaymentServices;
 using SkyDiveTicketing.Application.Services.ReservationServices;
 using SkyDiveTicketing.Core.Entities;
 using SkyDiveTicketing.Core.Repositories.Base;
+using static ClosedXML.Excel.XLPredefinedFormat;
+using System.Net.Sockets;
 
 namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
 {
@@ -93,10 +95,17 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
 
         private async Task AddTransactions(ShoppingCartDTO shoppingCart, User user, double amount, ulong refId)
         {
-            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.FirstOrDefaultAsync(c=> c.Id == shoppingCart.SkyDiveEventId);
+            var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.FirstOrDefaultAsync(c => c.Id == shoppingCart.SkyDiveEventId);
 
-            shoppingCart.Items.SelectMany(item => item.TicketsNumber, async (item, ticketNumber) =>
-               await _unitOfWork.TransactionRepositroy.AddTransaction(ticketNumber, skyDiveEvent!.Title, refId.ToString(), amount, TransactionType.Confirmed, user, false));
+            foreach (var item in shoppingCart.Items)
+            {
+                foreach (var ticketNumber in item.TicketsNumber)
+                {
+                    _unitOfWork.TransactionRepositroy.AddTransaction(ticketNumber, skyDiveEvent!.Location + " کد " + skyDiveEvent.Code.ToString("000"),
+                        refId.ToString(), amount, TransactionType.Confirmed, user, true);
+                }
+            }
+
         }
     }
 }

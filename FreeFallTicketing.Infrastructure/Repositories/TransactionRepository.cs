@@ -11,13 +11,13 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
         {
         }
 
-        public async Task<int> AddTransaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, User payer,
+        public int AddTransaction(string ticketNumber, string eventName, string paymetInformation, double amount, TransactionType type, User payer,
             bool walletCharging, int? invoiceNumber = null)
         {
             var settings = Context.Settings.SingleOrDefault();
 
             int number = invoiceNumber ?? Context.Transactions.OrderByDescending(s => s.InvoiceNumber).FirstOrDefault()?.InvoiceNumber ?? 0;
-            await Context.Transactions.AddAsync(new Transaction(ticketNumber, eventName, paymetInformation, amount, type, walletCharging ? number : ++number, payer,
+            Context.Transactions.Add(new Transaction(ticketNumber, eventName, paymetInformation, amount, type, walletCharging ? number : ++number, payer,
                walletCharging ? 0 : Math.Truncate(amount * settings.VAT / 100)));
 
             return number;

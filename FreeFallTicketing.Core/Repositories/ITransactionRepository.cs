@@ -5,7 +5,7 @@ namespace SkyDiveTicketing.Core.Repositories
 {
     public interface ITransactionRepository : IRepository<Transaction>
     {
-        Task<int> AddTransaction(string ticketNumber, string eventName, string paymetInformation, double amount,
+        int AddTransaction(string ticketNumber, string eventName, string paymetInformation, double amount,
             TransactionType type, User payer, bool walletCharging, int? number = null);
     }
 }

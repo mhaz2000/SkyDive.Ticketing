@@ -419,9 +419,9 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketAmount, shoppingCartItem.ReservedFor,
                     shoppingCart.SkyDiveEvent.Id, flightLoad!.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
 
-                number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
-                    shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "",
-                    ticketAmount, TransactionType.Confirmed, user, false, number);
+                //number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
+                //    shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "",
+                //    ticketAmount, TransactionType.Confirmed, user, true, number);
             }
 
             await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);

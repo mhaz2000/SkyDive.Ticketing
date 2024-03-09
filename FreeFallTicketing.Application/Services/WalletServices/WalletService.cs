@@ -26,7 +26,7 @@ namespace SkyDiveTicketing.Application.Services.WalletServices
 
             _unitOfWork.WalletRepository.ChangeWalletBalance(wallet, command.Amount);
             
-            await _unitOfWork.TransactionRepositroy
+            _unitOfWork.TransactionRepositroy
                 .AddTransaction(string.Empty, string.Empty, command.Amount > 0 ? "شارژ کیف پول" : "برداشت از کیف پول", command.Amount, Core.Entities.TransactionType.Confirmed, user, true);
 
             await _unitOfWork.UserRepository
