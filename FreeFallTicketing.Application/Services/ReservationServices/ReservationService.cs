@@ -128,7 +128,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
 
             var wallet = await _unitOfWork.WalletRepository.GetFirstWithIncludeAsync(c => c.User.Id == userId, c => c.User);
 
-            double payableAmount = await ReservationProcess(shoppingCart, user);
+            double payableAmount = await ReservationProcess(shoppingCart, user, true);
             if (wallet.Balance < payableAmount)
                 throw new ManagedException("موجودی کیف پول شما کافی نیست.");
 
@@ -355,7 +355,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                     shoppingCartItem.ReservedFor.Code, shoppingCartItem.FlightLoadItem.FlightLoadType.Title,
                     shoppingCart.SkyDiveEvent?.TypesAmount?.FirstOrDefault(c => c.Type == shoppingCartItem.FlightLoadItem.FlightLoadType)?.Amount ?? 0,
                     shoppingCart.SkyDiveEvent!.SubjecToVAT, data!.FirstOrDefault(c => c.FlightLoadItem == shoppingCartItem.FlightLoadItem)!.FlightLoad.Id,
-                    shoppingCartItem.FlightLoadItem.FlightLoadType.Id, shoppingCartItem.FlightLoadItem.Tickets.Where(c=> c.ReservedBy == user).Select(s=> s.TicketNumber))).ToList()
+                    shoppingCartItem.FlightLoadItem.FlightLoadType.Id, shoppingCartItem.FlightLoadItem.Tickets.Where(c => c.ReservedBy == user).Select(s => s.TicketNumber))).ToList()
             };
 
             shoppingCartDto.SkyDiveEventId = shoppingCart.SkyDiveEvent.Id;
@@ -395,7 +395,7 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
             }
         }
 
-        private async Task<double> ReservationProcess(ShoppingCart shoppingCart, User user)
+        private async Task<double> ReservationProcess(ShoppingCart shoppingCart, User user, bool addTransaction = false)
         {
             var (status, errors) = await CheckTickets(user.Id);
             if (!status)
@@ -419,9 +419,10 @@ namespace SkyDiveTicketing.Application.Services.ReservationServices
                 _unitOfWork.TicketRepository.SetAsPaid(ticket, ticketAmount, shoppingCartItem.ReservedFor,
                     shoppingCart.SkyDiveEvent.Id, flightLoad!.Number, shoppingCartItem.FlightLoadItem.FlightLoadType.Title, flightLoad.Date, user);
 
-                //number = await _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
-                //    shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "",
-                //    ticketAmount, TransactionType.Confirmed, user, true, number);
+                if (addTransaction)
+                    number = _unitOfWork.TransactionRepositroy.AddTransaction(ticket.TicketNumber,
+                        shoppingCart.SkyDiveEvent.Location + " کد " + shoppingCart.SkyDiveEvent.Code.ToString("000"), "",
+                        ticketAmount, TransactionType.Confirmed, user, shoppingCart.SkyDiveEvent.SubjecToVAT, number);
             }
 
             await _unitOfWork.ShoppingCartRepository.ClearShoppingCartAsync(user);

@@ -55,5 +55,7 @@ namespace SkyDiveTicketing.Core.Repositories
         void AcceptingTermsAndConditions(User user);
 
         Task<User> GetUserWithInclude(Expression<Func<User, bool>> filter);
+
+        void RemoveUser(User user);
     }
 }

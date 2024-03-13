@@ -210,6 +210,20 @@ namespace SkyDiveTicketing.API.Controllers.Users
             }
         }
 
+        [HttpDelete("RemoveUser/{id}")]
+        public async Task<IActionResult> RemoveUser(Guid id)
+        {
+            try
+            {
+                await _userService.RemoveUser(id);
+                return OkResult("کاربر با موفقیت حذف شد.");
+            }
+            catch (ManagedException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet("AdminCartableMessages")]
         public IActionResult GetAdminCartableMessages([FromQuery] PageQuery pageQuery, RequestType? requestType, string? search)
         {

@@ -48,6 +48,7 @@ namespace SkyDiveTicketing.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyGlobalFilter<BaseEntity>(p => !p.IsDeleted);
+            modelBuilder.ApplyGlobalFilter<User>(p => !p.IsDeleted);
 
             #region ticket and user type relationship
 

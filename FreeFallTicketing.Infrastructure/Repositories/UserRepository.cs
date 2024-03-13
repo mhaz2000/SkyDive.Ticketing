@@ -267,5 +267,10 @@ namespace SkyDiveTicketing.Infrastructure.Repositories
                 .Include(c => c.UserType)
                 .ThenInclude(c => c!.AllowedTicketTypes).ThenInclude(c => c.TicketType).FirstOrDefaultAsync(filter);
         }
+
+        public void RemoveUser(User user)
+        {
+            user.SetAsDeleted();
+        }
     }
 }

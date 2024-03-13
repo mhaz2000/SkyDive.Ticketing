@@ -78,7 +78,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
 
         public IEnumerable<UserDTO> GetUsers(string search, DateTime? minDate, DateTime? maxDate, UserStatus? userStatus)
         {
-            var users = _unitOfWork.UserRepository.Include(c => c.UserType)
+            var users = _unitOfWork.UserRepository.Include(c => c.UserType).Where(c => !c.IsDeleted)
                  .Where(c => (c.NationalCode?.Contains(search) ?? false) || (c.FullName?.Contains(search) ?? false));
 
             var adminUsers = _unitOfWork.RoleRepository.GetAdminUsers();
@@ -87,7 +87,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (minDate is not null)
                 users = users.Where(c => c.CreatedAt.Date >= minDate.Value.Date);
 
-            if(maxDate is not null)
+            if (maxDate is not null)
                 users = users.Where(c => c.CreatedAt.Date <= maxDate.Value.Date);
 
             if (userStatus is not null)
@@ -502,8 +502,8 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             var logBookDocumentFile = user.Passenger.LogBookDocumentFiles?.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
             var nationalCardDocumentFile = user.Passenger.NationalCardDocumentFiles?.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
 
-            var documentsConfirmed = attorneyDocumentFile is null ? true: attorneyDocumentFile?.Status == DocumentStatus.Confirmed &&
-                                     medicalDocumentFile is null ? true:  medicalDocumentFile?.Status == DocumentStatus.Confirmed &&
+            var documentsConfirmed = attorneyDocumentFile is null ? true : attorneyDocumentFile?.Status == DocumentStatus.Confirmed &&
+                                     medicalDocumentFile is null ? true : medicalDocumentFile?.Status == DocumentStatus.Confirmed &&
                                      logBookDocumentFile?.Status == DocumentStatus.Confirmed &&
                                      nationalCardDocumentFile.Status == DocumentStatus.Confirmed;
 
@@ -559,7 +559,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         {
             List<string> errors = new List<string>();
 
-            var settings = _unitOfWork.SettingsRepository.FirstOrDefault(c=> true);
+            var settings = _unitOfWork.SettingsRepository.FirstOrDefault(c => true);
 
             if (nationalCardDocument is not null && nationalCardDocument.FileId is not null && user.Passenger!.NationalCardDocumentFiles.All(c => c.FileId != nationalCardDocument.FileId))
                 await _unitOfWork.PassengerRepository.AddNationalCardDocument(user.Passenger, nationalCardDocument.FileId.Value);
@@ -569,7 +569,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 if (attorneyDocument.ExpirationDate is null)
                     errors.Add("تاریخ انقضای وکالتنامه محضری الزامی است.");
 
-                if(attorneyDocument.ExpirationDate!.Value.AddDays(settings.AttorneyDocumentsValidityDuration * (-1)) < DateTime.Now)
+                if (attorneyDocument.ExpirationDate!.Value.AddDays(settings.AttorneyDocumentsValidityDuration * (-1)) < DateTime.Now)
                     errors.Add("حداقل مدت اعتبار وکالتنامه محضری رعایت نشده است.");
 
                 await _unitOfWork.PassengerRepository.AddAttorneyDocumentAsync(user.Passenger, attorneyDocument.FileId.Value, attorneyDocument.ExpirationDate);
@@ -610,7 +610,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 errors.Add("شماره موبایل اضطراری نباید با شماره موبایل خود شخص یکسان باشد.");
 
             if (errors.Any())
-                    throw new ManagedException(string.Join("\n", errors));
+                throw new ManagedException(string.Join("\n", errors));
 
             _unitOfWork.UserRepository.CompeleteOtherUserPersonalInfo(command.Email ?? string.Empty, command.CityAndState, command.Address ?? string.Empty,
                 command.EmergencyContact ?? string.Empty, fixEmergencyPhoneNumber, command.Height, command.Weight, user);
@@ -618,5 +618,14 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             await Task.CompletedTask;
         }
 
+        public async Task RemoveUser(Guid id)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(id);
+            if (user is null)
+                throw new ManagedException("کاربر مورد نظر یافت نشد.");
+
+            _unitOfWork.UserRepository.RemoveUser(user);
+            await _unitOfWork.CommitAsync();
+        }
     }
 }

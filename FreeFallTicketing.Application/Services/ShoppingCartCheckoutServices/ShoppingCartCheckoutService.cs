@@ -80,7 +80,7 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
 
             await _reservationService.SetAsPaid(userId);
 
-            await AddTransactions(shoppingCartInfo, user, amount, refId);
+            await AddTransactions(shoppingCartInfo, user, refId);
 
             await _unitOfWork.CommitAsync();
 
@@ -93,7 +93,7 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
             };
         }
 
-        private async Task AddTransactions(ShoppingCartDTO shoppingCart, User user, double amount, ulong refId)
+        private async Task AddTransactions(ShoppingCartDTO shoppingCart, User user, ulong refId)
         {
             var skyDiveEvent = await _unitOfWork.SkyDiveEventRepository.FirstOrDefaultAsync(c => c.Id == shoppingCart.SkyDiveEventId);
 
@@ -102,7 +102,7 @@ namespace SkyDiveTicketing.Application.Services.ShoppingCartCheckoutServices
                 foreach (var ticketNumber in item.TicketsNumber)
                 {
                     _unitOfWork.TransactionRepositroy.AddTransaction(ticketNumber, skyDiveEvent!.Location + " کد " + skyDiveEvent.Code.ToString("000"),
-                        refId.ToString(), amount, TransactionType.Confirmed, user, true);
+                        refId.ToString(), item.Amount, TransactionType.Confirmed, user, skyDiveEvent.SubjecToVAT);
                 }
             }
 

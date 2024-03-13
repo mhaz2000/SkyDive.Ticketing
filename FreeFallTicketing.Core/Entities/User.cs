@@ -16,6 +16,7 @@ namespace SkyDiveTicketing.Core.Entities
             LoginFailedAttempts = 0;
             TermsAndConditionsAcceptance = false;
             SecurityInformationIsCompeleted = false;
+            IsDeleted = false;
         }
 
         /// <summary>
@@ -104,6 +105,8 @@ namespace SkyDiveTicketing.Core.Entities
         /// </summary>
         public ICollection<Message>? Messages { get; private set; }
 
+        public bool IsDeleted { get; set; }
+
         public string FullName => FirstName + " " + LastName;
 
 
@@ -112,6 +115,11 @@ namespace SkyDiveTicketing.Core.Entities
             Messages.Add(message);
         }
 
+        public void SetAsDeleted()
+        {
+            IsDeleted = true;
+            Status = UserStatus.Inactive;
+        }
     }
 
     public enum UserStatus

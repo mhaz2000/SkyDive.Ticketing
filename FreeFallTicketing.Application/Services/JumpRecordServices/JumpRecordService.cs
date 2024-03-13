@@ -59,6 +59,8 @@ namespace SkyDiveTicketing.Application.Services.JumpRecordServices
             await _unitOfWork.JumpRecordRepository.AddJumpRecord(command.Date, command.Location, command.Equipments, command.PlaneType, command.Height,
                 command.Time, command.Description, user, createdByAdmin);
 
+            await _unitOfWork.AdminCartableRepository.AddToCartable("درخواست تایید اطلاعات سابقه پرش", user, RequestType.UserInformationConfirmation);
+
             await _unitOfWork.CommitAsync();
         }
 
