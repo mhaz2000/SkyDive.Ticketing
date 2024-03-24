@@ -68,7 +68,7 @@ namespace SkyDiveTicketing.Application.Services.UserServices
             if (user is null)
                 throw new ManagedException("کاربری یافت نشد.");
 
-            var checkUsernameDuplication = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username);
+            var checkUsernameDuplication = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username && !c.IsDeleted);
             if (checkUsernameDuplication)
                 throw new ManagedException("نام کاربری تکراری است.");
 
@@ -283,12 +283,12 @@ namespace SkyDiveTicketing.Application.Services.UserServices
                 throw new ManagedException("نوع کاربری یافت نشد.");
 
             var phoneDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower() &&
-                c.Status != UserStatus.Inactive && c.Id != userId);
+                c.Status != UserStatus.Inactive && c.Id != userId && !c.IsDeleted);
 
-            var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username && c.Id != userId);
+            var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username && c.Id != userId && !c.IsDeleted);
 
             var emailDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => !string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower()
-                && c.Status != UserStatus.Inactive && c.Id != userId);
+                && c.Status != UserStatus.Inactive && c.Id != userId && !c.IsDeleted);
 
             if (phoneDuplicationCheck)
                 errors.Add("شماره موبایل تکراری است.");
@@ -419,10 +419,10 @@ namespace SkyDiveTicketing.Application.Services.UserServices
         {
             var errors = new List<string>();
 
-            var phoneDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower() && c.Status != UserStatus.Inactive);
-            var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username);
+            var phoneDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.PhoneNumber.ToLower() == command.Phone.ToLower() && c.Status != UserStatus.Inactive && !c.IsDeleted);
+            var usernameDuplicationCheck = await _unitOfWork.UserRepository.AnyAsync(c => c.UserName == command.Username && !c.IsDeleted);
             var emailDuplicationCheck = await _unitOfWork.UserRepository
-                .AnyAsync(c => !string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower() && c.Status != UserStatus.Inactive);
+                .AnyAsync(c => !string.IsNullOrEmpty(command.Email) && c.Email.ToLower() == command.Email.ToLower() && c.Status != UserStatus.Inactive && !c.IsDeleted);
 
             if (phoneDuplicationCheck)
                 errors.Add("شماره موبایل تکراری است.");
