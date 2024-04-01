@@ -29,7 +29,7 @@ namespace SkyDiveTicketing.API.Controllers.Reports
                 command.Validate();
 
                 (var data, var total, var cacheId) = await _reportService.GetTicketsReport(command);
-                return OkResult(cacheId.ToString(), data.ToPagingAndSorting(pageQuery), total);
+                return OkResult(cacheId.ToString(), data.AsEnumerable().ToPagingAndSorting(pageQuery), total);
             }
             catch (ValidationException e)
             {

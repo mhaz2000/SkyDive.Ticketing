@@ -77,7 +77,7 @@ namespace SkyDiveTicketing.Application.Services.ReportServices
                         data.skyDiveEvent.StartDate >= DateTime.Now ? TicketStatus.Reserved.GetDescription() : TicketStatus.Held.GetDescription()
                 });
 
-            result = result.Where(c => (c.FullName + c.TicketNumber + c.NationalCode + c.UserCode + c.TicketType).Contains(command.Search));
+            result = result.Where(c => (c.EventTitle + c.FlightNumber + c.EventDate + c.FullName + c.TicketNumber + c.NationalCode + c.UserCode + c.TicketType).Contains(command.Search));
 
             _memoryCache.Set(cacheId, JsonConvert.SerializeObject(result), TimeSpan.FromHours(1));
 
