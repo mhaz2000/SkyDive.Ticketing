@@ -24,7 +24,7 @@ namespace SkyDiveTicketing.Application.Helpers
                 foreach (var col in colData)
                 {
                     rowCounter++;
-                    worksheet.Cell(rowCounter, colCounter).Value = col.ToString();
+                    worksheet.Cell(rowCounter, colCounter).Value = col?.ToString() ?? string.Empty;
                     if (rowCounter % 2 == 1)
                         worksheet.Cell(rowCounter, colCounter).Style.Fill.BackgroundColor = XLColor.LightBlue;
 
